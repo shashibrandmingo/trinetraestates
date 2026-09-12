@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 import { OfficeSpace } from '../models/OfficeSpace.js';
 import { officeQuerySchema, createOfficeSchema } from '../validations/office.validation.js';
-import { processMediaPayload } from '../services/storage.service.js';
+import { processMediaPayload, saveBase64ToFile } from '../services/storage.service.js';
 
 export const getOffices = async (req, res, next) => {
   try {
@@ -201,9 +201,14 @@ export const getOffices = async (req, res, next) => {
         thumbnail = typeof cover === 'string' ? cover : cover?.url || '';
       }
 
-      // If thumbnail is a heavy base64 data URI (>1500 chars), fall back to asset image to prevent payload bloat
-      if (thumbnail && thumbnail.startsWith('data:') && thumbnail.length > 1500) {
-        thumbnail = '/images/sample-office.png';
+      // If thumbnail is a base64 data URI, auto-convert and save directly to VPS SSD!
+      if (thumbnail && thumbnail.startsWith('data:')) {
+        const savedUrl = saveBase64ToFile(thumbnail, `thumb-${doc.propertyId || doc._id}`);
+        if (savedUrl && !savedUrl.startsWith('data:')) {
+          thumbnail = savedUrl;
+          // Async update in DB so next time it's already a clean lightweight URL
+          OfficeSpace.updateOne({ _id: doc._id }, { $set: { 'images.0.url': savedUrl } }).catch(() => {});
+        }
       }
 
       const priceNum = Number(doc.price) || 0;
@@ -629,9 +634,12 @@ export const searchOffices = async (req, res, next) => {
         thumbnail = typeof cover === 'string' ? cover : cover?.url || '';
       }
 
-      // If thumbnail is a heavy base64 data URI (>1500 chars), fall back to asset image to prevent payload bloat
-      if (thumbnail && thumbnail.startsWith('data:') && thumbnail.length > 1500) {
-        thumbnail = '/images/sample-office.png';
+      // If thumbnail is a base64 data URI, auto-convert and save directly to VPS SSD!
+      if (thumbnail && thumbnail.startsWith('data:')) {
+        const savedUrl = saveBase64ToFile(thumbnail, `thumb-${doc.propertyId || doc._id}`);
+        if (savedUrl && !savedUrl.startsWith('data:')) {
+          thumbnail = savedUrl;
+        }
       }
 
       const priceNum = Number(doc.price) || 0;

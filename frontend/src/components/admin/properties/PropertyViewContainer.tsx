@@ -251,8 +251,15 @@ export const PropertyViewContainer: React.FC<PropertyViewContainerProps> = ({
     setIsDetailsOpen(true);
   };
 
-  const handleEditProperty = (property: PropertyItem) => {
-    setEditingProperty(property);
+  const handleEditProperty = async (property: PropertyItem) => {
+    const propId = property.propertyId || property.id;
+    if (propId) {
+      // Fetch full property data with all real uploaded media
+      const full = await propertyService.getPropertyById(propId, true);
+      setEditingProperty(full || property);
+    } else {
+      setEditingProperty(property);
+    }
     setViewMode('edit');
   };
 

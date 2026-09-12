@@ -17,7 +17,7 @@ const formatTimeAgo = (date) => {
 
 // Format currency
 const formatRevenue = (val) => {
-  if (!val || val === 0) return '₹50,000';
+  if (!val || val === 0) return '₹0';
   if (val >= 10000000) return `₹${(val / 10000000).toFixed(2)} Cr`;
   if (val >= 100000) return `₹${(val / 100000).toFixed(2)} L`;
   return `₹${val.toLocaleString('en-IN')}`;
@@ -130,7 +130,7 @@ export const getDashboardOverview = async (req, res, next) => {
 
     const propertyCounts = officeStats[0] || { total: 0, active: 0, expiring: 0, expired: 0 };
     const rawRevenue = revenueStats[0]?.totalRevenue || 0;
-    const totalRev = rawRevenue > 0 ? rawRevenue : 50000;
+    const totalRev = rawRevenue || 0;
 
     // Map recent leads
     const formattedLeads = recentLeads.map((c) => ({
@@ -221,8 +221,8 @@ export const getDashboardOverview = async (req, res, next) => {
           expiredProperties: 0,
           totalLeads: 0,
           newLeadsToday: 0,
-          monthlyRevenue: 50000,
-          monthlyRevenueFormatted: '₹50,000'
+          monthlyRevenue: 0,
+          monthlyRevenueFormatted: '₹0'
         },
         recentLeads: [],
         expiringProperties: [],

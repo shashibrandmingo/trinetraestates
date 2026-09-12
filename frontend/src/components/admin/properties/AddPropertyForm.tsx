@@ -66,16 +66,59 @@ export const AddPropertyForm: React.FC<AddPropertyFormProps> = ({ onBack, onSucc
   const [errorSections, setErrorSections] = useState<string[]>([]);
 
   // Uploaded media states - clean empty list by default
-  const [documents, setDocuments] = useState<UploadedDocument[]>([]);
+  const [documents, setDocuments] = useState<UploadedDocument[]>(() => {
+    if (initialData?.documents && initialData.documents.length > 0) {
+      return initialData.documents.map((d, idx) => ({
+        id: `doc-${idx}`,
+        name: d.name,
+        size: 'Attached'
+      }));
+    }
+    return [];
+  });
 
   const [images, setImages] = useState<UploadedImage[]>(() => {
-    if (initialData?.imageUrl) {
+    if (initialData?.images && initialData.images.length > 0) {
+      return initialData.images.map((img, idx) => ({
+        id: `img-${idx}`,
+        url: typeof img === 'string' ? img : img.url,
+        isCover: img.isCover || idx === 0
+      }));
+    }
+    if (initialData?.imageUrl && initialData.imageUrl !== '/images/sample-office.png') {
       return [{ id: 'img-cover', url: initialData.imageUrl, isCover: true }];
     }
     return [{ id: 'img-1', url: '/images/sample-office.png', isCover: true }];
   });
 
-  const [videoName, setVideoName] = useState<string | null>(null);
+  // Sync real images and documents when initialData loads/updates
+  useEffect(() => {
+    if (!initialData) return;
+    if (initialData.images && initialData.images.length > 0) {
+      setImages(
+        initialData.images.map((img, idx) => ({
+          id: `img-${idx}`,
+          url: typeof img === 'string' ? img : img.url,
+          isCover: img.isCover || idx === 0
+        }))
+      );
+    } else if (initialData.imageUrl && initialData.imageUrl !== '/images/sample-office.png') {
+      setImages([{ id: 'img-cover', url: initialData.imageUrl, isCover: true }]);
+    }
+
+    if (initialData.documents && initialData.documents.length > 0) {
+      setDocuments(
+        initialData.documents.map((d, idx) => ({
+          id: `doc-${idx}`,
+          name: d.name,
+          size: 'Attached'
+        }))
+      );
+    }
+    if (initialData.videoUrl) setVideoName(initialData.videoUrl);
+  }, [initialData?.id, initialData?.propertyId, initialData?.images?.length]);
+
+  const [videoName, setVideoName] = useState<string | null>(initialData?.videoUrl || null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
 
