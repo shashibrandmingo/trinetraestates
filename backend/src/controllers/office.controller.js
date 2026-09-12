@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 import { OfficeSpace } from '../models/OfficeSpace.js';
 import { officeQuerySchema, createOfficeSchema } from '../validations/office.validation.js';
+import { processMediaPayload } from '../services/storage.service.js';
 
 export const getOffices = async (req, res, next) => {
   try {
@@ -341,7 +342,9 @@ export const getOfficeStats = async (req, res, next) => {
 
 export const createOffice = async (req, res, next) => {
   try {
-    const validatedData = createOfficeSchema.parse(req.body);
+    // Automatically save any uploaded base64 images/docs to VPS local disk
+    const processedBody = processMediaPayload(req.body);
+    const validatedData = createOfficeSchema.parse(processedBody);
 
     // Auto-generate unique Property ID
     const randomCode = Math.floor(1000 + Math.random() * 9000);
@@ -411,7 +414,8 @@ export const updateOffice = async (req, res, next) => {
     const { id } = req.params;
     const query = id.startsWith('PROP-') ? { propertyId: id } : { _id: id };
 
-    const updateData = { ...req.body };
+    // Automatically save any updated base64 images/docs to VPS local disk
+    const updateData = processMediaPayload({ ...req.body });
 
     // Calculate rentPerSqFt and areaSqFt if applicable
     const area = Number(updateData.builtUpAreaSqFt || updateData.carpetAreaSqFt || updateData.areaSqFt);

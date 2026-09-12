@@ -10,6 +10,7 @@ export interface LeadItem {
   budget?: number;
   requirementSqFt?: number;
   preferredSector?: string;
+  propertyTitle?: string;
   notes?: string;
   source?: string;
   followUpDate?: string;

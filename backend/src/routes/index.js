@@ -4,6 +4,7 @@ import officeRoutes from './office.routes.js';
 import clientRoutes from './client.routes.js';
 import leadRoutes from './lead.routes.js';
 import dashboardRoutes from './dashboard.routes.js';
+import uploadRoutes from './upload.routes.js';
 
 const router = Router();
 
@@ -13,6 +14,7 @@ router.use('/offices', officeRoutes);
 router.use('/clients', clientRoutes);
 router.use('/leads', leadRoutes);
 router.use('/dashboard', dashboardRoutes);
+router.use('/upload', uploadRoutes);
 
 export default router;
 

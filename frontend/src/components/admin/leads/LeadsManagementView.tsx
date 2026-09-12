@@ -433,7 +433,7 @@ export default function LeadsManagementView() {
     tomorrow.setDate(tomorrow.getDate() + 1);
     setVisitDate(tomorrow.toISOString().slice(0, 10));
     setVisitTime('11:30 AM');
-    setVisitTower(lead.propertyTitle || `${lead.preferredSector || 'Sector 62'} Commercial Tower`);
+    setVisitTower(lead.siteVisitDetails?.propertyTitle || (lead as any).propertyTitle || `${lead.preferredSector || 'Sector 62'} Commercial Tower`);
     setVisitRemarks(lead.notes || '');
   };
 

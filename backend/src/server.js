@@ -5,12 +5,19 @@ import morgan from 'morgan';
 import { env } from './config/env.js';
 import { connectDB } from './config/db.js';
 import apiRoutes from './routes/index.js';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import { notFoundHandler, globalErrorHandler } from './middleware/errorHandler.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 
 // Security and utility middleware
-app.use(helmet());
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: 'cross-origin' }
+}));
 app.use(cors({
   origin: env.CLIENT_ORIGIN,
   credentials: true
@@ -23,6 +30,9 @@ if (env.NODE_ENV === 'development') {
 } else {
   app.use(morgan('combined'));
 }
+
+// Serve uploaded images, videos & documents directly from VPS local storage
+app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
 // Centralized API routes mounting
 app.use('/api', apiRoutes);

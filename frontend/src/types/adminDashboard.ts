@@ -58,4 +58,10 @@ export interface DashboardData {
   expiringProperties: ExpiringPropertyItem[];
   recentProperties: RecentPropertyItem[];
   recentActivities: RecentActivityItem[];
+  quickInsights?: {
+    revenueThisMonth?: string;
+    avgDealSize?: string;
+    activeBrokers?: number;
+    conversionRate?: string;
+  };
 }
