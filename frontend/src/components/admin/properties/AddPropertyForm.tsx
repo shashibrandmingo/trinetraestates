@@ -964,7 +964,7 @@ export const AddPropertyForm: React.FC<AddPropertyFormProps> = ({ onBack, onSucc
                 key={img.id}
                 className="relative h-28 rounded-xl border border-slate-200 overflow-hidden group bg-slate-100"
               >
-                <Image src={img.url} alt="Uploaded preview" fill sizes="120px" className="object-cover" />
+                <Image src={img.url} alt="Uploaded preview" fill sizes="120px" unoptimized className="object-cover" />
                 
                 {/* Cover badge */}
                 {img.isCover && (

@@ -25,19 +25,26 @@ export const saveBase64ToFile = (base64Data, prefix = 'img') => {
   if (!base64Data.startsWith('data:')) return base64Data; // Already an uploaded URL
 
   try {
-    const matches = base64Data.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/);
-    if (!matches || matches.length !== 3) return base64Data;
+    const commaIdx = base64Data.indexOf(',');
+    if (commaIdx === -1) return base64Data;
 
-    const mimeType = matches[1].toLowerCase();
-    const dataBuffer = Buffer.from(matches[2], 'base64');
+    const header = base64Data.substring(0, commaIdx).toLowerCase();
+    const base64Body = base64Data.substring(commaIdx + 1);
+    if (!base64Body) return base64Data;
+
+    const dataBuffer = Buffer.from(base64Body, 'base64');
 
     let ext = 'jpg';
-    if (mimeType.includes('png')) ext = 'png';
-    else if (mimeType.includes('webp')) ext = 'webp';
-    else if (mimeType.includes('jpeg') || mimeType.includes('jpg')) ext = 'jpg';
-    else if (mimeType.includes('pdf')) ext = 'pdf';
-    else if (mimeType.includes('mp4') || mimeType.includes('video')) ext = 'mp4';
-    else if (mimeType.includes('svg')) ext = 'svg';
+    if (header.includes('png')) ext = 'png';
+    else if (header.includes('webp')) ext = 'webp';
+    else if (header.includes('jpeg') || header.includes('jpg')) ext = 'jpg';
+    else if (header.includes('pdf')) ext = 'pdf';
+    else if (header.includes('mp4') || header.includes('video')) ext = 'mp4';
+    else if (header.includes('svg')) ext = 'svg';
+
+    if (!fs.existsSync(UPLOAD_DIR)) {
+      fs.mkdirSync(UPLOAD_DIR, { recursive: true });
+    }
 
     const randomSuffix = crypto.randomBytes(4).toString('hex');
     const filename = `${prefix}-${Date.now()}-${randomSuffix}.${ext}`;

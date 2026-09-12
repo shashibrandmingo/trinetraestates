@@ -109,6 +109,7 @@ export const AdminPropertyCard: React.FC<AdminPropertyCardProps> = ({ property, 
           src={imageSource}
           alt={property.title}
           fill
+          unoptimized
           className={`object-cover group-hover:scale-105 transition-transform duration-300 ${
             isClosed ? 'filter grayscale-[35%] contrast-90' : ''
           }`}

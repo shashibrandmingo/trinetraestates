@@ -10,6 +10,7 @@ const nextConfig = {
     ignoreDuringBuilds: true
   },
   images: {
+    unoptimized: true,
     formats: ['image/avif', 'image/webp'],
     remotePatterns: [
       {
@@ -28,6 +29,16 @@ const nextConfig = {
         pathname: '/**'
       }
     ]
+  },
+  async rewrites() {
+    const apiBase = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+    const backendOrigin = apiBase.replace(/\/api\/?$/, '');
+    return [
+      {
+        source: '/uploads/:path*',
+        destination: `${backendOrigin}/uploads/:path*`
+      }
+    ];
   },
   headers: async () => [
     {
