@@ -40,13 +40,15 @@ export const getLeads = async (req, res, next) => {
     const sortOptions = {};
     sortOptions[sortBy] = sortOrder === 'asc' ? 1 : -1;
 
-    const skip = (Number(page) - 1) * Number(limit);
+    const safeLimit = Math.min(Math.max(Number(limit) || 25, 1), 100);
+    const safePage = Math.max(Number(page) || 1, 1);
+    const skip = (safePage - 1) * safeLimit;
 
     const [leads, total] = await Promise.all([
       Lead.find(filter)
         .sort(sortOptions)
         .skip(skip)
-        .limit(Number(limit))
+        .limit(safeLimit)
         .lean(),
       Lead.countDocuments(filter)
     ]);
@@ -55,9 +57,48 @@ export const getLeads = async (req, res, next) => {
       success: true,
       data: leads,
       total,
-      page: Number(page),
-      limit: Number(limit),
-      pages: Math.ceil(total / Number(limit))
+      page: safePage,
+      limit: safeLimit,
+      pages: Math.ceil(total / safeLimit)
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * Get aggregated lead statistics for fast card rendering
+ * GET /api/leads/stats
+ */
+export const getLeadStats = async (req, res, next) => {
+  try {
+    const todayStr = new Date().toISOString().slice(0, 10);
+    const startOfToday = new Date(todayStr);
+    const endOfToday = new Date(todayStr);
+    endOfToday.setHours(23, 59, 59, 999);
+
+    const [total, inDiscussion, siteVisits, dealClosed, dueFollowUps, newToday] = await Promise.all([
+      Lead.countDocuments(),
+      Lead.countDocuments({ status: 'In Discussion' }),
+      Lead.countDocuments({ status: 'Site Visit Scheduled' }),
+      Lead.countDocuments({ status: 'Deal Closed' }),
+      Lead.countDocuments({
+        followUpDate: { $lte: endOfToday, $ne: null },
+        status: { $nin: ['Deal Closed', 'Cold / Inactive'] }
+      }),
+      Lead.countDocuments({ createdAt: { $gte: startOfToday } })
+    ]);
+
+    res.status(200).json({
+      success: true,
+      data: {
+        totalLeads: total || 0,
+        inDiscussion: inDiscussion || 0,
+        siteVisitsScheduled: siteVisits || 0,
+        dealsClosed: dealClosed || 0,
+        dueFollowUps: dueFollowUps || 0,
+        newLeadsToday: newToday || 0
+      }
     });
   } catch (error) {
     next(error);

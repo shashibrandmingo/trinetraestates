@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import {
   getLeads,
+  getLeadStats,
   createLead,
   updateLead,
   deleteLead,
@@ -9,6 +10,7 @@ import {
 
 const router = Router();
 
+router.get('/stats', getLeadStats);
 router.get('/export/csv', exportLeadsCSV);
 router.get('/', getLeads);
 router.post('/', createLead);

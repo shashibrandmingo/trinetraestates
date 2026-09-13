@@ -86,13 +86,15 @@ export const getClients = async (req, res, next) => {
     const sortOptions = {};
     sortOptions[sortBy] = sortOrder === 'asc' ? 1 : -1;
 
-    const skip = (Number(page) - 1) * Number(limit);
+    const safeLimit = Math.min(Math.max(Number(limit) || 25, 1), 100);
+    const safePage = Math.max(Number(page) || 1, 1);
+    const skip = (safePage - 1) * safeLimit;
 
     const [clients, total] = await Promise.all([
       Client.find(filter)
         .sort(sortOptions)
         .skip(skip)
-        .limit(Number(limit))
+        .limit(safeLimit)
         .lean(),
       Client.countDocuments(filter)
     ]);
@@ -101,9 +103,9 @@ export const getClients = async (req, res, next) => {
       success: true,
       data: clients,
       total,
-      page: Number(page),
-      limit: Number(limit),
-      pages: Math.ceil(total / Number(limit))
+      page: safePage,
+      limit: safeLimit,
+      pages: Math.ceil(total / safeLimit)
     });
   } catch (error) {
     next(error);

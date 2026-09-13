@@ -32,9 +32,48 @@ export interface LeadFilterParams {
   limit?: number;
 }
 
+export interface LeadStats {
+  totalLeads: number;
+  inDiscussion: number;
+  siteVisitsScheduled: number;
+  dealsClosed: number;
+  dueFollowUps: number;
+  newLeadsToday: number;
+}
+
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
 
 export const leadService = {
+  /**
+   * Fetch aggregated lead statistics for fast card rendering
+   */
+  async getLeadStats(): Promise<LeadStats> {
+    try {
+      const res = await fetch(`${API_BASE}/leads/stats`, {
+        cache: 'no-store'
+      });
+      if (!res.ok) throw new Error('Failed to fetch lead stats');
+      const json = await res.json();
+      return json.data || {
+        totalLeads: 0,
+        inDiscussion: 0,
+        siteVisitsScheduled: 0,
+        dealsClosed: 0,
+        dueFollowUps: 0,
+        newLeadsToday: 0
+      };
+    } catch (err) {
+      console.error('[leadService] Error fetching lead stats:', err);
+      return {
+        totalLeads: 0,
+        inDiscussion: 0,
+        siteVisitsScheduled: 0,
+        dealsClosed: 0,
+        dueFollowUps: 0,
+        newLeadsToday: 0
+      };
+    }
+  },
   /**
    * Fetch leads with optional search, status filtering, and pagination
    */

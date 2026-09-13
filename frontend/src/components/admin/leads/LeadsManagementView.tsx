@@ -252,19 +252,38 @@ export default function LeadsManagementView() {
     setTimeout(() => setToastMessage(''), 3500);
   };
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(25);
+
+  // Reset to page 1 on filter or search changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [search, statusFilter, sourceFilter, onlyDueFollowUps]);
+
+  // Dedicated fast stats query (separate from paginated table rows)
+  const { data: leadStats } = useQuery({
+    queryKey: ['lead-stats'],
+    queryFn: () => leadService.getLeadStats(),
+    staleTime: 5 * 60 * 1000
+  });
+
   // TanStack Query: cached fetching
   const { data: leadsData, isLoading } = useQuery({
-    queryKey: ['admin-leads', search, statusFilter, sourceFilter],
+    queryKey: ['admin-leads', search, statusFilter, sourceFilter, currentPage, pageSize],
     queryFn: () =>
       leadService.getLeads({
         search,
         status: statusFilter === 'due' ? 'all' : statusFilter,
-        source: sourceFilter
+        source: sourceFilter,
+        page: currentPage,
+        limit: pageSize
       }),
     staleTime: 2 * 60 * 1000
   });
 
   const rawLeads = leadsData?.data || [];
+  const totalRecords = leadsData?.total || 0;
+  const totalPages = Math.max(1, leadsData?.pages || 1);
 
   // Filter due follow-ups if tab selected
   const todayStr = new Date().toISOString().slice(0, 10);
@@ -274,7 +293,7 @@ export default function LeadsManagementView() {
       )
     : rawLeads;
 
-  const dueCount = rawLeads.filter(
+  const dueCount = leadStats?.dueFollowUps ?? rawLeads.filter(
     (l) => l.followUpDate && new Date(l.followUpDate).toISOString().slice(0, 10) <= todayStr
   ).length;
 
@@ -521,7 +540,7 @@ export default function LeadsManagementView() {
               Leads & Inquiries
             </h1>
             <span className="text-[11px] sm:text-xs px-2.5 py-0.5 rounded-full bg-blue-50 border border-blue-200/80 text-blue-700 font-bold whitespace-nowrap">
-              {rawLeads.length} Records
+              {leadStats?.totalLeads ?? totalRecords ?? rawLeads.length} Records
             </span>
             {dueCount > 0 && (
               <span className="text-[11px] sm:text-xs font-bold px-2.5 py-0.5 rounded-full bg-rose-50 text-rose-700 border border-rose-200/80 flex items-center gap-1 whitespace-nowrap">
@@ -574,7 +593,9 @@ export default function LeadsManagementView() {
           </div>
           <div className="min-w-0">
             <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Total Leads</div>
-            <div className="text-lg font-bold text-navy-900 leading-tight">{rawLeads.length}</div>
+            <div className="text-lg font-bold text-navy-900 leading-tight">
+              {leadStats?.totalLeads ?? totalRecords ?? rawLeads.length}
+            </div>
             <div className="text-[10px] text-slate-500 truncate">Registered Prospects</div>
           </div>
         </div>
@@ -615,7 +636,7 @@ export default function LeadsManagementView() {
           <div className="min-w-0">
             <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400">In Discussion</div>
             <div className="text-lg font-bold text-navy-900 leading-tight">
-              {rawLeads.filter((l) => l.status === 'In Discussion').length}
+              {leadStats?.inDiscussion ?? rawLeads.filter((l) => l.status === 'In Discussion').length}
             </div>
             <div className="text-[10px] text-slate-500 truncate">Active Negotiations</div>
           </div>
@@ -631,7 +652,9 @@ export default function LeadsManagementView() {
           <div className="min-w-0">
             <div className="text-[10px] font-bold uppercase tracking-wider text-emerald-800">Closed / Visits</div>
             <div className="text-lg font-bold text-emerald-700 leading-tight">
-              {rawLeads.filter((l) => l.status === 'Site Visit Scheduled' || l.status === 'Deal Closed').length}
+              {leadStats
+                ? ((leadStats.siteVisitsScheduled || 0) + (leadStats.dealsClosed || 0))
+                : rawLeads.filter((l) => l.status === 'Site Visit Scheduled' || l.status === 'Deal Closed').length}
             </div>
             <div className="text-[10px] text-emerald-600 font-semibold truncate">Visits & Closures</div>
           </div>
@@ -1111,6 +1134,71 @@ export default function LeadsManagementView() {
                 </tbody>
               </table>
             </div>
+
+            {/* Pagination Controls */}
+            {totalRecords > 0 && (
+              <div className="px-5 py-3.5 bg-slate-50/80 border-t border-slate-200/80 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+                <div className="text-slate-500 font-medium flex items-center gap-1.5">
+                  <span>Showing</span>
+                  <span className="font-bold text-navy-950 font-heading">
+                    {Math.min((currentPage - 1) * pageSize + 1, totalRecords)}
+                  </span>
+                  <span>to</span>
+                  <span className="font-bold text-navy-950 font-heading">
+                    {Math.min(currentPage * pageSize, totalRecords)}
+                  </span>
+                  <span>of</span>
+                  <span className="font-bold text-navy-950 font-heading">
+                    {totalRecords.toLocaleString()}
+                  </span>
+                  <span>leads</span>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  {/* Rows per page selector */}
+                  <div className="flex items-center gap-1.5 text-slate-500 font-medium">
+                    <span className="hidden sm:inline">Rows:</span>
+                    <select
+                      value={pageSize}
+                      onChange={(e) => {
+                        setPageSize(Number(e.target.value));
+                        setCurrentPage(1);
+                      }}
+                      className="bg-white border border-slate-200 rounded-lg px-2 py-1 text-navy-950 font-bold focus:outline-none focus:ring-1 focus:ring-gold-500 cursor-pointer text-xs"
+                    >
+                      <option value={25}>25</option>
+                      <option value={50}>50</option>
+                      <option value={100}>100</option>
+                    </select>
+                  </div>
+
+                  {/* Previous / Next & Page Numbers */}
+                  <div className="flex items-center gap-1">
+                    <button
+                      type="button"
+                      disabled={currentPage <= 1}
+                      onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                      className="px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white font-bold text-navy-950 hover:bg-slate-100 disabled:opacity-40 disabled:pointer-events-none transition-colors cursor-pointer"
+                    >
+                      Previous
+                    </button>
+
+                    <div className="px-2 font-bold text-navy-950">
+                      Page {currentPage} of {totalPages}
+                    </div>
+
+                    <button
+                      type="button"
+                      disabled={currentPage >= totalPages}
+                      onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                      className="px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white font-bold text-navy-950 hover:bg-slate-100 disabled:opacity-40 disabled:pointer-events-none transition-colors cursor-pointer"
+                    >
+                      Next
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </>
       )}

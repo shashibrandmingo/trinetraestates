@@ -107,5 +107,20 @@ clientSchema.pre('save', async function (next) {
   next();
 });
 
+// High-speed compound indexes for 100,000+ client records
+clientSchema.index({ status: 1, createdAt: -1 });
+clientSchema.index({ clientType: 1, status: 1 });
+clientSchema.index({ createdAt: -1 });
+
+// Full-text search index for fast keyword matching
+clientSchema.index({
+  name: 'text',
+  phone: 'text',
+  email: 'text',
+  company: 'text',
+  preferredSector: 'text',
+  propertyTitle: 'text'
+});
+
 export const Client = mongoose.model('Client', clientSchema);
 export default Client;

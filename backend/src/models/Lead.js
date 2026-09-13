@@ -85,6 +85,22 @@ leadSchema.pre('save', async function (next) {
   next();
 });
 
+// High-speed compound indexes for 100,000+ lead records
+leadSchema.index({ status: 1, createdAt: -1 });
+leadSchema.index({ source: 1, status: 1 });
+leadSchema.index({ clientType: 1, status: 1 });
+leadSchema.index({ createdAt: -1 });
+leadSchema.index({ followUpDate: 1, status: 1 });
+
+// Full-text search index for fast keyword matching
+leadSchema.index({
+  name: 'text',
+  phone: 'text',
+  email: 'text',
+  company: 'text',
+  preferredSector: 'text'
+});
+
 const Lead = mongoose.models.Lead || mongoose.model('Lead', leadSchema);
 
 export default Lead;

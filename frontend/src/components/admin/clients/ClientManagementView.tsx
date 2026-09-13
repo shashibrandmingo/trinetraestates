@@ -94,15 +94,24 @@ export default function ClientManagementView() {
     setTimeout(() => setToastMessage(''), 4000);
   };
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(25);
+
+  // Reset to page 1 on search or filter change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, statusFilter, typeFilter]);
+
   // TanStack Query Cache: Instant loading without repeat fetches when switching tabs
   const { data: clientsRes, isLoading: isClientsLoading } = useQuery({
-    queryKey: ['clients', searchQuery, statusFilter, typeFilter],
+    queryKey: ['clients', searchQuery, statusFilter, typeFilter, currentPage, pageSize],
     queryFn: () =>
       clientService.getClients({
         search: searchQuery,
         status: statusFilter,
         clientType: typeFilter,
-        limit: 100
+        page: currentPage,
+        limit: pageSize
       }),
     staleTime: 3 * 60 * 1000,
   });
@@ -114,6 +123,8 @@ export default function ClientManagementView() {
   });
 
   const clients = clientsRes?.data || [];
+  const totalRecords = clientsRes?.total || 0;
+  const totalPages = Math.max(1, clientsRes?.pages || 1);
   const stats = statsData || null;
   const isLoading = isClientsLoading || isStatsLoading;
 
@@ -640,6 +651,71 @@ export default function ClientManagementView() {
               </tbody>
             </table>
           </div>
+
+          {/* Pagination Controls */}
+          {totalRecords > 0 && (
+            <div className="px-5 py-3.5 bg-slate-50/80 border-t border-slate-200/80 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+              <div className="text-slate-500 font-medium flex items-center gap-1.5">
+                <span>Showing</span>
+                <span className="font-bold text-navy-950 font-heading">
+                  {Math.min((currentPage - 1) * pageSize + 1, totalRecords)}
+                </span>
+                <span>to</span>
+                <span className="font-bold text-navy-950 font-heading">
+                  {Math.min(currentPage * pageSize, totalRecords)}
+                </span>
+                <span>of</span>
+                <span className="font-bold text-navy-950 font-heading">
+                  {totalRecords.toLocaleString()}
+                </span>
+                <span>clients</span>
+              </div>
+
+              <div className="flex items-center gap-3">
+                {/* Rows per page selector */}
+                <div className="flex items-center gap-1.5 text-slate-500 font-medium">
+                  <span className="hidden sm:inline">Rows:</span>
+                  <select
+                    value={pageSize}
+                    onChange={(e) => {
+                      setPageSize(Number(e.target.value));
+                      setCurrentPage(1);
+                    }}
+                    className="bg-white border border-slate-200 rounded-lg px-2 py-1 text-navy-950 font-bold focus:outline-none focus:ring-1 focus:ring-gold-500 cursor-pointer text-xs"
+                  >
+                    <option value={25}>25</option>
+                    <option value={50}>50</option>
+                    <option value={100}>100</option>
+                  </select>
+                </div>
+
+                {/* Previous / Next & Page Numbers */}
+                <div className="flex items-center gap-1">
+                  <button
+                    type="button"
+                    disabled={currentPage <= 1}
+                    onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                    className="px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white font-bold text-navy-950 hover:bg-slate-100 disabled:opacity-40 disabled:pointer-events-none transition-colors cursor-pointer"
+                  >
+                    Previous
+                  </button>
+
+                  <div className="px-2 font-bold text-navy-950">
+                    Page {currentPage} of {totalPages}
+                  </div>
+
+                  <button
+                    type="button"
+                    disabled={currentPage >= totalPages}
+                    onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                    className="px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white font-bold text-navy-950 hover:bg-slate-100 disabled:opacity-40 disabled:pointer-events-none transition-colors cursor-pointer"
+                  >
+                    Next
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         )}
       </div>
 
