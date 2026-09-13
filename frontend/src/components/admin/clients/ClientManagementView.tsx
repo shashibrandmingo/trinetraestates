@@ -455,7 +455,8 @@ export default function ClientManagementView() {
             </button>
           </div>
         ) : (
-          <div className="overflow-x-auto">
+          <>
+            <div className="overflow-x-auto">
             <table className="w-full text-left text-xs text-slate-600 border-collapse">
               <thead className="bg-slate-50/80 text-[11px] uppercase tracking-wider text-slate-400 font-bold border-b border-slate-200">
                 <tr>
@@ -716,7 +717,8 @@ export default function ClientManagementView() {
               </div>
             </div>
           )}
-        )}
+        </>
+      )}
       </div>
 
       {/* Add / Edit Modal */}
