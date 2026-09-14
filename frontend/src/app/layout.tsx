@@ -74,9 +74,12 @@ export const metadata: Metadata = {
     canonical: siteUrl
   },
   icons: {
-    icon: '/favicon.ico',
-    shortcut: '/favicon.ico',
-    apple: '/brand-logo.png'
+    icon: [
+      { url: '/favicon.png', type: 'image/png' },
+      { url: '/favicon.ico' }
+    ],
+    shortcut: '/favicon.png',
+    apple: '/favicon.png'
   }
 };
 
@@ -88,6 +91,8 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${poppins.variable} font-sans`}>
       <head>
+        <link rel="icon" href="/favicon.png" type="image/png" sizes="any" />
+        <link rel="apple-touch-icon" href="/favicon.png" />
         {isRealAdSense && (
           <>
             <link rel="preconnect" href="https://pagead2.googlesyndication.com" />
