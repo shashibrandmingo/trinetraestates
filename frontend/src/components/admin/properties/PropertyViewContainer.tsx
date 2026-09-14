@@ -11,6 +11,8 @@ import { PropertyListingView } from './PropertyListingView';
 import { PropertyDetailsModal } from './PropertyDetailsModal';
 import { AddPropertyForm } from './AddPropertyForm';
 import { BulkImportModal } from './BulkImportModal';
+import { DeletePropertyModal } from './DeletePropertyModal';
+import { ToastContainer, ToastMessage } from '@/components/common/Toast';
 import { clientService } from '@/services/clientService';
 
 const initialFilterState: PropertyFilterState = {
@@ -63,6 +65,17 @@ export const PropertyViewContainer: React.FC<PropertyViewContainerProps> = ({
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
   const [viewMode, setViewMode] = useState<'list' | 'add' | 'edit'>('list');
+  const [propertyToDelete, setPropertyToDelete] = useState<PropertyItem | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [toasts, setToasts] = useState<ToastMessage[]>([]);
+
+  const addToast = useCallback((message: string, type: ToastMessage['type'] = 'success') => {
+    const id = String(Date.now());
+    setToasts((prev) => [...prev, { id, type, message }]);
+    setTimeout(() => {
+      setToasts((prev) => prev.filter((t) => t.id !== id));
+    }, 4000);
+  }, []);
 
   // Count active non-default filters for mobile badge
   const activeFiltersCount = useMemo(() => {
@@ -282,6 +295,44 @@ export const PropertyViewContainer: React.FC<PropertyViewContainerProps> = ({
     }
   };
 
+  const handleDeleteProperty = (property: PropertyItem) => {
+    setPropertyToDelete(property);
+  };
+
+  const confirmDeleteProperty = async () => {
+    if (!propertyToDelete) return;
+    const prop = propertyToDelete;
+    const idToDelete = prop.propertyId || prop.id;
+    if (!idToDelete) return;
+
+    setIsDeleting(true);
+    try {
+      const ok = await propertyService.deleteProperty(idToDelete);
+      if (ok) {
+        // Instantly remove from UI list
+        setProperties((prev) =>
+          prev.filter((p) => p.id !== prop.id && p.propertyId !== prop.propertyId)
+        );
+        setTotalCount((prev) => Math.max(0, prev - 1));
+
+        // Invalidate queries so TanStack cache updates cleanly across all tabs & overview
+        queryClient.invalidateQueries({ queryKey: ['admin-properties-batch'] });
+        queryClient.invalidateQueries({ queryKey: ['property-kpi-stats'] });
+        queryClient.invalidateQueries({ queryKey: ['admin-dashboard-overview'] });
+
+        addToast(`Property ${prop.propertyId || prop.title} deleted successfully`, 'success');
+        setPropertyToDelete(null);
+      } else {
+        addToast('Failed to delete property. Please try again.', 'error');
+      }
+    } catch (err) {
+      console.error('Error deleting property:', err);
+      addToast('An error occurred while deleting the property.', 'error');
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
   const handleStatusChange = async (
     property: PropertyItem,
     newStatus: PropertyItem['status'],
@@ -424,6 +475,7 @@ export const PropertyViewContainer: React.FC<PropertyViewContainerProps> = ({
           onViewDetails={handleViewDetails}
           onEditProperty={handleEditProperty}
           onDuplicateProperty={handleDuplicateProperty}
+          onDeleteProperty={handleDeleteProperty}
           onStatusChange={handleStatusChange}
           hasMore={hasMore}
           isLoadingMore={isLoadingMore}
@@ -494,6 +546,21 @@ export const PropertyViewContainer: React.FC<PropertyViewContainerProps> = ({
           queryClient.invalidateQueries({ queryKey: ['property-kpi-stats'] });
           queryClient.invalidateQueries({ queryKey: ['admin-dashboard-overview'] });
         }}
+      />
+
+      {/* Delete Confirmation Modal */}
+      <DeletePropertyModal
+        property={propertyToDelete}
+        isOpen={!!propertyToDelete}
+        isDeleting={isDeleting}
+        onClose={() => setPropertyToDelete(null)}
+        onConfirm={confirmDeleteProperty}
+      />
+
+      {/* Toast Notifications */}
+      <ToastContainer
+        toasts={toasts}
+        onDismiss={(id) => setToasts((prev) => prev.filter((t) => t.id !== id))}
       />
     </div>
   );

@@ -395,8 +395,16 @@ export const createOffice = async (req, res, next) => {
 export const deleteOffice = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const query = id.startsWith('PROP-') ? { propertyId: id } : { _id: id };
-    const deleted = await OfficeSpace.findOneAndDelete(query);
+    let deleted = null;
+
+    if (mongoose.Types.ObjectId.isValid(id)) {
+      deleted = await OfficeSpace.findByIdAndDelete(id);
+    }
+    if (!deleted) {
+      deleted = await OfficeSpace.findOneAndDelete({
+        $or: [{ propertyId: id }, { slug: id }]
+      });
+    }
 
     if (!deleted) {
       return res.status(404).json({

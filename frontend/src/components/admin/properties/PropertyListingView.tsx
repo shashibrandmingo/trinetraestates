@@ -13,6 +13,7 @@ interface PropertyListingViewProps {
   onViewDetails: (property: PropertyItem) => void;
   onEditProperty?: (property: PropertyItem) => void;
   onDuplicateProperty?: (property: PropertyItem) => void;
+  onDeleteProperty?: (property: PropertyItem) => void;
   onStatusChange?: (property: PropertyItem, newStatus: PropertyItem['status'], dealData?: any) => Promise<void> | void;
   hasMore?: boolean;
   isLoadingMore?: boolean;
@@ -38,6 +39,7 @@ export const PropertyListingView: React.FC<PropertyListingViewProps> = ({
   onViewDetails,
   onEditProperty,
   onDuplicateProperty,
+  onDeleteProperty,
   onStatusChange,
   hasMore = false,
   isLoadingMore = false,
@@ -242,6 +244,7 @@ export const PropertyListingView: React.FC<PropertyListingViewProps> = ({
           onViewDetails={onViewDetails}
           onEditProperty={onEditProperty}
           onDuplicateProperty={onDuplicateProperty}
+          onDeleteProperty={onDeleteProperty}
           onStatusChange={onStatusChange}
         />
       ) : (
@@ -251,6 +254,7 @@ export const PropertyListingView: React.FC<PropertyListingViewProps> = ({
               key={item.id}
               property={item}
               onViewDetails={onViewDetails}
+              onDeleteProperty={onDeleteProperty}
             />
           ))}
         </div>

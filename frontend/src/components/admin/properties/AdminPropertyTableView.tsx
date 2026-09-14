@@ -10,6 +10,7 @@ interface AdminPropertyTableViewProps {
   onViewDetails: (property: PropertyItem) => void;
   onEditProperty?: (property: PropertyItem) => void;
   onDuplicateProperty?: (property: PropertyItem) => void;
+  onDeleteProperty?: (property: PropertyItem) => void;
   onStatusChange?: (property: PropertyItem, newStatus: PropertyItem['status'], dealData?: any) => Promise<void> | void;
   isLoading?: boolean;
 }
@@ -19,6 +20,7 @@ export const AdminPropertyTableView: React.FC<AdminPropertyTableViewProps> = ({
   onViewDetails,
   onEditProperty,
   onDuplicateProperty,
+  onDeleteProperty,
   onStatusChange,
   isLoading
 }) => {
@@ -593,6 +595,24 @@ export const AdminPropertyTableView: React.FC<AdminPropertyTableViewProps> = ({
                             <span>Copy ID ({item.propertyId?.slice(-4) || 'ID'})</span>
                           </button>
                         </div>
+
+                        {onDeleteProperty && (
+                          <div className="py-1 border-t border-slate-100">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setActiveMenuId(null);
+                                onDeleteProperty(item);
+                              }}
+                              className="w-full text-left px-3 py-1.5 text-xs text-rose-600 hover:text-rose-700 hover:bg-rose-50 font-medium flex items-center gap-2 cursor-pointer transition-colors"
+                            >
+                              <svg className="w-3.5 h-3.5 text-rose-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                              </svg>
+                              <span>Delete Property</span>
+                            </button>
+                          </div>
+                        )}
                       </div>
                     )}
                   </td>

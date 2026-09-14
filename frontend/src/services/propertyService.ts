@@ -564,10 +564,15 @@ export const propertyService = {
   deleteProperty: async (id: string): Promise<boolean> => {
     try {
       if (API_BASE) {
-        const res = await fetch(`${API_BASE}/offices/${id}`, {
+        const res = await fetch(`${API_BASE}/offices/${encodeURIComponent(id)}`, {
           method: 'DELETE'
         });
-        return res.ok;
+        if (res.ok) {
+          clearPropertyDetailCache(id);
+          memoryStatsCache = null;
+          return true;
+        }
+        return false;
       }
     } catch (err) {
       console.error('Delete failed:', err);

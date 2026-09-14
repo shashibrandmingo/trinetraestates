@@ -7,9 +7,14 @@ import { PropertyItem } from '@/types/propertyFilter';
 interface AdminPropertyCardProps {
   property: PropertyItem;
   onViewDetails: (property: PropertyItem) => void;
+  onDeleteProperty?: (property: PropertyItem) => void;
 }
 
-export const AdminPropertyCard: React.FC<AdminPropertyCardProps> = ({ property, onViewDetails }) => {
+export const AdminPropertyCard: React.FC<AdminPropertyCardProps> = ({
+  property,
+  onViewDetails,
+  onDeleteProperty
+}) => {
   const isSold = property.status === 'Sold';
   const isSoldByMe = property.status === 'Sold by Me';
   const isClosed = isSold || isSoldByMe;
@@ -216,23 +221,40 @@ export const AdminPropertyCard: React.FC<AdminPropertyCardProps> = ({ property, 
         {/* Expiry & CTA */}
         <div className="flex items-center justify-between pt-0.5">
           <div>{getExpiryDisplay()}</div>
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              onViewDetails(property);
-            }}
-            className={`px-2.5 py-1 text-xs font-semibold rounded-lg transition-colors flex items-center gap-1 cursor-pointer ${
-              isClosed
-                ? 'bg-slate-200/80 text-slate-700 hover:bg-slate-300/80'
-                : 'bg-slate-100 text-navy-900 hover:text-gold-600 hover:bg-gold-50/60'
-            }`}
-          >
-            <span>View Details</span>
-            <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
-          </button>
+          <div className="flex items-center gap-1.5">
+            {onDeleteProperty && (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onDeleteProperty(property);
+                }}
+                className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
+                title="Delete Property"
+              >
+                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                onViewDetails(property);
+              }}
+              className={`px-2.5 py-1 text-xs font-semibold rounded-lg transition-colors flex items-center gap-1 cursor-pointer ${
+                isClosed
+                  ? 'bg-slate-200/80 text-slate-700 hover:bg-slate-300/80'
+                  : 'bg-slate-100 text-navy-900 hover:text-gold-600 hover:bg-gold-50/60'
+              }`}
+            >
+              <span>View Details</span>
+              <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+          </div>
         </div>
       </div>
     </div>
