@@ -69,6 +69,10 @@ export interface BackendOfficeDoc {
   ownerPhone?: string;
   ownerEmail?: string;
   ownerNotes?: string;
+  internalNotes?: string;
+  dataAge?: string;
+  availabilityStatus?: string;
+  listingDate?: string | Date;
   createdAt?: string;
   dealDetails?: {
     soldBy?: string;
@@ -569,9 +573,9 @@ export const propertyService = {
       ).slice(0, 5);
 
       const matchedOwners = matchedProps
-        .filter((p) => p.ownerName)
+        .filter((p) => Boolean(p.ownerName))
         .map((p) => ({
-          ownerName: p.ownerName,
+          ownerName: p.ownerName || 'Direct Owner',
           ownerPhone: p.ownerPhone,
           propertyTitle: p.title,
           propertyId: p.propertyId
