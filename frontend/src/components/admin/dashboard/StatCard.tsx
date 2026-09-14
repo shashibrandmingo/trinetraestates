@@ -21,35 +21,35 @@ export default function StatCard({
     switch (variant) {
       case 'warning':
         return {
-          card: 'border-amber-300/85 bg-gradient-to-br from-amber-50/80 via-white to-amber-50/35 hover:border-amber-400',
+          card: 'border-amber-200 bg-white hover:border-amber-300',
           lblColor: 'text-amber-900/80',
           valColor: 'text-amber-800',
           iconWrap: 'bg-amber-100 text-amber-700 border-amber-200/80'
         };
       case 'danger':
         return {
-          card: 'border-rose-300/85 bg-gradient-to-br from-rose-50/80 via-white to-rose-50/35 hover:border-rose-400',
+          card: 'border-rose-200 bg-white hover:border-rose-300',
           lblColor: 'text-rose-900/80',
           valColor: 'text-rose-700',
           iconWrap: 'bg-rose-100 text-rose-700 border-rose-200/80'
         };
       case 'highlight':
         return {
-          card: 'border-emerald-300/85 bg-gradient-to-br from-emerald-50/80 via-white to-emerald-50/35 hover:border-emerald-400',
+          card: 'border-emerald-200 bg-white hover:border-emerald-300',
           lblColor: 'text-emerald-900/80',
           valColor: 'text-emerald-800',
           iconWrap: 'bg-emerald-100 text-emerald-700 border-emerald-200/80'
         };
       case 'indigo':
         return {
-          card: 'border-indigo-300/85 bg-gradient-to-br from-indigo-50/80 via-white to-blue-50/35 hover:border-indigo-400',
+          card: 'border-indigo-200 bg-white hover:border-indigo-300',
           lblColor: 'text-indigo-900/80',
           valColor: 'text-indigo-950',
           iconWrap: 'bg-indigo-100 text-indigo-700 border-indigo-200/80'
         };
       case 'teal':
         return {
-          card: 'border-teal-300/85 bg-gradient-to-br from-teal-50/80 via-white to-emerald-50/35 hover:border-teal-400',
+          card: 'border-teal-200 bg-white hover:border-teal-300',
           lblColor: 'text-teal-900/80',
           valColor: 'text-teal-900',
           iconWrap: 'bg-teal-100 text-teal-700 border-teal-200/80'
@@ -57,7 +57,7 @@ export default function StatCard({
       case 'blue':
       default:
         return {
-          card: 'border-blue-200/90 bg-gradient-to-br from-blue-50/75 via-white to-slate-50/40 hover:border-blue-300',
+          card: 'border-blue-200 bg-white hover:border-blue-300',
           lblColor: 'text-blue-900/80',
           valColor: 'text-navy-950',
           iconWrap: 'bg-blue-100/90 text-blue-700 border-blue-200/80'

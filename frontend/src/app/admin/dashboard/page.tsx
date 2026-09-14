@@ -101,7 +101,7 @@ export default function AdminDashboardPage() {
   const { summary, recentLeads, expiringProperties, recentProperties, recentActivities } = dashboardData;
 
   return (
-    <div className="h-screen w-screen overflow-hidden bg-white text-navy-900 flex flex-col">
+    <div className="h-screen w-screen overflow-hidden bg-[#ebebeb] text-navy-900 flex flex-col">
       {/* Top Navbar */}
       <AdminTopNavbar
         searchQuery={searchQuery}
@@ -130,7 +130,7 @@ export default function AdminDashboardPage() {
       />
 
       {/* Main Single-Frame Container with Sidebar & Content */}
-      <div className="flex flex-1 w-full min-h-0 overflow-hidden relative">
+      <div className="flex flex-1 w-full min-h-0 overflow-hidden relative bg-[#ebebeb]">
         <AdminSidebar
           activeTab={activeTab}
           onSelectTab={handleTabChange}
@@ -141,7 +141,7 @@ export default function AdminDashboardPage() {
 
         {/* Dashboard Dynamic Content View - Blurred on mobile when dropdown is open */}
         <main
-          className={`flex-1 min-w-0 h-full overflow-y-auto overflow-x-hidden custom-scrollbar px-2.5 sm:px-6 py-2.5 sm:py-4 space-y-3.5 sm:space-y-4 transition-all duration-300 ${
+          className={`flex-1 min-w-0 h-full overflow-y-auto overflow-x-hidden custom-scrollbar px-2.5 sm:px-6 py-2.5 sm:py-4 space-y-3.5 sm:space-y-4 transition-all duration-300 bg-[#ebebeb] ${
             isMobileMenuOpen ? 'blur-[8px] md:blur-none pointer-events-none md:pointer-events-auto' : ''
           }`}
           style={

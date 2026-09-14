@@ -137,6 +137,10 @@ export const mapBackendToPropertyItem = (office: BackendOfficeDoc): PropertyItem
     securityDeposit: office.securityDeposit,
     maintenanceCharge: office.maintenanceCharge,
     description: office.description,
+    internalNotes: office.internalNotes || office.description || '',
+    dataAge: office.dataAge || 'Ready to Move',
+    availabilityStatus: office.availabilityStatus || 'Available',
+    listingDate: office.listingDate ? String(office.listingDate).split('T')[0] : '',
     price: priceNum,
     buildingName: office.buildingName,
     createdAt: office.createdAt || (office as any).listingDate || new Date().toISOString(),
@@ -461,6 +465,32 @@ export const propertyService = {
     } catch (err: any) {
       console.warn('Could not duplicate property:', err);
       return { success: false, message: err?.message || 'Network error duplicating property' };
+    }
+    return { success: false, message: 'Backend unavailable' };
+  },
+
+  /**
+   * 1-Click Renew listing: Resets countdown to 60 days and marks Active
+   */
+  renewProperty: async (
+    id: string
+  ): Promise<{ success: boolean; data?: PropertyItem; message?: string }> => {
+    try {
+      if (API_BASE) {
+        const res = await fetch(`${API_BASE}/offices/${encodeURIComponent(id)}/renew`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' }
+        });
+        const json = await res.json();
+        if (json.success && json.data) {
+          propertyDetailCache.delete(id);
+          return { success: true, data: mapBackendToPropertyItem(json.data), message: json.message };
+        }
+        return { success: false, message: json.message || 'Failed to renew property' };
+      }
+    } catch (err: any) {
+      console.warn('Could not renew property:', err);
+      return { success: false, message: err?.message || 'Network error renewing property' };
     }
     return { success: false, message: 'Backend unavailable' };
   },

@@ -141,7 +141,7 @@ export default function PropertyKPIHeader({
                     Active
                   </span>
                 ) : (
-                  <span className="text-[8px] font-medium text-slate-400 group-hover:text-gold-600 transition-colors">
+                  <span className="text-[8px] font-medium text-slate-400 group-hover:text-blue-600 transition-colors">
                     Filter →
                   </span>
                 )}

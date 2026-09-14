@@ -60,14 +60,14 @@ export default function AdminSidebar({
 
   return (
     <aside
-      className={`h-full z-30 bg-white border-r border-slate-200 transition-all duration-300 ease-in-out hidden md:flex flex-col justify-between flex-shrink-0 select-none overflow-hidden ${
+      className={`h-full z-30 bg-[#0c1a30] border-r border-navy-800/80 transition-all duration-300 ease-in-out hidden md:flex flex-col justify-between flex-shrink-0 select-none overflow-hidden ${
         isCollapsed ? 'w-16 p-2.5' : 'w-52 p-3.5'
       }`}
     >
       <div>
         {/* Header with Toggle Arrow (< when expanded, > when collapsed) */}
         <div
-          className={`flex items-center mb-3 pb-2 border-b border-slate-100 ${
+          className={`flex items-center mb-3 pb-2 border-b border-navy-800/70 ${
             isCollapsed ? 'justify-center' : 'justify-between px-1.5'
           }`}
         >
@@ -81,16 +81,16 @@ export default function AdminSidebar({
           <button
             type="button"
             onClick={onToggleCollapse}
-            className="p-1.5 rounded-lg text-slate-500 hover:text-navy-900 hover:bg-slate-100 border border-slate-200/80 transition-colors flex items-center justify-center"
+            className="p-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-navy-800/80 border border-navy-700/60 transition-colors flex items-center justify-center cursor-pointer"
             title={isCollapsed ? 'Expand Sidebar' : 'Collapse to Icons'}
             aria-label="Toggle Sidebar"
           >
             {isCollapsed ? (
-              <svg className="w-4 h-4 text-navy-900" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+              <svg className="w-4 h-4 text-slate-200" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
               </svg>
             ) : (
-              <svg className="w-4 h-4 text-navy-900" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+              <svg className="w-4 h-4 text-slate-200" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
               </svg>
             )}
@@ -107,17 +107,17 @@ export default function AdminSidebar({
                 type="button"
                 onClick={() => onSelectTab(item.id)}
                 title={isCollapsed ? item.label : undefined}
-                className={`w-full flex items-center rounded-xl text-xs font-semibold transition-all duration-150 ${
+                className={`w-full flex items-center rounded-xl text-xs font-semibold transition-all duration-150 cursor-pointer ${
                   isCollapsed
                     ? 'justify-center py-2.5 px-0'
                     : 'gap-2.5 px-3 py-2 text-left'
                 } ${
                   isActive
-                    ? 'bg-navy-900 text-white shadow-xs'
-                    : 'text-slate-600 hover:text-navy-900 hover:bg-slate-100'
+                    ? 'bg-blue-600 text-white shadow-md font-bold'
+                    : 'text-slate-300 hover:text-white hover:bg-navy-800/80'
                 }`}
               >
-                <span className={isActive ? 'text-gold-400' : 'text-slate-400'}>
+                <span className={isActive ? 'text-white' : 'text-slate-400'}>
                   {item.icon}
                 </span>
                 {!isCollapsed && <span className="font-sans truncate">{item.label}</span>}
@@ -128,12 +128,12 @@ export default function AdminSidebar({
       </div>
 
       {/* Sidebar Bottom: Sign Out Button - ALWAYS VISIBLE AT BOTTOM OF FRAME */}
-      <div className="pt-3 pb-1 border-t border-slate-100 space-y-1.5 flex-shrink-0">
+      <div className="pt-3 pb-1 border-t border-navy-800/70 space-y-1.5 flex-shrink-0">
         <button
           type="button"
           onClick={onLogout}
           title={isCollapsed ? 'Sign Out' : undefined}
-          className={`w-full flex items-center rounded-xl text-xs font-semibold text-rose-600 hover:text-rose-700 hover:bg-rose-50 border border-rose-100 transition-colors font-sans cursor-pointer ${
+          className={`w-full flex items-center rounded-xl text-xs font-semibold text-rose-400 hover:text-rose-300 hover:bg-rose-950/40 border border-rose-500/30 transition-colors font-sans cursor-pointer ${
             isCollapsed ? 'justify-center py-2.5 px-0' : 'gap-2 px-3 py-2'
           }`}
         >

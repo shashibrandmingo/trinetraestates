@@ -10,12 +10,14 @@ interface PropertyDetailsModalProps {
   property: PropertyItem | null;
   isOpen: boolean;
   onClose: () => void;
+  onRenew?: (property: PropertyItem) => void;
 }
 
 export const PropertyDetailsModal: React.FC<PropertyDetailsModalProps> = ({
   property,
   isOpen,
-  onClose
+  onClose,
+  onRenew
 }) => {
   const [mounted, setMounted] = useState(false);
   const [copiedPitch, setCopiedPitch] = useState(false);
@@ -141,6 +143,19 @@ export const PropertyDetailsModal: React.FC<PropertyDetailsModalProps> = ({
     }
   };
 
+  const handleRenew = () => {
+    if (onRenew && activeProp) {
+      onRenew(activeProp);
+      if (detailData) {
+        setDetailData({
+          ...detailData,
+          status: 'Active',
+          daysRemaining: 60
+        });
+      }
+    }
+  };
+
   // Check if there is genuine closed deal information
   const hasRealDealDetails =
     isClosed &&
@@ -208,7 +223,7 @@ export const PropertyDetailsModal: React.FC<PropertyDetailsModalProps> = ({
                   type="button"
                   onClick={handleCopyId}
                   title="Copy Property ID"
-                  className="hover:text-gold-400 transition-colors"
+                  className="hover:text-blue-400 transition-colors"
                 >
                   {copiedId ? '✓' : '📋'}
                 </button>
@@ -494,27 +509,55 @@ export const PropertyDetailsModal: React.FC<PropertyDetailsModalProps> = ({
           </div>
 
           {/* Section: Video Tour (if available from full details) */}
-          {activeProp.videoUrl && (
-            <div className="p-3.5 rounded-xl bg-slate-900 text-white flex items-center justify-between gap-3 shadow-sm">
-              <div className="flex items-center gap-2.5">
-                <span className="w-8 h-8 rounded-full bg-rose-600 flex items-center justify-center text-white text-sm font-bold shrink-0">
-                  ▶
-                </span>
-                <div>
-                  <span className="text-xs font-bold block">Video Tour Available</span>
-                  <span className="text-[10.5px] text-slate-300">Watch full recorded walkthrough for this property</span>
+          {activeProp.videoUrl && (() => {
+            const raw = activeProp.videoUrl.trim();
+            const safeHref =
+              raw.startsWith('http://') || raw.startsWith('https://')
+                ? raw
+                : raw.startsWith('/uploads')
+                ? raw
+                : `/uploads/videos/${raw}`;
+
+            const isDirectVideoFile = safeHref.match(/\.(mp4|webm|mov|ogg)$/i) || safeHref.includes('/uploads/');
+
+            return (
+              <div className="p-3.5 rounded-xl bg-slate-900 text-white shadow-sm space-y-3">
+                <div className="flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-2.5">
+                    <span className="w-8 h-8 rounded-full bg-rose-600 flex items-center justify-center text-white text-sm font-bold shrink-0">
+                      ▶
+                    </span>
+                    <div>
+                      <span className="text-xs font-bold block">Video Tour Available</span>
+                      <span className="text-[10.5px] text-slate-300">Watch full recorded walkthrough for this property</span>
+                    </div>
+                  </div>
+                  <a
+                    href={safeHref}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="px-3 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs shadow-xs transition-colors shrink-0 cursor-pointer"
+                  >
+                    Open Video ↗
+                  </a>
                 </div>
+
+                {/* Inline HTML5 video player for direct video files */}
+                {isDirectVideoFile && (
+                  <div className="pt-1">
+                    <video
+                      controls
+                      preload="metadata"
+                      className="w-full max-h-72 rounded-lg bg-black border border-slate-700"
+                      src={safeHref}
+                    >
+                      Your browser does not support the video tag.
+                    </video>
+                  </div>
+                )}
               </div>
-              <a
-                href={activeProp.videoUrl}
-                target="_blank"
-                rel="noreferrer"
-                className="px-3 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs shadow-xs transition-colors shrink-0"
-              >
-                Watch Tour ↗
-              </a>
-            </div>
-          )}
+            );
+          })()}
 
           {/* Section: Documents & Floor Plans (if available from full details) */}
           {activeProp.documents && activeProp.documents.length > 0 && (
@@ -530,13 +573,13 @@ export const PropertyDetailsModal: React.FC<PropertyDetailsModalProps> = ({
                     href={doc.url}
                     target="_blank"
                     rel="noreferrer"
-                    className="flex items-center justify-between p-2 rounded-lg bg-white border border-slate-200 hover:border-gold-500 hover:shadow-xs transition-all text-navy-900 group"
+                    className="flex items-center justify-between p-2 rounded-lg bg-white border border-slate-200 hover:border-blue-500 hover:shadow-xs transition-all text-navy-900 group"
                   >
                     <span className="truncate font-medium flex items-center gap-2">
                       <span className="text-base">📄</span>
-                      <span className="group-hover:text-gold-600 transition-colors">{doc.name || `Floor Plan #${idx + 1}`}</span>
+                      <span className="group-hover:text-blue-600 transition-colors">{doc.name || `Floor Plan #${idx + 1}`}</span>
                     </span>
-                    <span className="text-[10px] font-bold text-gold-600 uppercase px-1.5 py-0.5 rounded bg-gold-50">
+                    <span className="text-[10px] font-bold text-blue-600 uppercase px-1.5 py-0.5 rounded bg-blue-50">
                       View ↗
                     </span>
                   </a>
@@ -645,6 +688,20 @@ export const PropertyDetailsModal: React.FC<PropertyDetailsModalProps> = ({
           </div>
 
           <div className="flex items-center gap-2">
+            {onRenew && !isClosed && (
+              <button
+                type="button"
+                onClick={handleRenew}
+                className="px-3.5 py-1.5 text-xs font-bold rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-300 shadow-2xs transition-colors cursor-pointer flex items-center gap-1.5"
+                title="Reset listing validity for 60 more days"
+              >
+                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+                <span>Renew (+60d)</span>
+              </button>
+            )}
+
             <button
               type="button"
               onClick={handleCopyPitch}

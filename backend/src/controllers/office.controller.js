@@ -194,7 +194,7 @@ export const getOffices = async (req, res, next) => {
     }
 
     // Transform into clean lightweight card payload (NO images array, NO videos, NO descriptions, NO amenities, NO documents)
-    const cardOffices = (rawOffices || []).map((doc) => {
+    const cardOffices = await Promise.all((rawOffices || []).map(async (doc) => {
       let thumbnail = '';
       if (doc.images && doc.images.length > 0) {
         const cover = doc.images.find((img) => img.isCover) || doc.images[0];
@@ -203,7 +203,7 @@ export const getOffices = async (req, res, next) => {
 
       // If thumbnail is a base64 data URI, auto-convert and save directly to VPS SSD!
       if (thumbnail && thumbnail.startsWith('data:')) {
-        const savedUrl = saveBase64ToFile(thumbnail, `thumb-${doc.propertyId || doc._id}`);
+        const savedUrl = await saveBase64ToFile(thumbnail, `thumb-${doc.propertyId || doc._id}`);
         if (savedUrl && !savedUrl.startsWith('data:')) {
           thumbnail = savedUrl;
           // Async update in DB so next time it's already a clean lightweight URL
@@ -218,6 +218,32 @@ export const getOffices = async (req, res, next) => {
       const rentPerSqFt =
         doc.rentPerSqFt ||
         (doc.areaSqFt > 0 && priceNum > 0 ? Math.round(priceNum / doc.areaSqFt) : 0);
+
+      // Dynamic 60-day expiration countdown from listingDate or createdAt
+      const listDate = new Date(doc.listingDate || doc.createdAt || Date.now());
+      const now = Date.now();
+      const diffMs = now - listDate.getTime();
+      const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+      const calcDaysRemaining = Math.max(0, 60 - (isNaN(diffDays) ? 0 : diffDays));
+
+      let computedStatus = doc.status || 'Active';
+      if (!['Sold', 'Sold by Me', 'Draft'].includes(computedStatus)) {
+        if (calcDaysRemaining === 0) {
+          computedStatus = 'Expired';
+        } else if (calcDaysRemaining <= 15) {
+          computedStatus = 'Expiring';
+        } else {
+          computedStatus = 'Active';
+        }
+
+        // Keep DB updated silently in background if status or days drifted
+        if (computedStatus !== doc.status || calcDaysRemaining !== doc.daysRemaining) {
+          OfficeSpace.updateOne(
+            { _id: doc._id },
+            { $set: { status: computedStatus, daysRemaining: calcDaysRemaining } }
+          ).catch(() => {});
+        }
+      }
 
       return {
         _id: doc._id,
@@ -243,18 +269,27 @@ export const getOffices = async (req, res, next) => {
         rentPerSqFt: rentPerSqFt,
         furnishing: doc.furnishing || 'Full',
         parking: doc.parking || 'Available',
-        status: doc.status || 'Active',
-        daysRemaining: doc.daysRemaining ?? 60,
+        status: computedStatus,
+        daysRemaining: calcDaysRemaining,
+        superBuiltUpAreaSqFt: doc.superBuiltUpAreaSqFt || 0,
+        securityDeposit: doc.securityDeposit || 0,
+        maintenanceCharge: doc.maintenanceCharge || 0,
+        facing: doc.facing || 'North-East',
+        dataAge: doc.dataAge || 'Ready to Move',
+        availabilityStatus: doc.availabilityStatus || 'Available',
         listingDate: doc.listingDate || doc.createdAt,
         createdAt: doc.createdAt,
         ownerName: doc.ownerName || '',
         ownerPhone: doc.ownerPhone || '',
         ownerEmail: doc.ownerEmail || '',
+        ownerNotes: doc.ownerNotes || '',
+        internalNotes: doc.internalNotes || '',
+        videoUrl: doc.videoUrl || '',
         thumbnail: thumbnail || '/images/sample-office.png',
         imageUrl: thumbnail || '/images/sample-office.png',
         dealDetails: doc.dealDetails || undefined
       };
-    });
+    }));
 
     const hasMore =
       typeof total === 'number'
@@ -348,7 +383,7 @@ export const getOfficeStats = async (req, res, next) => {
 export const createOffice = async (req, res, next) => {
   try {
     // Automatically save any uploaded base64 images/docs to VPS local disk
-    const processedBody = processMediaPayload(req.body);
+    const processedBody = await processMediaPayload(req.body);
     const validatedData = createOfficeSchema.parse(processedBody);
 
     // Auto-generate unique Property ID
@@ -428,7 +463,7 @@ export const updateOffice = async (req, res, next) => {
     const query = id.startsWith('PROP-') ? { propertyId: id } : { _id: id };
 
     // Automatically save any updated base64 images/docs to VPS local disk
-    const updateData = processMediaPayload({ ...req.body });
+    const updateData = await processMediaPayload({ ...req.body });
 
     // Calculate rentPerSqFt and areaSqFt if applicable
     const area = Number(updateData.builtUpAreaSqFt || updateData.carpetAreaSqFt || updateData.areaSqFt);
@@ -511,6 +546,44 @@ export const duplicateOffice = async (req, res, next) => {
       success: true,
       message: `Property duplicated successfully as ${newPropertyId}`,
       data: duplicatedDoc
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * 1-Click Renew listing: Resets listingDate to now, daysRemaining to 60, and status to Active
+ */
+export const renewOffice = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const isObjectId = mongoose.isValidObjectId(id);
+    const query = isObjectId ? { $or: [{ _id: id }, { propertyId: id }] } : { propertyId: id };
+
+    const updated = await OfficeSpace.findOneAndUpdate(
+      query,
+      {
+        $set: {
+          listingDate: new Date(),
+          daysRemaining: 60,
+          status: 'Active'
+        }
+      },
+      { new: true }
+    );
+
+    if (!updated) {
+      return res.status(404).json({
+        success: false,
+        message: 'Property not found'
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: `Property ${updated.propertyId || ''} renewed successfully for 60 days!`,
+      data: updated
     });
   } catch (error) {
     next(error);
@@ -635,7 +708,7 @@ export const searchOffices = async (req, res, next) => {
       .lean();
 
     // Transform into clean lightweight payload (NO heavy images array, NO videos, NO descriptions, NO documents)
-    const properties = rawProperties.map((doc) => {
+    const properties = await Promise.all(rawProperties.map(async (doc) => {
       let thumbnail = '';
       if (doc.images && doc.images.length > 0) {
         const cover = doc.images.find((img) => img.isCover) || doc.images[0];
@@ -644,7 +717,7 @@ export const searchOffices = async (req, res, next) => {
 
       // If thumbnail is a base64 data URI, auto-convert and save directly to VPS SSD!
       if (thumbnail && thumbnail.startsWith('data:')) {
-        const savedUrl = saveBase64ToFile(thumbnail, `thumb-${doc.propertyId || doc._id}`);
+        const savedUrl = await saveBase64ToFile(thumbnail, `thumb-${doc.propertyId || doc._id}`);
         if (savedUrl && !savedUrl.startsWith('data:')) {
           thumbnail = savedUrl;
         }
@@ -689,7 +762,7 @@ export const searchOffices = async (req, res, next) => {
         ownerName: doc.ownerName || '',
         ownerPhone: doc.ownerPhone || ''
       };
-    });
+    }));
 
     // Distinct sectors matching query or related to Noida
     let sectorFilter = { 'location.sector': fullReg };
@@ -895,3 +968,4 @@ export const exportOfficesCSV = async (req, res, next) => {
     next(error);
   }
 };
+

@@ -45,7 +45,7 @@ export default function RecentActivityCard({ activities }: RecentActivityCardPro
   };
 
   return (
-    <div className="bg-gradient-to-br from-slate-50/90 via-white to-emerald-50/25 rounded-xl border border-slate-200/90 shadow-2xs p-3.5 sm:p-4 flex flex-col justify-between hover:border-emerald-300/80 hover:shadow-xs transition-all duration-200">
+    <div className="bg-white rounded-xl border border-slate-200/90 shadow-2xs p-3.5 sm:p-4 flex flex-col justify-between hover:border-emerald-300/80 hover:shadow-xs transition-all duration-200">
       <div>
         {/* Header with Activity Radar Icon */}
         <div className="flex items-center justify-between pb-2.5 mb-2.5 border-b border-slate-100/90">
@@ -66,7 +66,7 @@ export default function RecentActivityCard({ activities }: RecentActivityCardPro
         </div>
 
         {activities.length === 0 ? (
-          <div className="py-4 px-3 text-center rounded-lg bg-white/80 border border-dashed border-slate-200">
+          <div className="py-4 px-3 text-center rounded-lg bg-white border border-dashed border-slate-200">
             <p className="text-xs font-semibold text-slate-600 font-sans">No recent activity</p>
             <p className="text-[10.5px] text-slate-400 font-sans mt-0.5">
               System events and new listings will stream here
@@ -77,7 +77,7 @@ export default function RecentActivityCard({ activities }: RecentActivityCardPro
             {activities.slice(0, 5).map((act) => (
               <div
                 key={act.id}
-                className="group flex items-start justify-between gap-2.5 p-2.5 rounded-lg border border-slate-200/70 bg-white/85 hover:bg-white hover:border-emerald-300/80 hover:shadow-2xs transition-all duration-150"
+                className="group flex items-start justify-between gap-2.5 p-2.5 rounded-lg border border-slate-200/70 bg-white hover:bg-white hover:border-emerald-300/80 hover:shadow-2xs transition-all duration-150"
               >
                 <div className="flex items-start gap-2.5 min-w-0">
                   {getActivityIcon(act.type)}

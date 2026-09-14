@@ -100,7 +100,7 @@ export default function RootLayout({
           </>
         )}
       </head>
-      <body className="font-sans antialiased bg-[#ffffff] text-navy-900 selection:bg-gold-500 selection:text-white min-h-screen overflow-x-hidden w-full">
+      <body className="font-sans antialiased bg-[#ebebeb] text-navy-900 selection:bg-gold-500 selection:text-white min-h-screen overflow-x-hidden w-full">
         <QueryProvider>
           {children}
         </QueryProvider>

@@ -24,43 +24,58 @@ interface UploadedImage {
   isCover: boolean;
 }
 
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+
 export const AddPropertyForm: React.FC<AddPropertyFormProps> = ({ onBack, onSuccess, initialData }) => {
   const isEditMode = Boolean(initialData);
 
   // Property ID
   const [propertyId] = useState(() => initialData?.propertyId || `PROP-2026-${Math.floor(1000 + Math.random() * 9000)}`);
   
+  // Helper to extract initial formData values accurately from initialData
+  const getInitialFormData = (data?: PropertyItem | null) => {
+    let priceInLakh = '';
+    if (data?.monthlyRentInLakh) {
+      priceInLakh = String(data.monthlyRentInLakh);
+    } else if (data?.price) {
+      const p = Number(data.price);
+      priceInLakh = p >= 1000 ? String(Math.round((p / 100000) * 100) / 100) : String(p);
+    }
+
+    return {
+      title: data?.title || '',
+      propertyType: data?.propertyType || 'Office',
+      purpose: data?.purpose || 'Rent',
+      city: data?.city || 'Noida',
+      sector: data?.sector || 'Sector 62',
+      locality: data?.sector || '',
+      address: data?.address || (data?.buildingName ? `${data.buildingName}, ${data.sector}` : ''),
+      buildingName: data?.buildingName || '',
+      floor: data?.floor || 'Middle Floor',
+      unitNo: data?.unitNo || '',
+      carpetAreaSqFt: data?.carpetAreaSqFt ? String(data.carpetAreaSqFt) : (data?.areaSqFt ? String(Math.round(data.areaSqFt * 0.8)) : ''),
+      builtUpAreaSqFt: data?.builtUpAreaSqFt ? String(data.builtUpAreaSqFt) : (data?.areaSqFt ? String(data.areaSqFt) : ''),
+      superBuiltUpAreaSqFt: data?.superBuiltUpAreaSqFt ? String(data.superBuiltUpAreaSqFt) : '',
+      furnishing: data?.furnishing || 'Full',
+      parking: typeof data?.parking === 'boolean' ? (data.parking ? 'Available' : 'No Parking') : (data?.parking || 'Available'),
+      facing: data?.facing || 'North-East',
+      availabilityStatus: data?.availabilityStatus || (data?.status === 'Active' ? 'Available' : 'Under Negotiation'),
+      dataAge: data?.dataAge || 'Ready to Move',
+      listingDate: data?.listingDate ? String(data.listingDate).split('T')[0] : new Date().toISOString().split('T')[0],
+      sellingPrice: priceInLakh,
+      securityDeposit: data?.securityDeposit !== undefined && data.securityDeposit !== null ? String(data.securityDeposit) : '',
+      maintenanceCharge: data?.maintenanceCharge !== undefined && data.maintenanceCharge !== null ? String(data.maintenanceCharge) : '',
+      ownerName: data?.ownerName || '',
+      ownerPhone: data?.ownerPhone || '',
+      ownerEmail: data?.ownerEmail || '',
+      ownerNotes: data?.ownerNotes || '',
+      videoUrl: data?.videoUrl || '',
+      internalNotes: data?.internalNotes || data?.description || '',
+    };
+  };
+
   // Form state initialized with initialData if editing
-  const [formData, setFormData] = useState(() => ({
-    title: initialData?.title || '',
-    propertyType: initialData?.propertyType || 'Office',
-    purpose: initialData?.purpose || 'Rent',
-    city: initialData?.city || 'Noida',
-    sector: initialData?.sector || 'Sector 62',
-    locality: initialData?.sector || '',
-    address: initialData?.buildingName ? `${initialData.buildingName}, ${initialData.sector}` : '',
-    buildingName: initialData?.buildingName || '',
-    floor: initialData?.floor || 'Middle Floor',
-    unitNo: '',
-    carpetAreaSqFt: initialData?.areaSqFt ? String(Math.round(initialData.areaSqFt * 0.8)) : '',
-    builtUpAreaSqFt: initialData?.areaSqFt ? String(initialData.areaSqFt) : '',
-    superBuiltUpAreaSqFt: initialData?.areaSqFt ? String(Math.round(initialData.areaSqFt * 1.2)) : '',
-    furnishing: initialData?.furnishing || 'Full',
-    parking: initialData?.parking ? 'Available' : 'No Parking',
-    facing: 'North-East',
-    availabilityStatus: initialData?.status === 'Active' ? 'Available' : 'Under Negotiation',
-    dataAge: 'Ready to Move',
-    listingDate: new Date().toISOString().split('T')[0],
-    sellingPrice: initialData?.monthlyRentInLakh ? String(Math.round(initialData.monthlyRentInLakh * 100000)) : '',
-    securityDeposit: initialData?.monthlyRentInLakh ? String(Math.round(initialData.monthlyRentInLakh * 200000)) : '',
-    maintenanceCharge: '5000',
-    ownerName: initialData?.ownerName || '',
-    ownerPhone: initialData?.ownerPhone || '',
-    ownerEmail: '',
-    ownerNotes: '',
-    videoUrl: '',
-    internalNotes: '',
-  }));
+  const [formData, setFormData] = useState(() => getInitialFormData(initialData));
 
   // Track sections with validation errors ('basic' | 'area' | 'pricing' | 'owner')
   const [errorSections, setErrorSections] = useState<string[]>([]);
@@ -91,9 +106,14 @@ export const AddPropertyForm: React.FC<AddPropertyFormProps> = ({ onBack, onSucc
     return [{ id: 'img-1', url: '/images/sample-office.png', isCover: true }];
   });
 
-  // Sync real images and documents when initialData loads/updates
+  // Sync real form data, images and documents when initialData loads/updates
   useEffect(() => {
     if (!initialData) return;
+
+    // 1. Sync all text and dropdown input fields
+    setFormData(getInitialFormData(initialData));
+
+    // 2. Sync images
     if (initialData.images && initialData.images.length > 0) {
       setImages(
         initialData.images.map((img, idx) => ({
@@ -106,6 +126,7 @@ export const AddPropertyForm: React.FC<AddPropertyFormProps> = ({ onBack, onSucc
       setImages([{ id: 'img-cover', url: initialData.imageUrl, isCover: true }]);
     }
 
+    // 3. Sync documents
     if (initialData.documents && initialData.documents.length > 0) {
       setDocuments(
         initialData.documents.map((d, idx) => ({
@@ -115,11 +136,22 @@ export const AddPropertyForm: React.FC<AddPropertyFormProps> = ({ onBack, onSucc
         }))
       );
     }
-    if (initialData.videoUrl) setVideoName(initialData.videoUrl);
+
+    // 4. Sync video
+    if (initialData.videoUrl) {
+      setVideoUrl(initialData.videoUrl);
+      const nameOnly = initialData.videoUrl.split('/').pop() || initialData.videoUrl;
+      setVideoName(nameOnly);
+    }
   }, [initialData?.id, initialData?.propertyId, initialData?.images?.length]);
 
-  const [videoName, setVideoName] = useState<string | null>(initialData?.videoUrl || null);
+  const [videoUrl, setVideoUrl] = useState<string>(initialData?.videoUrl || '');
+  const [videoName, setVideoName] = useState<string | null>(
+    initialData?.videoUrl ? (initialData.videoUrl.split('/').pop() || initialData.videoUrl) : null
+  );
+  const [isVideoUploading, setIsVideoUploading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isImagesLoading, setIsImagesLoading] = useState(false);
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
 
   const docInputRef = useRef<HTMLInputElement>(null);
@@ -164,7 +196,10 @@ export const AddPropertyForm: React.FC<AddPropertyFormProps> = ({ onBack, onSucc
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
-    
+
+    let pendingCount = files.length;
+    setIsImagesLoading(true);
+
     Array.from(files).forEach((file) => {
       const reader = new FileReader();
       reader.onload = () => {
@@ -178,10 +213,19 @@ export const AddPropertyForm: React.FC<AddPropertyFormProps> = ({ onBack, onSucc
             }
           ]);
         }
+        pendingCount -= 1;
+        if (pendingCount === 0) {
+          setIsImagesLoading(false);
+          addToast('success', `${files.length} image(s) ready`);
+        }
+      };
+      reader.onerror = () => {
+        pendingCount -= 1;
+        if (pendingCount === 0) setIsImagesLoading(false);
+        addToast('error', `Failed to read image: ${file.name}`);
       };
       reader.readAsDataURL(file);
     });
-    addToast('success', `${files.length} image(s) uploaded`);
   };
 
   // Set Cover Image
@@ -206,12 +250,53 @@ export const AddPropertyForm: React.FC<AddPropertyFormProps> = ({ onBack, onSucc
     });
   };
 
-  // Video file selection
-  const handleVideoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // Video file upload directly to VPS
+  const handleVideoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
-    setVideoName(files[0].name);
-    addToast('success', `Video attached: ${files[0].name}`);
+    const file = files[0];
+
+    if (file.size > 250 * 1024 * 1024) {
+      addToast('error', 'Video file is too large (Maximum allowed: 250MB)');
+      return;
+    }
+
+    setVideoName(file.name);
+    setIsVideoUploading(true);
+    addToast('info', `Uploading & processing video (${(file.size / (1024 * 1024)).toFixed(1)} MB)...`);
+
+    try {
+      const uploadFormData = new FormData();
+      uploadFormData.append('video', file);
+
+      const res = await fetch(`${API_BASE}/upload/video`, {
+        method: 'POST',
+        body: uploadFormData
+      });
+
+      const data = await res.json();
+      if (res.ok && data.url) {
+        setVideoUrl(data.url);
+        addToast('success', data.message || 'Video uploaded and ready');
+      } else {
+        throw new Error(data.message || 'Failed to upload video');
+      }
+    } catch (err: any) {
+      console.error('Video upload error:', err);
+      addToast('error', err.message || 'Video upload failed. Please try again.');
+    } finally {
+      setIsVideoUploading(false);
+    }
+  };
+
+  // Remove Video
+  const handleRemoveVideo = () => {
+    setVideoName(null);
+    setVideoUrl('');
+    if (videoInputRef.current) {
+      videoInputRef.current.value = '';
+    }
+    addToast('info', 'Video removed');
   };
 
   // Validation
@@ -271,10 +356,18 @@ export const AddPropertyForm: React.FC<AddPropertyFormProps> = ({ onBack, onSucc
 
   // Submit Handler
   const handleSubmit = async (status: 'Active' | 'Draft' = 'Active') => {
+    if (isImagesLoading) {
+      addToast('warning', 'Please wait until images finish loading before saving.');
+      return;
+    }
+    if (isVideoUploading) {
+      addToast('warning', 'Please wait until the video finishes uploading to VPS.');
+      return;
+    }
     if (!validateForm()) return;
 
     setIsSubmitting(true);
-    const API_BASE = process.env.NEXT_PUBLIC_API_URL;
+    const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
 
     const payload = {
       title: formData.title.trim(),
@@ -307,7 +400,7 @@ export const AddPropertyForm: React.FC<AddPropertyFormProps> = ({ onBack, onSucc
       ownerNotes: formData.ownerNotes.trim(),
       documents: documents.map((d) => ({ name: d.name, url: '/documents/' + d.name })),
       images: images.map((img) => ({ url: img.url, isCover: img.isCover })),
-      videoUrl: videoName || formData.videoUrl,
+      videoUrl: videoUrl || formData.videoUrl || '',
       internalNotes: formData.internalNotes.trim(),
       status
     };
@@ -358,9 +451,19 @@ export const AddPropertyForm: React.FC<AddPropertyFormProps> = ({ onBack, onSucc
           <button
             type="button"
             onClick={onBack}
-            className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-navy-950 transition-colors mb-1 cursor-pointer"
+            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 hover:text-navy-950 border border-slate-300 shadow-2xs hover:shadow-xs transition-all mb-2.5 cursor-pointer group active:scale-95"
+            title="Return to Properties list"
           >
-            ← Properties
+            <svg
+              className="w-3.5 h-3.5 text-slate-600 group-hover:text-navy-950 group-hover:-translate-x-0.5 transition-transform"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth="2.5"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            <span>Back to Properties</span>
           </button>
           <div className="flex items-center gap-2.5">
             <h1 className="font-heading text-xl sm:text-2xl font-bold text-navy-950 tracking-tight">
@@ -998,7 +1101,7 @@ export const AddPropertyForm: React.FC<AddPropertyFormProps> = ({ onBack, onSucc
             {/* Add Images Box */}
             <div
               onClick={() => imgInputRef.current?.click()}
-              className="h-28 border-2 border-dashed border-slate-200 rounded-xl flex flex-col items-center justify-center cursor-pointer hover:border-gold-400 hover:bg-gold-50/10 transition-colors text-slate-400 hover:text-gold-600"
+              className="h-28 border-2 border-dashed border-slate-200 rounded-xl flex flex-col items-center justify-center cursor-pointer hover:border-blue-400 hover:bg-blue-50/20 transition-colors text-slate-400 hover:text-blue-600"
             >
               <span className="text-2xl leading-none mb-1">+</span>
               <span className="text-[11px] font-bold">Add Images</span>
@@ -1008,9 +1111,12 @@ export const AddPropertyForm: React.FC<AddPropertyFormProps> = ({ onBack, onSucc
 
         {/* CARD 8: PROPERTY VIDEO */}
         <section className="bg-white rounded-xl border border-slate-200/90 p-4 sm:p-5 shadow-xs space-y-3">
-          <h2 className="font-heading text-xs sm:text-sm font-bold uppercase tracking-wider text-navy-900 border-b border-slate-100 pb-2">
-            Property Video
-          </h2>
+          <div className="flex items-center justify-between border-b border-slate-100 pb-2">
+            <h2 className="font-heading text-xs sm:text-sm font-bold uppercase tracking-wider text-navy-900">
+              Property Video
+            </h2>
+            <span className="text-[10.5px] text-slate-400">Optional</span>
+          </div>
 
           <input
             type="file"
@@ -1020,19 +1126,74 @@ export const AddPropertyForm: React.FC<AddPropertyFormProps> = ({ onBack, onSucc
             className="hidden"
           />
 
-          <div
-            onClick={() => videoInputRef.current?.click()}
-            className="border-2 border-dashed border-slate-200 rounded-xl p-5 text-center cursor-pointer hover:border-gold-400 hover:bg-gold-50/10 transition-colors"
-          >
-            <span className="text-2xl block mb-1">🎥</span>
-            <span className="text-xs font-bold text-navy-900 block">
-              {videoName ? (
-                <span className="text-emerald-600">Attached: {videoName}</span>
-              ) : (
-                <>Upload Property Video or <span className="text-gold-600 underline">Browse Video</span></>
-              )}
-            </span>
-            <span className="text-[10px] text-slate-400 mt-0.5 block">MP4 / MOV / WebM</span>
+          {videoName || videoUrl ? (
+            <div className="flex items-center justify-between p-3.5 bg-emerald-50/80 border border-emerald-200 rounded-xl">
+              <div className="flex items-center gap-2.5 min-w-0">
+                <span className="text-xl shrink-0">🎥</span>
+                <div className="min-w-0">
+                  <span className="text-xs font-bold text-emerald-900 block truncate">
+                    {videoName || 'Attached Video Tour'}
+                  </span>
+                  {isVideoUploading ? (
+                    <span className="text-[10.5px] text-emerald-700 font-medium animate-pulse flex items-center gap-1.5 mt-0.5">
+                      <span className="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
+                      Uploading & processing on VPS...
+                    </span>
+                  ) : (
+                    <span className="text-[10px] text-emerald-600 block mt-0.5">
+                      {videoUrl.startsWith('http') ? 'External Link' : 'Stored on VPS'} • Ready to play
+                    </span>
+                  )}
+                </div>
+              </div>
+              <div className="flex items-center gap-2 shrink-0">
+                {videoUrl && !isVideoUploading && (
+                  <a
+                    href={videoUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-[11px] font-semibold text-emerald-700 bg-white hover:bg-emerald-100 border border-emerald-300 px-2.5 py-1 rounded-lg transition-colors cursor-pointer"
+                  >
+                    Preview ↗
+                  </a>
+                )}
+                <button
+                  type="button"
+                  disabled={isVideoUploading}
+                  onClick={handleRemoveVideo}
+                  className="text-[11px] font-semibold text-rose-600 bg-white hover:bg-rose-50 border border-rose-200 px-2.5 py-1 rounded-lg transition-colors cursor-pointer disabled:opacity-50"
+                >
+                  Remove ✕
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div
+              onClick={() => videoInputRef.current?.click()}
+              className="border-2 border-dashed border-slate-200 rounded-xl p-5 text-center cursor-pointer hover:border-blue-400 hover:bg-blue-50/10 transition-colors"
+            >
+              <span className="text-2xl block mb-1">🎥</span>
+              <span className="text-xs font-bold text-navy-900 block">
+                Upload Property Video or <span className="text-blue-600 underline">Browse Video</span>
+              </span>
+              <span className="text-[10px] text-slate-400 mt-0.5 block">MP4 / MOV / WebM (Max 250MB)</span>
+            </div>
+          )}
+
+          {/* Alternative: External Video Link (YouTube / Vimeo) */}
+          <div className="pt-1 flex items-center gap-2">
+            <span className="text-[11px] text-slate-500 font-medium shrink-0">Or paste YouTube / Video link:</span>
+            <input
+              type="url"
+              placeholder="https://youtube.com/watch?v=... or https://..."
+              value={videoUrl.startsWith('http') ? videoUrl : ''}
+              onChange={(e) => {
+                const val = e.target.value.trim();
+                setVideoUrl(val);
+                setVideoName(val ? 'External Video Link' : null);
+              }}
+              className="flex-1 px-3 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-lg focus:outline-hidden focus:ring-1 focus:ring-blue-500 text-navy-900"
+            />
           </div>
         </section>
 
@@ -1062,11 +1223,20 @@ export const AddPropertyForm: React.FC<AddPropertyFormProps> = ({ onBack, onSucc
           </button>
           <button
             type="button"
-            disabled={isSubmitting}
+            disabled={isSubmitting || isImagesLoading || isVideoUploading}
             onClick={() => handleSubmit('Active')}
-            className="btn-gold px-8 py-2.5 rounded-xl text-xs font-bold text-white shadow-md transition-all cursor-pointer"
+            className={`btn-gold px-8 py-2.5 rounded-xl text-xs font-bold text-white shadow-md transition-all ${
+              isImagesLoading || isVideoUploading ? 'opacity-60 cursor-not-allowed' : 'cursor-pointer'
+            }`}
           >
-            {isSubmitting ? 'Saving Property...' : 'Save Property'}
+            {isSubmitting
+              ? 'Saving Property...'
+              : isImagesLoading
+              ? '⏳ Images Loading...'
+              : isVideoUploading
+              ? '⏳ Video Uploading...'
+              : 'Save Property'
+            }
           </button>
         </div>
       </div>

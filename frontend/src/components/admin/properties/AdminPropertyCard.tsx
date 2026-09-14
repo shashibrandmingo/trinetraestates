@@ -8,12 +8,14 @@ interface AdminPropertyCardProps {
   property: PropertyItem;
   onViewDetails: (property: PropertyItem) => void;
   onDeleteProperty?: (property: PropertyItem) => void;
+  onRenewProperty?: (property: PropertyItem) => void;
 }
 
 export const AdminPropertyCard: React.FC<AdminPropertyCardProps> = ({
   property,
   onViewDetails,
-  onDeleteProperty
+  onDeleteProperty,
+  onRenewProperty
 }) => {
   const isSold = property.status === 'Sold';
   const isSoldByMe = property.status === 'Sold by Me';
@@ -83,10 +85,44 @@ export const AdminPropertyCard: React.FC<AdminPropertyCardProps> = ({
       );
     }
     if (property.status === 'Expired' || property.daysRemaining <= 0) {
-      return <span className="text-[11px] font-bold text-rose-500">EXPIRED</span>;
+      return (
+        <div className="flex items-center gap-1.5">
+          <span className="text-[11px] font-bold text-rose-500">EXPIRED</span>
+          {onRenewProperty && (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                onRenewProperty(property);
+              }}
+              className="text-[10px] font-bold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-300 px-1.5 py-0.5 rounded transition-colors cursor-pointer"
+              title="Renew listing (+60 Days)"
+            >
+              Renew ↺
+            </button>
+          )}
+        </div>
+      );
     }
     if (property.daysRemaining <= 15) {
-      return <span className="text-[11px] font-bold text-amber-600">Expires in {property.daysRemaining} days</span>;
+      return (
+        <div className="flex items-center gap-1.5">
+          <span className="text-[11px] font-bold text-amber-600">Expires in {property.daysRemaining} days</span>
+          {onRenewProperty && (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                onRenewProperty(property);
+              }}
+              className="text-[10px] font-bold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-300 px-1.5 py-0.5 rounded transition-colors cursor-pointer"
+              title="Renew listing (+60 Days)"
+            >
+              Renew ↺
+            </button>
+          )}
+        </div>
+      );
     }
     return <span className="text-[11px] text-slate-500">Expires in {property.daysRemaining} days</span>;
   };
@@ -180,7 +216,7 @@ export const AdminPropertyCard: React.FC<AdminPropertyCardProps> = ({
               className={`text-sm font-bold font-heading line-clamp-1 transition-colors ${
                 isClosed
                   ? 'text-slate-600 group-hover:text-navy-900'
-                  : 'text-navy-950 group-hover:text-gold-600'
+                  : 'text-navy-950 group-hover:text-blue-600'
               }`}
             >
               {property.title}
@@ -246,7 +282,7 @@ export const AdminPropertyCard: React.FC<AdminPropertyCardProps> = ({
               className={`px-2.5 py-1 text-xs font-semibold rounded-lg transition-colors flex items-center gap-1 cursor-pointer ${
                 isClosed
                   ? 'bg-slate-200/80 text-slate-700 hover:bg-slate-300/80'
-                  : 'bg-slate-100 text-navy-900 hover:text-gold-600 hover:bg-gold-50/60'
+                  : 'bg-slate-100 text-navy-900 hover:text-blue-600 hover:bg-blue-50/60'
               }`}
             >
               <span>View Details</span>

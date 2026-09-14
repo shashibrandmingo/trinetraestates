@@ -61,5 +61,5 @@ export const createOfficeSchema = z.object({
   images: z.array(z.object({ url: z.string(), isCover: z.boolean().default(false) })).optional().default([]),
   videoUrl: z.string().trim().optional().default(''),
   internalNotes: z.string().trim().optional().default(''),
-  status: z.enum(['Active', 'Expiring', 'Expired', 'Sold', 'Draft']).default('Active')
+  status: z.enum(['Active', 'Expiring', 'Expired', 'Sold', 'Sold by Me', 'Draft']).default('Active')
 });

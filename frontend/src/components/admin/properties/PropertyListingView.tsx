@@ -14,6 +14,7 @@ interface PropertyListingViewProps {
   onEditProperty?: (property: PropertyItem) => void;
   onDuplicateProperty?: (property: PropertyItem) => void;
   onDeleteProperty?: (property: PropertyItem) => void;
+  onRenewProperty?: (property: PropertyItem) => void;
   onStatusChange?: (property: PropertyItem, newStatus: PropertyItem['status'], dealData?: any) => Promise<void> | void;
   hasMore?: boolean;
   isLoadingMore?: boolean;
@@ -40,6 +41,7 @@ export const PropertyListingView: React.FC<PropertyListingViewProps> = ({
   onEditProperty,
   onDuplicateProperty,
   onDeleteProperty,
+  onRenewProperty,
   onStatusChange,
   hasMore = false,
   isLoadingMore = false,
@@ -245,6 +247,7 @@ export const PropertyListingView: React.FC<PropertyListingViewProps> = ({
           onEditProperty={onEditProperty}
           onDuplicateProperty={onDuplicateProperty}
           onDeleteProperty={onDeleteProperty}
+          onRenewProperty={onRenewProperty}
           onStatusChange={onStatusChange}
         />
       ) : (
@@ -255,6 +258,7 @@ export const PropertyListingView: React.FC<PropertyListingViewProps> = ({
               property={item}
               onViewDetails={onViewDetails}
               onDeleteProperty={onDeleteProperty}
+              onRenewProperty={onRenewProperty}
             />
           ))}
         </div>
@@ -278,7 +282,7 @@ export const PropertyListingView: React.FC<PropertyListingViewProps> = ({
             <button
               type="button"
               onClick={onLoadMore}
-              className="px-3.5 py-1.5 rounded-lg bg-white border border-slate-300 font-bold text-navy-950 hover:border-gold-500 hover:text-gold-600 shadow-2xs transition-colors cursor-pointer flex items-center gap-1.5"
+              className="px-3.5 py-1.5 rounded-lg bg-white border border-slate-300 font-bold text-navy-950 hover:border-blue-500 hover:text-blue-600 shadow-2xs transition-colors cursor-pointer flex items-center gap-1.5"
             >
               <span>Load Next 20 More</span>
               <span>↓</span>

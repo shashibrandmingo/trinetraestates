@@ -10,7 +10,7 @@ export default function RevenueCard({
   periodLabel = 'This Month'
 }: RevenueCardProps) {
   return (
-    <div className="rounded-xl border border-gold-300/80 bg-gradient-to-br from-gold-50/70 via-white to-gold-50/30 py-2 sm:py-2.5 px-2.5 sm:px-3.5 shadow-2xs hover:shadow-xs transition-all duration-150 flex flex-col justify-between relative overflow-hidden min-h-[76px] sm:min-h-[88px]">
+    <div className="rounded-xl border border-gold-300/80 bg-white py-2.5 px-3.5 shadow-2xs hover:shadow-xs transition-all duration-150 flex flex-col justify-between relative overflow-hidden min-h-[76px] sm:min-h-[88px]">
       <div className="flex items-center justify-between gap-1 mb-0.5 sm:mb-1">
         <div className="flex items-center gap-1.5">
           <span className="text-[9px] sm:text-[10.5px] font-bold uppercase tracking-wider text-gold-900 font-sans">

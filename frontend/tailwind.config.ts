@@ -9,18 +9,19 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Luxury Real Estate Palette matching Brand Logo
+        white: '#ffffff',
+        // Eye-Comforting Blue Palette (replaces harsh mustard gold with soothing royal blue)
         gold: {
-          50: '#fbf8f0',
-          100: '#f5edd7',
-          200: '#eddab0',
-          300: '#e1c382',
-          400: '#d5ab56',
-          500: '#c5a363', // Brand Gold
-          600: '#b08d4b',
-          700: '#927138',
-          800: '#755830',
-          900: '#5f4728'
+          50: '#f0f7ff',
+          100: '#e0effe',
+          200: '#bae0fd',
+          300: '#7cc4fa',
+          400: '#38a5f8',
+          500: '#2563eb', // Comfort Blue Primary
+          600: '#1d4ed8',
+          700: '#1e40af',
+          800: '#1e3a8a',
+          900: '#172554'
         },
         navy: {
           50: '#f0f4f9',

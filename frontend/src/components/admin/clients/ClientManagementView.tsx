@@ -255,7 +255,7 @@ export default function ClientManagementView() {
               setEditingClient(null);
               setIsAddEditOpen(true);
             }}
-            className="flex-1 sm:flex-none justify-center px-4 py-2 rounded-xl text-xs font-bold text-navy-950 bg-gradient-to-r from-gold-400 to-gold-500 hover:from-gold-300 hover:to-gold-400 transition-all flex items-center gap-1.5 shadow-sm hover:shadow-md cursor-pointer whitespace-nowrap active:scale-98"
+            className="flex-1 sm:flex-none justify-center px-4 py-2 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 transition-all flex items-center gap-1.5 shadow-sm hover:shadow-md cursor-pointer whitespace-nowrap active:scale-98"
           >
             <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
@@ -282,7 +282,7 @@ export default function ClientManagementView() {
         </div>
 
         {/* Card 2: Deals Closed & Revenue */}
-        <div className="bg-gradient-to-br from-emerald-500/10 via-white to-white py-2.5 px-3.5 rounded-xl border border-emerald-200/90 shadow-2xs flex items-center gap-3 transition-all hover:border-emerald-300">
+        <div className="bg-white py-2.5 px-3.5 rounded-xl border border-emerald-200/90 shadow-2xs flex items-center gap-3 transition-all hover:border-emerald-300">
           <div className="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center flex-shrink-0 border border-emerald-200">
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
               <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
@@ -446,7 +446,7 @@ export default function ClientManagementView() {
                 setEditingClient(null);
                 setIsAddEditOpen(true);
               }}
-              className="mt-3 px-3.5 py-1.5 rounded-lg text-xs font-bold text-navy-950 bg-gold-400 hover:bg-gold-500 shadow-2xs inline-flex items-center gap-1.5 cursor-pointer"
+              className="mt-3 px-3.5 py-1.5 rounded-lg text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-2xs inline-flex items-center gap-1.5 cursor-pointer"
             >
               <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
@@ -475,7 +475,7 @@ export default function ClientManagementView() {
                   const cleanPhone = client.phone ? client.phone.replace(/[^0-9]/g, '') : '';
 
                   return (
-                    <tr key={client._id} className="hover:bg-slate-50/70 transition-colors">
+                    <tr key={client._id} className="hover:bg-blue-50/40 transition-colors">
                       {/* Client Name & ID */}
                       <td className="py-2.5 px-4">
                         <div className="flex items-center gap-3">
@@ -489,7 +489,7 @@ export default function ClientManagementView() {
                                 setViewingClient(client);
                                 setIsDetailsOpen(true);
                               }}
-                              className="font-bold text-navy-900 hover:text-gold-600 text-left transition-colors cursor-pointer"
+                              className="font-bold text-navy-900 hover:text-blue-600 text-left transition-colors cursor-pointer"
                             >
                               {client.name}
                             </button>
@@ -626,7 +626,7 @@ export default function ClientManagementView() {
                               setIsAddEditOpen(true);
                             }}
                             title="Edit Client"
-                            className="p-1.5 rounded-lg text-slate-400 hover:text-gold-600 hover:bg-gold-50 transition-colors"
+                            className="p-1.5 rounded-lg text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-colors"
                           >
                             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />

@@ -112,6 +112,10 @@ const officeSpaceSchema = new mongoose.Schema(
       type: Date,
       default: Date.now
     },
+    daysRemaining: {
+      type: Number,
+      default: 60
+    },
     ownerName: {
       type: String,
       default: ''

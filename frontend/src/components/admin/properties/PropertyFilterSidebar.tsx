@@ -56,7 +56,7 @@ export default function PropertyFilterSidebar({
           <button
             type="button"
             onClick={onResetFilters}
-            className="text-[11px] font-semibold text-gold-600 hover:text-gold-700 underline cursor-pointer"
+            className="text-[11px] font-semibold text-blue-600 hover:text-blue-700 underline cursor-pointer"
           >
             Reset All
           </button>

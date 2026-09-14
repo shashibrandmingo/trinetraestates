@@ -39,6 +39,10 @@ export interface PropertyItem {
   securityDeposit?: number;
   maintenanceCharge?: number;
   description?: string;
+  internalNotes?: string;
+  dataAge?: string;
+  availabilityStatus?: string;
+  listingDate?: string;
   price?: number;
   createdAt?: string;
   agentName?: string;

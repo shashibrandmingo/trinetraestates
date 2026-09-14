@@ -9,6 +9,7 @@ import {
   deleteOffice,
   updateOffice,
   duplicateOffice,
+  renewOffice,
   purgeTestData,
   getOfficeById
 } from '../controllers/office.controller.js';
@@ -29,6 +30,10 @@ router.get('/export', exportOfficesCSV);
 
 // Bulk import properties from Excel / CSV endpoint
 router.post('/bulk-import', bulkImportOffices);
+
+// Renew property listing (+60 days)
+router.put('/:id/renew', renewOffice);
+router.post('/:id/renew', renewOffice);
 
 // Duplicate property endpoint
 router.post('/:id/duplicate', duplicateOffice);

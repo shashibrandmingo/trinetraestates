@@ -368,9 +368,7 @@ export const PropertyViewContainer: React.FC<PropertyViewContainerProps> = ({
             dealAmount: dealData.dealAmount || 0,
             commissionEarned: dealData.commissionEarned || 0,
             paymentMode: dealData.paymentMode || 'Bank Transfer',
-            dealDate: dealData.soldDate || new Date().toISOString(),
-            notes: dealData.notes || 'Deal closed via Sales by Me',
-            source: 'Sales by Me'
+            notes: dealData.remarks || `Closed deal via property status update`
           }).then(() => {
             queryClient.invalidateQueries({ queryKey: ['clients'] });
             queryClient.invalidateQueries({ queryKey: ['client-stats'] });
@@ -379,6 +377,31 @@ export const PropertyViewContainer: React.FC<PropertyViewContainerProps> = ({
       }
     } catch (err) {
       console.warn('Could not update property status:', err);
+    }
+  };
+
+  const handleRenewProperty = async (property: PropertyItem) => {
+    const id = property.propertyId || property.id;
+    if (!id) return;
+    try {
+      const res = await propertyService.renewProperty(id);
+      if (res.success && res.data) {
+        setProperties((prev) =>
+          prev.map((p) => (p.propertyId === id || p.id === id ? { ...p, ...res.data! } : p))
+        );
+        if (selectedProperty && (selectedProperty.propertyId === id || selectedProperty.id === id)) {
+          setSelectedProperty((prev) => (prev ? { ...prev, ...res.data! } : null));
+        }
+        addToast(res.message || `Property ${id} renewed for 60 days!`, 'success');
+        queryClient.invalidateQueries({ queryKey: ['admin-properties-batch'] });
+        queryClient.invalidateQueries({ queryKey: ['property-kpi-stats'] });
+        queryClient.invalidateQueries({ queryKey: ['admin-dashboard-overview'] });
+      } else {
+        addToast(res.message || 'Failed to renew property', 'error');
+      }
+    } catch (err: any) {
+      console.error('Error renewing property:', err);
+      addToast(err?.message || 'Error renewing property', 'error');
     }
   };
 
@@ -477,6 +500,7 @@ export const PropertyViewContainer: React.FC<PropertyViewContainerProps> = ({
           onDuplicateProperty={handleDuplicateProperty}
           onDeleteProperty={handleDeleteProperty}
           onStatusChange={handleStatusChange}
+          onRenewProperty={handleRenewProperty}
           hasMore={hasMore}
           isLoadingMore={isLoadingMore}
           isLoading={isLoading}
@@ -535,6 +559,7 @@ export const PropertyViewContainer: React.FC<PropertyViewContainerProps> = ({
         property={selectedProperty}
         isOpen={isDetailsOpen}
         onClose={() => setIsDetailsOpen(false)}
+        onRenew={handleRenewProperty}
       />
 
       {/* Bulk Import Excel / CSV Modal */}

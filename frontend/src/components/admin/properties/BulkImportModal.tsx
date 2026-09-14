@@ -307,7 +307,7 @@ export const BulkImportModal: React.FC<BulkImportModalProps> = ({
           {!file ? (
             <div
               onClick={() => fileInputRef.current?.click()}
-              className="border-2 border-dashed border-slate-300 hover:border-gold-500 bg-slate-50/50 hover:bg-gold-50/20 rounded-2xl p-8 text-center cursor-pointer transition-colors group"
+              className="border-2 border-dashed border-slate-300 hover:border-blue-500 bg-slate-50/50 hover:bg-blue-50/30 rounded-2xl p-8 text-center cursor-pointer transition-colors group"
             >
               <input
                 ref={fileInputRef}
@@ -316,7 +316,7 @@ export const BulkImportModal: React.FC<BulkImportModalProps> = ({
                 onChange={handleFileChange}
                 className="hidden"
               />
-              <div className="w-12 h-12 rounded-full bg-slate-100 group-hover:bg-gold-100 text-slate-500 group-hover:text-gold-700 flex items-center justify-center mx-auto mb-3 transition-colors">
+              <div className="w-12 h-12 rounded-full bg-slate-100 group-hover:bg-blue-100 text-slate-500 group-hover:text-blue-700 flex items-center justify-center mx-auto mb-3 transition-colors">
                 <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
                 </svg>

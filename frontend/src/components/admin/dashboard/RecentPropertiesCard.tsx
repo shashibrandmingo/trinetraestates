@@ -25,7 +25,7 @@ export default function RecentPropertiesCard({
   onSelectProperty
 }: RecentPropertiesCardProps) {
   return (
-    <div className="bg-gradient-to-br from-slate-50/90 via-white to-blue-50/30 rounded-xl border border-slate-200/90 shadow-2xs p-3.5 sm:p-4 flex flex-col justify-between hover:border-blue-300/80 hover:shadow-xs transition-all duration-200">
+    <div className="bg-white rounded-xl border border-slate-200/90 shadow-2xs p-3.5 sm:p-4 flex flex-col justify-between hover:border-blue-300/80 hover:shadow-xs transition-all duration-200">
       <div>
         {/* Header with Luxury Icon & Badge */}
         <div className="flex items-center justify-between pb-2.5 mb-2.5 border-b border-slate-100/90">
@@ -51,7 +51,7 @@ export default function RecentPropertiesCard({
         </div>
 
         {properties.length === 0 ? (
-          <div className="py-4 px-3 text-center rounded-lg bg-white/80 border border-dashed border-slate-200">
+          <div className="py-4 px-3 text-center rounded-lg bg-white border border-dashed border-slate-200">
             <p className="text-xs font-semibold text-slate-600 font-sans">No properties listed yet</p>
             <p className="text-[10.5px] text-slate-400 font-sans mt-0.5">
               Click &quot;+ Add Property&quot; to create the first listing
@@ -68,7 +68,7 @@ export default function RecentPropertiesCard({
                   key={prop.id}
                   title={prop.towerName}
                   onClick={() => (onSelectProperty ? onSelectProperty(prop) : onViewAll?.())}
-                  className="group flex items-center justify-between p-2.5 rounded-lg border border-slate-200/70 bg-white/85 hover:bg-blue-50/50 hover:border-blue-300 hover:shadow-xs transition-all duration-150 gap-2.5 cursor-pointer"
+                  className="group flex items-center justify-between p-2.5 rounded-lg border border-slate-200/70 bg-white hover:bg-blue-50/50 hover:border-blue-300 hover:shadow-xs transition-all duration-150 gap-2.5 cursor-pointer"
                 >
                   <div className="flex items-center gap-2.5 min-w-0">
                     {/* Property Icon */}
