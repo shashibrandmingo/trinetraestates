@@ -16,8 +16,8 @@ export const getOffices = async (req, res, next) => {
     }
 
     // Sector & Locality filter
-    if (query.sector && query.sector !== 'All Sectors') {
-      filter['location.sector'] = new RegExp(query.sector.trim(), 'i');
+    if (query.sector && query.sector !== 'All Sectors' && query.sector.toLowerCase() !== 'all') {
+      filter['location.sector'] = new RegExp(`^${query.sector.trim()}$`, 'i');
     }
     if (query.locality) {
       andConditions.push({
@@ -373,6 +373,34 @@ export const getOfficeStats = async (req, res, next) => {
         sold: sold || 0,
         soldByMe: soldByMe || 0,
         totalRevenue: totalRevenue || 0
+      }
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getSectorSummary = async (req, res, next) => {
+  try {
+    const counts = await OfficeSpace.aggregate([
+      { $match: { status: 'Active' } },
+      { $group: { _id: '$location.sector', count: { $sum: 1 } } },
+      { $sort: { count: -1 } }
+    ]);
+
+    const total = counts.reduce((acc, c) => acc + (c.count || 0), 0);
+    const sectors = counts
+      .filter((c) => c._id && String(c._id).trim() !== '')
+      .map((c) => ({
+        sector: String(c._id).trim(),
+        count: c.count
+      }));
+
+    res.status(200).json({
+      success: true,
+      data: {
+        total,
+        sectors
       }
     });
   } catch (error) {

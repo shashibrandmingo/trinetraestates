@@ -28,7 +28,7 @@ export const clearPropertyDetailCache = (id?: string) => {
   }
 };
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL;
+const API_BASE = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api').replace(/\/+$/, '');
 
 export interface BackendOfficeDoc {
   _id?: string;
@@ -62,6 +62,8 @@ export interface BackendOfficeDoc {
   parking?: string | boolean;
   floor?: string;
   amenities?: string[];
+  thumbnail?: string;
+  imageUrl?: string;
   images?: Array<{ url: string; isCover?: boolean }>;
   videoUrl?: string;
   documents?: Array<{ name: string; url: string }>;

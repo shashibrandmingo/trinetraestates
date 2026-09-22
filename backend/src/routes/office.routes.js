@@ -2,6 +2,7 @@ import { Router } from 'express';
 import {
   getOffices,
   getOfficeStats,
+  getSectorSummary,
   searchOffices,
   createOffice,
   bulkImportOffices,
@@ -18,6 +19,9 @@ const router = Router();
 
 // Stats summary endpoint
 router.get('/stats', getOfficeStats);
+
+// Sector counts summary endpoint
+router.get('/sectors', getSectorSummary);
 
 // Dedicated quick search endpoint (properties, sectors, owners)
 router.get('/search', searchOffices);

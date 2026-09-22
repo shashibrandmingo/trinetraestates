@@ -1,7 +1,7 @@
 import { DashboardData } from '@/types/adminDashboard';
 import { initialDashboardData } from '@/data/mockDashboardData';
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL;
+const API_BASE = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api').replace(/\/+$/, '');
 
 export const adminDashboardService = {
   /**

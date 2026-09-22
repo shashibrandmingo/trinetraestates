@@ -2,23 +2,125 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ==========================================================================
+   GLOBAL DESIGN TOKENS (Noida Office Space)
+   Central source of truth for both Public Website & Admin Dashboard.
+   ========================================================================== */
+
 :root {
-  --font-sans: var(--font-poppins);
-  --font-heading: var(--font-poppins);
+  /* --- Brand Primary Colors --- */
+  --primary: #0a233c;            /* Executive Deep Blue / Navy */
+  --primary-hover: #07192b;      /* Darker Blue for hover states */
+  --primary-light: #e8eff6;      /* Subtle blue tint for badges & borders */
+
+  /* --- Brand Accent / Golden Colors --- */
+  --gold: #9d7448;               /* Warm Corporate Gold */
+  --gold-hover: #86613a;         /* Deep Rich Gold for hover */
+  --gold-light: #faf5ef;         /* Soft Champagne Gold tint for backgrounds/badges */
+  --gold-border: #ebd9c5;        /* Light golden border */
+  --gold-bright: #e5be83;        /* Luminous Champagne Gold for icons & highlights on dark surfaces */
+  --gold-gradient: linear-gradient(180deg, #e4c28d 0%, #cb9f64 60%, #b58849 100%); /* Metallic Champagne Gold */
+  --gold-gradient-hover: linear-gradient(180deg, #ecd1a0 0%, #d5aa72 60%, #bf9253 100%);
+
+  /* --- Backgrounds --- */
+  --bg-main: #fefefe;            /* Main Website Light Background */
+  --bg-surface: #ffffff;         /* Pure White for cards & forms */
+  --bg-subtle: #f8fafc;          /* Ultra soft grey for alternating sections */
+  --bg-dark: #07192b;            /* Dark footer & deep contrast surfaces */
+
+  /* --- Typography Colors (Light Backgrounds) --- */
+  --text-heading: #0a233c;       /* Executive Navy Headings on Light bg */
+  --text-body: #475569;          /* Slate Grey for high legibility on Light bg */
+  --text-muted: #64748b;         /* Captions, helper text on Light bg */
+  --text-gold: #9d7448;          /* Highlighted words & badges */
+
+  /* --- Typography Colors (Dark / Blue Backgrounds) --- */
+  --text-white: #ffffff;         /* 100% Pure White for headings/important elements */
+  --text-light: #f8fafc;         /* Bright, crisp white for body paragraphs on dark/blue surfaces */
+  --text-light-muted: #cbd5e1;   /* Clean light slate for links/secondary text on dark surfaces */
+
+  /* --- Footer Tokens --- */
+  --footer-bg: #07192b;          /* Dark Navy Corporate Footer */
+  --footer-border: #142a40;      /* Subtle dark border */
+  --footer-input: #0c2339;       /* Input box navy surface */
+  --footer-text: #f8fafc;        /* 100% Crisp bright white for footer body */
+  --footer-text-muted: #cbd5e1;  /* Clean light slate for footer links */
+
+  /* --- Borders & Shadows --- */
+  --border-subtle: #e6ebf1;      /* Crisp subtle border */
+  --border-card: #edf1f5;        /* Card boundary */
+  --shadow-sm: 0 2px 8px -2px rgba(10, 35, 60, 0.05);
+  --shadow-card: 0 10px 35px -5px rgba(10, 35, 60, 0.07), 0 2px 10px -2px rgba(10, 35, 60, 0.04);
+  --shadow-gold: 0 10px 25px -5px rgba(157, 116, 72, 0.35);
+  --shadow-blue: 0 10px 25px -5px rgba(10, 35, 60, 0.35);
+
+  /* --- Typography Fluid Scales --- */
+  --h1-size: clamp(2rem, 3.8vw, 2.95rem);      /* 32px on mobile to ~47px on desktop */
+  --h2-size: clamp(1.6rem, 2.8vw, 2.35rem);     /* 25px to 37px */
+  --h3-size: clamp(1.2rem, 1.8vw, 1.5rem);      /* 19px to 24px */
+  --h4-size: 1.125rem;                          /* 18px */
+  --body-size: 1rem;                            /* 16px */
+  --body-line-height: 1.68;
+  --eyebrow-size: 0.75rem;                       /* 12px uppercase */
+
+  /* --- Section & Container Spacing --- */
+  --container-max-width: 80rem;                 /* 1280px */
+  --section-gap: clamp(2.75rem, 5vw, 4.25rem);   /* Global equal distance between sections */
+  --section-padding-y: calc(var(--section-gap) / 2);
+  --section-padding-y-compact: calc(var(--section-gap) / 2.5);
+  --section-padding-y-sm: calc(var(--section-gap) / 2.5);
+
+  /* --- Global Border Radii --- */
+  --radius-button: 0.75rem;                     /* 12px */
+  --radius-card: 1.25rem;                       /* 20px */
+  --radius-input: 0.65rem;                      /* 10px */
+  --radius-badge: 9999px;                       /* Full pill */
+
+  /* --- Global Transition Timing --- */
+  --transition-smooth: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* Website Typography Font Tokens */
+  --font-heading: var(--font-sans), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
-@layer base {
-  html, body {
-    overflow-x: hidden;
-    max-width: 100vw;
-    background-color: #ebebeb;
-    color: #0c1a30;
-    font-family: var(--font-poppins), 'Poppins', sans-serif;
-    font-feature-settings: "rlig" 1, "calt" 1;
+/* Base Body & Smooth Scrolling Styles */
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  overflow-x: hidden;
+  max-width: 100vw;
+  background-color: var(--bg-main);
+  color: var(--text-body);
+  font-family: var(--font-sans), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  line-height: var(--body-line-height);
+}
+
+section[id] {
+  scroll-margin-top: 105px;
+}
+
+@media (max-width: 1023px) {
+  section[id] {
+    scroll-margin-top: 85px;
   }
 }
 
-/* Eye-Comforting Blue Gradient & Button Utilities */
+/* Admin Scope: 100% Preserved with Poppins and Admin Tokens */
+.admin-scope {
+  font-family: var(--font-poppins), 'Poppins', sans-serif !important;
+  background-color: #ebebeb !important;
+  color: #0c1a30 !important;
+}
+
+/* ==========================================================================
+   ADMIN DASHBOARD UTILITIES (Preserved 100% Intact)
+   ========================================================================== */
+
+/* Admin Comfort Blue Gradient & Button */
 .btn-gold {
   background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 50%, #1e40af 100%);
   color: #ffffff;
@@ -42,7 +144,7 @@
   border: 1px solid rgba(37, 99, 235, 0.22);
 }
 
-/* Smooth UI Animations */
+/* Admin Dashboard Keyframes */
 @keyframes dashboardFadeIn {
   from {
     opacity: 0;
@@ -118,7 +220,7 @@
   animation: blueFlow 3.5s linear infinite;
 }
 
-/* Streaming Laser Beam that runs across navbar from start to end over search bar */
+/* Streaming Laser Beam */
 @keyframes navbarLaserRun {
   0% {
     transform: translateX(-350px);
@@ -149,7 +251,7 @@
   pointer-events: none;
 }
 
-/* Thin Sleek Custom Scrollbar for Admin Panels & Filters */
+/* Custom Scrollbars for Admin Panels */
 aside::-webkit-scrollbar,
 .custom-scrollbar::-webkit-scrollbar {
   width: 4px;
@@ -178,5 +280,450 @@ aside,
   scrollbar-color: #cbd5e1 transparent;
 }
 
+/* ==========================================================================
+   PUBLIC WEBSITE SCOPED STYLES (.website-scope)
+   Ensures 100% exact website styles without leaking into Admin Dashboard.
+   ========================================================================== */
 
+.website-scope {
+  font-family: var(--font-sans), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background-color: var(--bg-main);
+  color: var(--text-body);
+  line-height: var(--body-line-height);
+  width: 100%;
+}
 
+/* Website Typography Hierarchy */
+.website-scope h1,
+.website-scope .h1 {
+  font-size: var(--h1-size);
+  font-weight: 800;
+  line-height: 1.14;
+  letter-spacing: -0.025em;
+  color: var(--text-heading);
+}
+
+.website-scope .hero-title,
+.website-scope section h1.hero-title {
+  font-size: var(--h1-size) !important;
+  color: var(--text-white) !important;
+  font-weight: 600 !important;
+  line-height: 1.14;
+  letter-spacing: -0.025em;
+}
+
+.website-scope .hero-subtitle {
+  color: var(--text-light) !important;
+}
+
+/* Hero Banner Overlay: Crisp vertical gradient on mobile, horizontal on desktop */
+.hero-banner-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(7, 25, 43, 0.88) 0%, rgba(10, 35, 60, 0.74) 48%, rgba(7, 25, 43, 0.78) 100%);
+}
+
+@media (min-width: 1024px) {
+  .hero-banner-overlay {
+    background: linear-gradient(90deg, rgba(10, 35, 60, 0.55) 0%, rgba(10, 35, 60, 0.18) 50%, transparent 100%);
+  }
+}
+
+.website-scope h2,
+.website-scope .h2 {
+  font-size: var(--h2-size);
+  font-weight: 750;
+  line-height: 1.22;
+  letter-spacing: -0.02em;
+  color: var(--text-heading);
+}
+
+.website-scope h3,
+.website-scope .h3 {
+  font-size: var(--h3-size);
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: -0.015em;
+  color: var(--text-heading);
+}
+
+.website-scope h4,
+.website-scope .h4 {
+  font-size: var(--h4-size);
+  font-weight: 650;
+  line-height: 1.4;
+  color: var(--text-heading);
+}
+
+.website-scope p,
+.website-scope .body-text {
+  font-size: var(--body-size);
+  color: var(--text-body);
+  line-height: var(--body-line-height);
+}
+
+/* Website Dark & Blue Background Overrides */
+.website-scope .bg-dark,
+.website-scope .bg-primary,
+.website-scope .bg-navy,
+.website-scope [data-theme="dark"],
+.website-scope footer {
+  color: var(--text-light);
+}
+
+.website-scope .bg-dark p,
+.website-scope .bg-primary p,
+.website-scope .bg-navy p,
+.website-scope [data-theme="dark"] p,
+.website-scope footer p {
+  color: var(--text-light) !important;
+}
+
+.website-scope .bg-dark h1,
+.website-scope .bg-dark h2,
+.website-scope .bg-dark h3,
+.website-scope .bg-dark h4,
+.website-scope .bg-primary h1,
+.website-scope .bg-primary h2,
+.website-scope .bg-primary h3,
+.website-scope .bg-primary h4,
+.website-scope footer h1,
+.website-scope footer h2,
+.website-scope footer h3,
+.website-scope footer h4 {
+  color: var(--text-white) !important;
+}
+
+.website-scope .text-light {
+  color: var(--text-light) !important;
+}
+.website-scope .text-light-muted {
+  color: var(--text-light-muted) !important;
+}
+.website-scope .text-dark-heading {
+  color: var(--text-heading) !important;
+}
+.website-scope .text-dark-body {
+  color: var(--text-body) !important;
+}
+.website-scope .text-white {
+  color: var(--text-white) !important;
+}
+.website-scope .text-gold,
+.website-scope .golden-text {
+  color: var(--gold) !important;
+}
+
+/* Website Eyebrow */
+.website-scope .eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: var(--eyebrow-size);
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+
+.website-scope .eyebrow-line {
+  display: inline-block;
+  width: 2rem;
+  height: 2px;
+  background-color: var(--gold);
+  border-radius: 9999px;
+}
+
+/* Website Container & Section Spacing */
+.website-scope .global-container {
+  width: 100%;
+  max-width: var(--container-max-width);
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1.25rem;
+  padding-right: 1.25rem;
+}
+
+@media (min-width: 640px) {
+  .website-scope .global-container {
+    padding-left: 1.75rem;
+    padding-right: 1.75rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .website-scope .global-container {
+    padding-left: 2.25rem;
+    padding-right: 2.25rem;
+  }
+}
+
+.website-scope .section-padding {
+  padding-top: var(--section-padding-y);
+  padding-bottom: var(--section-padding-y);
+}
+
+.website-scope .section-padding-sm {
+  padding-top: var(--section-padding-y-sm);
+  padding-bottom: var(--section-padding-y-sm);
+}
+
+.website-scope .global-section-padding {
+  padding-top: var(--section-padding-y);
+  padding-bottom: var(--section-padding-y);
+}
+
+.website-scope .global-section-padding-first,
+.website-scope .hero-section + .global-section-padding,
+.website-scope .hero-section + section {
+  padding-top: var(--section-gap) !important;
+  padding-bottom: var(--section-padding-y);
+}
+
+.website-scope .global-section-padding-last {
+  padding-top: var(--section-padding-y);
+  padding-bottom: var(--section-gap);
+}
+
+.website-scope .global-section-padding-compact {
+  padding-top: var(--section-padding-y-compact);
+  padding-bottom: var(--section-padding-y-compact);
+}
+
+/* Website Button Styles (Gold Gradient Scoped) */
+.website-scope .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+  font-weight: 600;
+  font-size: 0.935rem;
+  border-radius: var(--radius-button);
+  padding: 0.82rem 1.65rem;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+  text-decoration: none;
+  white-space: nowrap;
+  user-select: none;
+}
+
+.website-scope .btn:active {
+  transform: scale(0.98);
+}
+
+.website-scope .btn i {
+  transition: transform 0.25s ease;
+}
+
+.website-scope .btn:hover i {
+  transform: translateX(3px);
+}
+
+.website-scope .btn-gold,
+.website-scope .btn-gold-gradient {
+  background: var(--gold-gradient);
+  color: var(--primary) !important;
+  font-weight: 700 !important;
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  box-shadow: 0 8px 22px -3px rgba(181, 136, 73, 0.42), inset 0 1px 1px rgba(255, 255, 255, 0.5);
+  border-radius: var(--radius-button);
+}
+
+.website-scope .btn-gold span,
+.website-scope .btn-gold i,
+.website-scope .btn-gold-gradient span,
+.website-scope .btn-gold-gradient i {
+  color: var(--primary) !important;
+}
+
+.website-scope .btn-gold:hover,
+.website-scope .btn-gold-gradient:hover {
+  background: var(--gold-gradient-hover);
+  box-shadow: 0 12px 28px -2px rgba(181, 136, 73, 0.52), inset 0 1px 1px rgba(255, 255, 255, 0.6);
+  transform: translateY(-1.5px);
+  color: var(--primary) !important;
+}
+
+.website-scope .btn-blue,
+.website-scope .btn-primary {
+  background-color: var(--primary);
+  color: var(--text-white) !important;
+  font-weight: 600;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 4px 14px 0 rgba(10, 35, 60, 0.28);
+  border-radius: var(--radius-button);
+}
+
+.website-scope .btn-blue span,
+.website-scope .btn-blue i,
+.website-scope .btn-primary span,
+.website-scope .btn-primary i {
+  color: var(--text-white) !important;
+}
+
+.website-scope .btn-blue:hover,
+.website-scope .btn-primary:hover {
+  background-color: var(--primary-hover);
+  box-shadow: 0 8px 22px 0 rgba(10, 35, 60, 0.38);
+  transform: translateY(-1.5px);
+  color: var(--text-white) !important;
+}
+
+.website-scope .btn-outline-gold {
+  background-color: transparent;
+  color: var(--gold) !important;
+  border: 1.5px solid var(--gold);
+}
+
+.website-scope .btn-outline-gold:hover {
+  background-color: var(--gold);
+  color: var(--text-white) !important;
+  box-shadow: var(--shadow-gold);
+}
+
+.website-scope .btn-outline-blue {
+  background-color: transparent;
+  color: var(--primary) !important;
+  border: 1.5px solid var(--primary);
+}
+
+.website-scope .btn-outline-blue:hover {
+  background-color: var(--primary);
+  color: var(--text-white) !important;
+  box-shadow: var(--shadow-blue);
+}
+
+/* Website Form & Input */
+.website-scope .input-luxury {
+  width: 100%;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-input);
+  padding: 0.78rem 1rem;
+  font-size: 0.9rem;
+  color: var(--text-heading);
+  outline: none;
+  transition: var(--transition-smooth);
+}
+
+.website-scope .input-luxury::placeholder {
+  color: var(--text-muted);
+}
+
+.website-scope .input-luxury:focus {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(157, 116, 72, 0.15);
+}
+
+/* Website Cards */
+.website-scope .card-luxury {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  transition: var(--transition-smooth);
+}
+
+.website-scope .card-hover:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 40px -8px rgba(10, 35, 60, 0.12);
+}
+
+/* Website Badges */
+.website-scope .badge-gold {
+  background-color: var(--gold-light);
+  color: var(--gold);
+  border: 1px solid var(--gold-border);
+  padding: 0.35rem 0.85rem;
+  border-radius: var(--radius-badge);
+  font-size: 0.78rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.website-scope .badge-blue {
+  background-color: var(--primary-light);
+  color: var(--primary);
+  border: 1px solid var(--border-subtle);
+  padding: 0.35rem 0.85rem;
+  border-radius: var(--radius-badge);
+  font-size: 0.78rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+/* Website Fonts & Animations */
+.website-scope .font-script {
+  font-family: var(--font-caveat), 'Caveat', cursive, sans-serif;
+}
+
+.website-scope .property-card-title {
+  font-size: 14px !important;
+  line-height: 1.3 !important;
+  font-weight: 700 !important;
+}
+
+@keyframes fadeInWeb {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fadeInUpWeb {
+  from { opacity: 0; transform: translateY(22px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeInDownWeb {
+  from { opacity: 0; transform: translateY(-18px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes scaleInWeb {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes floatSlowWeb {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+
+.website-scope .animate-fade-in {
+  animation: fadeInWeb 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.website-scope .animate-fade-up {
+  animation: fadeInUpWeb 0.85s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.website-scope .animate-fade-down {
+  animation: fadeInDownWeb 0.85s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.website-scope .animate-scale-in {
+  animation: scaleInWeb 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.website-scope .animate-float {
+  animation: floatSlowWeb 5s ease-in-out infinite;
+}
+
+.website-scope .delay-75  { animation-delay: 75ms; }
+.website-scope .delay-100 { animation-delay: 100ms; }
+.website-scope .delay-150 { animation-delay: 150ms; }
+.website-scope .delay-200 { animation-delay: 200ms; }
+.website-scope .delay-250 { animation-delay: 250ms; }
+.website-scope .delay-300 { animation-delay: 300ms; }
+.website-scope .delay-350 { animation-delay: 350ms; }
+.website-scope .delay-400 { animation-delay: 400ms; }
+.website-scope .delay-500 { animation-delay: 500ms; }
+.website-scope .delay-600 { animation-delay: 600ms; }
+
+.website-scope .smooth-transition {
+  transition: var(--transition-smooth);
+}

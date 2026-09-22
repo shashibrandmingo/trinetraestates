@@ -2,12 +2,38 @@ import type { Config } from 'tailwindcss';
 
 const config: Config = {
   content: [
-    './src/pages/**/*.{js,ts,jsx,tsx,mdx}',
-    './src/components/**/*.{js,ts,jsx,tsx,mdx}',
-    './src/app/**/*.{js,ts,jsx,tsx,mdx}'
+    './src/**/*.{js,ts,jsx,tsx,mdx}'
   ],
   theme: {
     extend: {
+      spacing: {
+        '4.5': '1.125rem',
+        '5.5': '1.375rem',
+        '6.5': '1.625rem',
+        '7.5': '1.875rem',
+        '8.5': '2.125rem',
+        '13': '3.25rem',
+        '15': '3.75rem',
+        '18': '4.5rem',
+        '22': '5.5rem',
+        '26': '6.5rem',
+      },
+      scale: {
+        '102': '1.02',
+        '105': '1.05',
+        '106': '1.06',
+        '108': '1.08',
+        '115': '1.15',
+        '120': '1.20',
+        '125': '1.25',
+      },
+      boxShadow: {
+        'xs': '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
+        '2xs': '0 1px 1px 0 rgba(0, 0, 0, 0.03)',
+      },
+      backdropBlur: {
+        'xs': '2px',
+      },
       colors: {
         white: '#ffffff',
         // Eye-Comforting Blue Palette (replaces harsh mustard gold with soothing royal blue)
@@ -38,8 +64,8 @@ const config: Config = {
         }
       },
       fontFamily: {
-        heading: ['var(--font-poppins)', 'Poppins', 'sans-serif'],
-        sans: ['var(--font-poppins)', 'Poppins', 'sans-serif'],
+        sans: ['var(--font-sans)', 'Plus Jakarta Sans', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+        heading: ['var(--font-sans)', 'Plus Jakarta Sans', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
         poppins: ['var(--font-poppins)', 'Poppins', 'sans-serif']
       }
     }

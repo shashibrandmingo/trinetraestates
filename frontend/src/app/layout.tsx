@@ -1,21 +1,37 @@
 import type { Metadata, Viewport } from 'next';
-import { Poppins } from 'next/font/google';
+import { Poppins, Plus_Jakarta_Sans, Caveat } from 'next/font/google';
 import './globals.css';
 import QueryProvider from '@/providers/QueryProvider';
 
-// Modern, Clean Poppins Font for Entire Website
+// Admin Modern Poppins Font
 const poppins = Poppins({
   subsets: ['latin'],
   display: 'swap',
   variable: '--font-poppins',
-  weight: ['300', '400', '500', '600', '700', '800']
+  weight: ['300', '400', '500', '600', '700', '800'],
+});
+
+// Website Executive Plus Jakarta Sans Font
+const plusJakarta = Plus_Jakarta_Sans({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-sans',
+  weight: ['300', '400', '500', '600', '700', '800'],
+});
+
+// Website Luxury Script Caveat Font
+const caveat = Caveat({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-caveat',
+  weight: ['400', '500', '600', '700'],
 });
 
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
   maximumScale: 5,
-  themeColor: '#0c1a30'
+  themeColor: '#0a233c',
 };
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
@@ -30,17 +46,17 @@ const isRealAdSense =
 export const metadata: Metadata = {
   metadataBase: siteUrl ? new URL(siteUrl) : undefined,
   title: {
-    default: 'Noida Office Spaces | Verified Corporate & Commercial Leasing',
-    template: '%s | Noida Office Spaces'
+    default: 'Noida Office Spaces | Find Premium Commercial Office Spaces in Noida',
+    template: '%s | Noida Office Spaces',
   },
   description:
-    'Exclusive commercial office spaces, corporate headquarters, and managed tech offices in prime Noida sectors (Sector 62, 132, 16, Expressway).',
+    'Find premium furnished, bare-shell & coworking office spaces across prime sectors of Noida and Greater Noida Expressway. Verified listings with zero brokerage options.',
   keywords: [
-    'Office Space Noida',
-    'Noida Sector 62 Office',
-    'Noida Expressway Commercial Space',
-    'Furnished Office Rent Noida',
-    'Corporate Real Estate Noida'
+    'Noida Office Space',
+    'Commercial Office Noida',
+    'Office for rent Sector 62',
+    'Office space Noida Expressway',
+    'Coworking space Noida',
   ],
   authors: [{ name: 'Noida Office Spaces' }],
   creator: 'Noida Office Spaces',
@@ -52,47 +68,55 @@ export const metadata: Metadata = {
       follow: true,
       'max-video-preview': -1,
       'max-image-preview': 'large',
-      'max-snippet': -1
-    }
+      'max-snippet': -1,
+    },
   },
   openGraph: {
     type: 'website',
     locale: 'en_IN',
     url: siteUrl,
     siteName: 'Noida Office Spaces',
-    title: 'Noida Office Spaces | Verified Corporate & Commercial Leasing',
+    title: 'Noida Office Spaces | Find Premium Commercial Office Spaces in Noida',
     description:
-      'Exclusive commercial office spaces, corporate headquarters, and managed tech offices in prime Noida sectors.'
+      'Find premium furnished, bare-shell & coworking office spaces across prime sectors of Noida and Greater Noida Expressway.',
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Noida Office Spaces',
     description:
-      'Exclusive commercial office spaces, corporate headquarters, and managed tech offices in prime Noida sectors.'
+      'Find premium furnished, bare-shell & coworking office spaces across prime sectors of Noida and Greater Noida Expressway.',
   },
   alternates: {
-    canonical: siteUrl
+    canonical: siteUrl,
   },
   icons: {
     icon: [
       { url: '/favicon.png', type: 'image/png' },
-      { url: '/favicon.ico' }
+      { url: '/favicon.ico' },
     ],
     shortcut: '/favicon.png',
-    apple: '/favicon.png'
-  }
+    apple: '/favicon.png',
+  },
 };
 
 export default function RootLayout({
-  children
+  children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${poppins.variable} font-sans`}>
+    <html
+      lang="en"
+      className={`${poppins.variable} ${plusJakarta.variable} ${caveat.variable} scroll-smooth`}
+    >
       <head>
-        <link rel="icon" href="/favicon.png" type="image/png" sizes="any" />
-        <link rel="apple-touch-icon" href="/favicon.png" />
+        <link
+          rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+          integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
+          crossOrigin="anonymous"
+          referrerPolicy="no-referrer"
+        />
         {isRealAdSense && (
           <>
             <link rel="preconnect" href="https://pagead2.googlesyndication.com" />
@@ -105,10 +129,8 @@ export default function RootLayout({
           </>
         )}
       </head>
-      <body className="font-sans antialiased bg-[#ebebeb] text-navy-900 selection:bg-gold-500 selection:text-white min-h-screen overflow-x-hidden w-full">
-        <QueryProvider>
-          {children}
-        </QueryProvider>
+      <body className="font-sans antialiased min-h-screen overflow-x-hidden w-full">
+        <QueryProvider>{children}</QueryProvider>
       </body>
     </html>
   );
