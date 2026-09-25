@@ -443,7 +443,7 @@ export default function FeaturedPropertiesSection({
               <div className="relative w-full h-[162px] sm:h-[170px] lg:h-[176px] overflow-hidden bg-[var(--primary)]">
                 <img
                   src={property.image}
-                  alt={`${property.title} - Office Space in ${property.location}`}
+                  alt={`Office Space in ${property.location}`}
                   onError={(e) => {
                     (e.currentTarget as HTMLImageElement).src = "/images/sectors/sector-62.jpg";
                   }}
@@ -478,25 +478,22 @@ export default function FeaturedPropertiesSection({
               {/* Card Details Body */}
               <div className="p-3 sm:p-3.5 flex-1 flex flex-col justify-between">
                 <div>
-                  <h4
-                    className="property-card-title text-[var(--text-heading)] group-hover:text-[var(--gold)] transition-colors tracking-tight truncate"
-                    style={{ fontSize: "14px", lineHeight: "1.3", fontWeight: "700" }}
-                    title={property.title}
-                  >
-                    {property.title}
-                  </h4>
-
-                  {/* Location */}
-                  <div
-                    className="flex items-center gap-1.5 text-[var(--text-muted)] font-normal mt-0.5"
-                    style={{ fontSize: "11.5px" }}
-                  >
-                    <i className="fa-solid fa-location-dot text-[var(--gold)] text-[10px]" aria-hidden="true" />
-                    <span className="truncate">{property.location}</span>
+                  {/* Highlighted Location (Backend Office Title Hidden) */}
+                  <div className="flex items-center gap-2">
+                    <span className="w-6 h-6 rounded-full bg-[var(--gold-light)] border border-[var(--gold-border)]/60 text-[var(--gold)] flex items-center justify-center shrink-0 shadow-xs">
+                      <i className="fa-solid fa-location-dot text-[11px]" aria-hidden="true" />
+                    </span>
+                    <h4
+                      className="property-card-title text-[var(--text-heading)] group-hover:text-[var(--gold)] transition-colors tracking-tight truncate font-bold text-[14.5px] sm:text-[15px]"
+                      style={{ lineHeight: "1.3" }}
+                      title={property.location}
+                    >
+                      {property.location}
+                    </h4>
                   </div>
 
                   {/* 3 Spec Badges */}
-                  <div className="flex items-center justify-between text-[10px] text-[var(--text-body)] font-medium pt-2 pb-0.5 border-t border-[var(--border-subtle)] mt-2">
+                  <div className="flex items-center justify-between text-[10px] text-[var(--text-body)] font-medium pt-2.5 pb-0.5 border-t border-[var(--border-subtle)] mt-2.5">
                     <div className="flex items-center gap-1 shrink-0">
                       <i className="fa-regular fa-building text-[var(--gold)] text-[9.5px]" aria-hidden="true" />
                       <span className="whitespace-nowrap">{property.area}</span>

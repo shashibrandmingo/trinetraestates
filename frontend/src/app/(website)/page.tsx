@@ -72,8 +72,8 @@ export default function HomePage() {
               ? {
                   area: property.sector || property.location,
                   spaceType: property.badge || "",
-                  requirements: property.title
-                    ? `Inquiring about ${property.title} (${property.area || ""}, ${property.location || ""})`
+                  requirements: property.location || property.sector
+                    ? `Inquiring about office space in ${property.location || property.sector} (${property.area || ""})`
                     : "",
                 }
               : {}
