@@ -205,6 +205,7 @@ function LeadSourceSelect({
 export default function LeadsManagementView() {
   const queryClient = useQueryClient();
   const [search, setSearch] = useState('');
+  const [portalFilter, setPortalFilter] = useState<'all' | 'officespaceinnoida' | 'trinetraestates'>('all');
   const [statusFilter, setStatusFilter] = useState('all');
   const [sourceFilter, setSourceFilter] = useState('all');
   const [onlyDueFollowUps, setOnlyDueFollowUps] = useState(false);
@@ -243,6 +244,7 @@ export default function LeadsManagementView() {
     budget: 0,
     status: 'Lead',
     source: 'Direct Call',
+    portal: 'officespaceinnoida',
     followUpDate: '',
     notes: ''
   });
@@ -258,23 +260,24 @@ export default function LeadsManagementView() {
   // Reset to page 1 on filter or search changes
   useEffect(() => {
     setCurrentPage(1);
-  }, [search, statusFilter, sourceFilter, onlyDueFollowUps]);
+  }, [search, statusFilter, sourceFilter, onlyDueFollowUps, portalFilter]);
 
   // Dedicated fast stats query (separate from paginated table rows)
   const { data: leadStats } = useQuery({
-    queryKey: ['lead-stats'],
-    queryFn: () => leadService.getLeadStats(),
+    queryKey: ['lead-stats', portalFilter],
+    queryFn: () => leadService.getLeadStats(portalFilter),
     staleTime: 5 * 60 * 1000
   });
 
   // TanStack Query: cached fetching
   const { data: leadsData, isLoading } = useQuery({
-    queryKey: ['admin-leads', search, statusFilter, sourceFilter, currentPage, pageSize],
+    queryKey: ['admin-leads', search, statusFilter, sourceFilter, portalFilter, currentPage, pageSize],
     queryFn: () =>
       leadService.getLeads({
         search,
         status: statusFilter === 'due' ? 'all' : statusFilter,
         source: sourceFilter,
+        portal: portalFilter,
         page: currentPage,
         limit: pageSize
       }),
@@ -522,6 +525,21 @@ export default function LeadsManagementView() {
     }
   };
 
+  const getPortalBadge = (portal?: string) => {
+    if (portal === 'trinetraestates') {
+      return {
+        label: 'Trinetra Estates',
+        badgeClass: 'bg-amber-50 text-amber-900 border-amber-300 font-bold',
+        icon: '🏛️'
+      };
+    }
+    return {
+      label: 'Office Space Noida',
+      badgeClass: 'bg-blue-50 text-blue-900 border-blue-200 font-bold',
+      icon: '🌐'
+    };
+  };
+
   return (
     <div className="w-full space-y-3.5 sm:space-y-4">
       {/* Toast */}
@@ -661,6 +679,49 @@ export default function LeadsManagementView() {
         </div>
       </div>
 
+      {/* ── PORTAL / WEBSITE FILTER TABS (All Portals / Office Space Noida / Trinetra Estates) ── */}
+      <div className="flex items-center justify-between gap-3 flex-wrap bg-white p-2 rounded-xl border border-slate-200/90 shadow-2xs">
+        <div className="flex items-center gap-1.5 overflow-x-auto custom-scrollbar w-full sm:w-auto">
+          {[
+            { id: 'all', label: 'All Leads', icon: '🏢' },
+            { id: 'officespaceinnoida', label: 'Office Space Noida', icon: '🌐' },
+            { id: 'trinetraestates', label: 'Trinetra Estates', icon: '🏛️' },
+          ].map((portalTab) => {
+            const isSelected = portalFilter === portalTab.id;
+            return (
+              <button
+                key={portalTab.id}
+                type="button"
+                onClick={() => setPortalFilter(portalTab.id as any)}
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all whitespace-nowrap cursor-pointer flex items-center gap-1.5 ${
+                  isSelected
+                    ? portalTab.id === 'trinetraestates'
+                      ? 'bg-[#c69960] text-white shadow-sm'
+                      : portalTab.id === 'officespaceinnoida'
+                      ? 'bg-blue-600 text-white shadow-sm'
+                      : 'bg-navy-900 text-white shadow-sm'
+                    : 'bg-slate-100 text-slate-600 hover:text-navy-900 hover:bg-slate-200'
+                }`}
+              >
+                <span>{portalTab.icon}</span>
+                <span>{portalTab.label}</span>
+              </button>
+            );
+          })}
+        </div>
+
+        <div className="text-[11px] text-slate-500 font-medium hidden sm:flex items-center gap-2">
+          <span>Viewing:</span>
+          <span className="font-bold text-navy-900">
+            {portalFilter === 'trinetraestates'
+              ? '🏛️ Trinetra Estates Portal'
+              : portalFilter === 'officespaceinnoida'
+              ? '🌐 Office Space Noida Portal'
+              : '🏢 All Portals Combined'}
+          </span>
+        </div>
+      </div>
+
       {/* Filter and Live Search Controls - matching Client CRM layout */}
       <div className="bg-white p-2.5 rounded-xl border border-slate-200 flex flex-col md:flex-row md:items-center justify-between gap-2.5 shadow-2xs">
         {/* Search Bar */}
@@ -771,6 +832,14 @@ export default function LeadsManagementView() {
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-1.5 flex-wrap">
                         <span className="font-bold text-navy-950 text-sm">{lead.name}</span>
+                        {(() => {
+                          const p = getPortalBadge(lead.portal);
+                          return (
+                            <span className={`text-[9px] px-1.5 py-0.2 rounded border ${p.badgeClass}`}>
+                              {p.icon} {p.label}
+                            </span>
+                          );
+                        })()}
                         {lead.source && (
                           <span className={`text-[9.5px] font-semibold px-1.5 py-0.2 rounded border ${getSourceBadge(lead.source)}`}>
                             {lead.source}
@@ -967,6 +1036,14 @@ export default function LeadsManagementView() {
                             <div className="min-w-0">
                               <div className="flex items-center gap-1.5 flex-wrap">
                                 <span className="font-bold text-navy-900 text-xs">{lead.name}</span>
+                                {(() => {
+                                  const p = getPortalBadge(lead.portal);
+                                  return (
+                                    <span className={`text-[9px] px-1.5 py-0.2 rounded border ${p.badgeClass}`}>
+                                      {p.icon} {p.label}
+                                    </span>
+                                  );
+                                })()}
                                 {lead.source && (
                                   <span className={`text-[9.5px] font-semibold px-1.5 py-0.2 rounded border ${getSourceBadge(lead.source)}`}>
                                     {lead.source}
@@ -1670,6 +1747,19 @@ export default function LeadsManagementView() {
                     className="w-full px-3 py-1.5 border border-slate-200 rounded-lg focus:outline-none focus:border-navy-900"
                   />
                 </div>
+              </div>
+
+              {/* Portal / Website Selection */}
+              <div>
+                <label className="block font-semibold text-slate-700 mb-1">Lead Source Portal / Website</label>
+                <select
+                  value={newLead.portal || 'officespaceinnoida'}
+                  onChange={(e) => setNewLead({ ...newLead, portal: e.target.value as any })}
+                  className="w-full px-3 py-1.5 border border-slate-200 rounded-lg focus:outline-none focus:border-navy-900 bg-white cursor-pointer"
+                >
+                  <option value="officespaceinnoida">🌐 Office Space Noida</option>
+                  <option value="trinetraestates">🏛️ Trinetra Estates</option>
+                </select>
               </div>
 
               {/* Feature 3: Source Selection & Next Follow-Up Date in Create Form */}

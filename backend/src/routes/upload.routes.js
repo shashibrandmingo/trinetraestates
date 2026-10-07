@@ -2,7 +2,7 @@ import { Router } from 'express';
 import multer from 'multer';
 import path from 'path';
 import crypto from 'crypto';
-import { saveBase64ToFile } from '../services/storage.service.js';
+import { saveBase64ToFile, deleteFileFromStorage } from '../services/storage.service.js';
 import { VIDEO_UPLOAD_DIR, processAndOptimizeVideo } from '../services/video.service.js';
 
 const router = Router();
@@ -105,6 +105,35 @@ router.post('/video', (req, res) => {
       });
     }
   });
+});
+
+/**
+ * DELETE /api/upload
+ * Safely unlinks a file from VPS disk storage
+ */
+router.delete('/', async (req, res) => {
+  try {
+    const { url } = req.body;
+    if (!url || typeof url !== 'string') {
+      return res.status(400).json({
+        success: false,
+        message: 'File URL is required'
+      });
+    }
+
+    const unlinked = await deleteFileFromStorage(url);
+    res.status(200).json({
+      success: true,
+      deleted: unlinked,
+      message: unlinked ? 'File successfully unlinked from VPS disk' : 'File not found or already deleted'
+    });
+  } catch (error) {
+    console.error('File deletion error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to delete file from VPS disk'
+    });
+  }
 });
 
 export default router;

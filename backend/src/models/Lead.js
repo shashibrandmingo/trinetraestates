@@ -52,9 +52,14 @@ const leadSchema = new mongoose.Schema(
       trim: true,
       default: 'Sector 62'
     },
+    portal: {
+      type: String,
+      enum: ['officespaceinnoida', 'trinetraestates', 'general', 'other'],
+      default: 'officespaceinnoida',
+      index: true
+    },
     source: {
       type: String,
-      enum: ['Direct Call', 'Website Enquiry', '99acres', 'MagicBricks', 'Reference', 'Walk-in'],
       default: 'Direct Call',
       index: true
     },
@@ -87,6 +92,7 @@ leadSchema.pre('save', async function (next) {
 
 // High-speed compound indexes for 100,000+ lead records
 leadSchema.index({ status: 1, createdAt: -1 });
+leadSchema.index({ portal: 1, createdAt: -1 });
 leadSchema.index({ source: 1, status: 1 });
 leadSchema.index({ clientType: 1, status: 1 });
 leadSchema.index({ createdAt: -1 });

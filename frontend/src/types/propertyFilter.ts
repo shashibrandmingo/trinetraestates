@@ -33,6 +33,10 @@ export interface PropertyItem {
   carpetAreaSqFt?: number;
   builtUpAreaSqFt?: number;
   superBuiltUpAreaSqFt?: number;
+  workstations?: number;
+  cabins?: number;
+  meetingRooms?: number;
+  badge?: string;
   unitNo?: string;
   address?: string;
   facing?: string;
@@ -56,6 +60,16 @@ export interface PropertyItem {
     paymentMode?: string;
     notes?: string;
   };
+  locationDescription?: string;
+  mapEmbedUrl?: string;
+  connectivityHighlights?: string[];
+  nearbyPlaces?: Array<{
+    label: string;
+    time: string;
+    icon?: string;
+  }>;
+  overviewHeading?: string;
+  overviewDescription?: string;
 }
 
 export interface PropertyFilterState {

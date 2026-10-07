@@ -1,7 +1,12 @@
 import mongoose from 'mongoose';
 import { OfficeSpace } from '../models/OfficeSpace.js';
 import { officeQuerySchema, createOfficeSchema } from '../validations/office.validation.js';
-import { processMediaPayload, saveBase64ToFile } from '../services/storage.service.js';
+import {
+  processMediaPayload,
+  saveBase64ToFile,
+  cleanupPropertyFilesOnDelete,
+  cleanupOrphanedMediaOnUpdate
+} from '../services/storage.service.js';
 
 export const getOffices = async (req, res, next) => {
   try {
@@ -34,6 +39,14 @@ export const getOffices = async (req, res, next) => {
       filter.propertyType = query.propertyType;
     }
 
+    // Category (matches single category field or categories array)
+    if (query.category && query.category !== 'All') {
+      filter.$or = [
+        { category: query.category },
+        { categories: query.category }
+      ];
+    }
+
     // Purpose (Rent, Sale, Lease)
     if (query.purpose && query.purpose !== 'All') {
       filter.purpose = query.purpose;
@@ -46,6 +59,7 @@ export const getOffices = async (req, res, next) => {
       (query.sector && query.sector !== 'All Sectors') ||
       query.locality ||
       (query.propertyType && query.propertyType !== 'All') ||
+      (query.category && query.category !== 'All') ||
       (query.purpose && query.purpose !== 'All') ||
       query.minArea ||
       query.maxArea ||
@@ -116,6 +130,7 @@ export const getOffices = async (req, res, next) => {
           { ownerName: reg },
           { ownerPhone: reg },
           { propertyType: reg },
+          { category: reg },
           { furnishing: reg }
         ]
       });
@@ -164,6 +179,10 @@ export const getOffices = async (req, res, next) => {
       status: 1,
       daysRemaining: 1,
       listingDate: 1,
+      workstations: 1,
+      cabins: 1,
+      meetingRooms: 1,
+      badge: 1,
       createdAt: 1,
       ownerName: 1,
       ownerPhone: 1,
@@ -264,6 +283,10 @@ export const getOffices = async (req, res, next) => {
         areaSqFt: doc.areaSqFt || 0,
         carpetAreaSqFt: doc.carpetAreaSqFt || 0,
         builtUpAreaSqFt: doc.builtUpAreaSqFt || 0,
+        workstations: doc.workstations || 0,
+        cabins: doc.cabins || 0,
+        meetingRooms: doc.meetingRooms || 0,
+        badge: doc.badge || '',
         price: priceNum,
         monthlyRentInLakh: rentInLakh,
         rentPerSqFt: rentPerSqFt,
@@ -458,27 +481,36 @@ export const createOffice = async (req, res, next) => {
 export const deleteOffice = async (req, res, next) => {
   try {
     const { id } = req.params;
-    let deleted = null;
+    let target = null;
 
     if (mongoose.Types.ObjectId.isValid(id)) {
-      deleted = await OfficeSpace.findByIdAndDelete(id);
+      target = await OfficeSpace.findById(id).lean();
     }
-    if (!deleted) {
-      deleted = await OfficeSpace.findOneAndDelete({
+    if (!target) {
+      target = await OfficeSpace.findOne({
         $or: [{ propertyId: id }, { slug: id }]
-      });
+      }).lean();
     }
 
-    if (!deleted) {
+    if (!target) {
       return res.status(404).json({
         success: false,
         message: 'Property not found'
       });
     }
 
+    // Safely remove listing from MongoDB
+    await OfficeSpace.findByIdAndDelete(target._id);
+
+    // Clean up physical media files (images, thumbnail, video, docs) from VPS disk
+    // Only deletes files that are NOT referenced by any other property
+    cleanupPropertyFilesOnDelete(target, OfficeSpace).catch((cleanupErr) => {
+      console.warn('[Delete Office] Background media cleanup warning:', cleanupErr?.message);
+    });
+
     res.status(200).json({
       success: true,
-      message: 'Property deleted successfully'
+      message: 'Property and associated media files deleted successfully'
     });
   } catch (error) {
     next(error);
@@ -489,6 +521,15 @@ export const updateOffice = async (req, res, next) => {
   try {
     const { id } = req.params;
     const query = id.startsWith('PROP-') ? { propertyId: id } : { _id: id };
+
+    // Fetch existing document to track media modifications
+    const existingDoc = await OfficeSpace.findOne(query).lean();
+    if (!existingDoc) {
+      return res.status(404).json({
+        success: false,
+        message: 'Property not found'
+      });
+    }
 
     // Automatically save any updated base64 images/docs to VPS local disk
     const updateData = await processMediaPayload({ ...req.body });
@@ -522,6 +563,12 @@ export const updateOffice = async (req, res, next) => {
         message: 'Property not found'
       });
     }
+
+    // Clean up any orphaned media files removed during this edit
+    // (e.g. user deleted an image or changed the video)
+    cleanupOrphanedMediaOnUpdate(existingDoc, updated, OfficeSpace).catch((cleanupErr) => {
+      console.warn('[Update Office] Background media cleanup warning:', cleanupErr?.message);
+    });
 
     res.status(200).json({
       success: true,
@@ -627,11 +674,17 @@ export const purgeTestData = async (req, res, next) => {
         { ownerName: { $regex: /test|dummy|sample/i } }
       ]
     };
+    const dummyDocs = await OfficeSpace.find(filter).lean();
     const result = await OfficeSpace.deleteMany(filter);
+
+    // Clean up physical media files for purged test properties
+    for (const doc of dummyDocs) {
+      cleanupPropertyFilesOnDelete(doc, OfficeSpace).catch(() => {});
+    }
 
     res.status(200).json({
       success: true,
-      message: `Purged ${result.deletedCount} dummy/test properties from database.`,
+      message: `Purged ${result.deletedCount} dummy/test properties from database and disk.`,
       deletedCount: result.deletedCount
     });
   } catch (error) {
@@ -996,4 +1049,5 @@ export const exportOfficesCSV = async (req, res, next) => {
     next(error);
   }
 };
+
 

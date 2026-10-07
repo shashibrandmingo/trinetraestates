@@ -13,13 +13,16 @@ export const connectDB = async () => {
   try {
     const conn = await mongoose.connect(env.MONGODB_URI, {
       autoIndex: env.NODE_ENV !== 'production',
-      maxPoolSize: 10,
+      maxPoolSize: 50,
+      minPoolSize: 5,
       serverSelectionTimeoutMS: 5000,
-      socketTimeoutMS: 45000
+      socketTimeoutMS: 45000,
+      connectTimeoutMS: 10000,
+      heartbeatFrequencyMS: 10000,
     });
 
     isConnected = true;
-    console.log(`[Database] MongoDB Connected: ${conn.connection.host}`);
+    console.log(`[Database] MongoDB Connected: ${conn.connection.host} (Pool: 5-50)`);
   } catch (error) {
     console.error(`[Database Error] Connection failed: ${error.message}`);
     process.exit(1);

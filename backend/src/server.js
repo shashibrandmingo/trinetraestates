@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
+import compression from 'compression';
 import morgan from 'morgan';
 import { env } from './config/env.js';
 import { connectDB } from './config/db.js';
@@ -9,15 +10,24 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { notFoundHandler, globalErrorHandler } from './middleware/errorHandler.js';
 
+import { apiLimiter } from './middleware/rateLimiter.js';
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
 
+// Trust reverse proxy (Nginx / Vercel / Cloudflare) for accurate client IP detection
+app.set('trust proxy', 1);
+
+// Enable GZIP compression for ultra-fast response times under heavy traffic
+app.use(compression());
+
 // Security and utility middleware
 app.use(helmet({
   crossOriginResourcePolicy: { policy: 'cross-origin' }
 }));
+
 // Flexible Production-Ready CORS configuration
 const configuredOrigins = (env.CLIENT_ORIGIN || 'http://localhost:3000')
   .split(',')
@@ -50,8 +60,18 @@ if (env.NODE_ENV === 'development') {
   app.use(morgan('combined'));
 }
 
-// Serve uploaded images, videos & documents directly from VPS local storage
-app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
+// Serve uploaded images, videos & documents with 30-day immutable browser caching (0ms reload)
+app.use(
+  '/uploads',
+  express.static(path.join(__dirname, '../uploads'), {
+    maxAge: '30d',
+    immutable: true,
+    etag: true
+  })
+);
+
+// Apply rate limiter to all API endpoints
+app.use('/api', apiLimiter);
 
 // Centralized API routes mounting
 app.use('/api', apiRoutes);

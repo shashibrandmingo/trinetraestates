@@ -5,42 +5,76 @@ import Image from 'next/image';
 
 export default function DashboardSkeletonLoader() {
   return (
-    <div className="min-h-screen w-screen bg-gradient-to-b from-[#f8fafc] via-white to-[#f8fafc] flex flex-col items-center justify-center p-6 relative overflow-hidden select-none">
-      {/* Ambient Luxury Background Auras */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 rounded-full bg-gold-200/25 blur-3xl pointer-events-none" />
-
+    <div
+      style={{
+        minHeight: '100vh',
+        width: '100vw',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: '#f8fafc',
+        padding: '24px',
+        boxSizing: 'border-box'
+      }}
+      className="min-h-screen w-screen bg-slate-50 flex flex-col items-center justify-center p-6 relative overflow-hidden select-none"
+    >
       {/* Main Centered Loader Box */}
-      <div className="flex flex-col items-center justify-center relative z-10 animate-fade-in">
-        {/* Animated Circular Rotating Ring around Brand Logo */}
-        <div className="relative w-24 h-24 sm:w-28 sm:h-28 flex items-center justify-center mb-5">
-          {/* Outer Rotating Circular Spinner Ring */}
-          <div className="absolute inset-0 rounded-full border-[3px] border-slate-200/80 border-t-gold-500 border-r-gold-400 animate-spin" />
-
-          {/* Secondary Soft Pulse Ring */}
-          <div className="absolute -inset-2 rounded-full border border-gold-300/30 animate-ping opacity-25" />
-
-          {/* Centered Brand Logo Box */}
-          <div className="w-16 h-16 sm:w-18 sm:h-18 rounded-2xl bg-white p-2.5 shadow-md border border-gold-200/90 flex items-center justify-center relative z-10 ring-4 ring-gold-50/70">
-            <div className="relative w-full h-full">
-              <Image
-                src="/brand-logo.png"
-                alt="Noida Office Spaces"
-                fill
-                sizes="72px"
-                className="object-contain"
-                priority
-              />
-            </div>
-          </div>
+      <div
+        style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}
+        className="flex flex-col items-center justify-center relative z-10"
+      >
+        {/* Centered Brand Logo Box */}
+        <div
+          style={{
+            width: '72px',
+            height: '72px',
+            borderRadius: '16px',
+            backgroundColor: '#ffffff',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
+            border: '1px solid #e2e8f0',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            marginBottom: '16px',
+            position: 'relative'
+          }}
+          className="w-18 h-18 rounded-2xl bg-white shadow-md border border-slate-200 flex items-center justify-center mb-4 relative"
+        >
+          <Image
+            src="/brand-logo.png"
+            alt="Noida Office Spaces"
+            width={48}
+            height={48}
+            style={{ width: '48px', height: '48px', objectFit: 'contain' }}
+            priority
+          />
         </div>
 
         {/* Brand Name & Clean Loading Status */}
-        <div className="text-center space-y-1.5">
-          <h2 className="font-heading text-lg sm:text-xl font-bold text-navy-950 tracking-tight">
+        <div style={{ textAlign: 'center' }} className="text-center space-y-2">
+          <h2
+            style={{ fontSize: '18px', fontWeight: 700, color: '#0a233c', margin: '0 0 6px 0', fontFamily: 'system-ui, sans-serif' }}
+            className="text-lg font-bold text-navy-950 tracking-tight"
+          >
             Noida Office Spaces
           </h2>
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-gold-50/90 border border-gold-200/80 text-[11px] font-semibold text-gold-800 shadow-2xs font-sans">
-            <span className="w-1.5 h-1.5 rounded-full bg-gold-500 animate-pulse" />
+          <div
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '8px',
+              padding: '4px 14px',
+              borderRadius: '9999px',
+              backgroundColor: '#f1f5f9',
+              border: '1px solid #cbd5e1',
+              fontSize: '12px',
+              fontWeight: 600,
+              color: '#334155',
+              fontFamily: 'system-ui, sans-serif'
+            }}
+          >
+            <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#2563eb' }} />
             <span>Loading Inventory...</span>
           </div>
         </div>

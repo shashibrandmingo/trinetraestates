@@ -1,0 +1,617 @@
+{
+  "info": {
+    "_postman_id": "9a1b2c3d-4e5f-6a7b-8c9d-0e1f2a3b4c5d",
+    "name": "Office Space Noida - Complete API Suite & Monitoring",
+    "description": "Complete API Collection for Office Space Noida backend with automated test scripts for Postman Monitoring.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "https://trinetraestates.com/api",
+      "type": "string"
+    },
+    {
+      "key": "sampleOfficeId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "sampleClientId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "sampleLeadId",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "1. System Health",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/health",
+              "host": ["{{baseUrl}}"],
+              "path": ["health"]
+            },
+            "description": "Checks server and database connection health."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Response time is under 1000ms', function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(1000);",
+                  "});",
+                  "pm.test('Server status is healthy/ok', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.status || jsonData.success).to.be.ok;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "2. Dashboard",
+      "item": [
+        {
+          "name": "Get Dashboard Overview",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/dashboard/overview",
+              "host": ["{{baseUrl}}"],
+              "path": ["dashboard", "overview"]
+            },
+            "description": "Aggregated metrics for total properties, clients, active leads, and recent activities."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Overview returns success: true', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.eql(true);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "3. Offices & Properties",
+      "item": [
+        {
+          "name": "Get All Offices (Paginated / Filtered)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/offices?page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["offices"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "10" }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.data && jsonData.data.length > 0) {",
+                  "    pm.collectionVariables.set('sampleOfficeId', jsonData.data[0]._id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Office Stats",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/offices/stats",
+              "host": ["{{baseUrl}}"],
+              "path": ["offices", "stats"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Stats returns success', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.eql(true);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Quick Search Offices",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/offices/search?q=Noida",
+              "host": ["{{baseUrl}}"],
+              "path": ["offices", "search"],
+              "query": [
+                { "key": "q", "value": "Noida" }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Single Office by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/offices/{{sampleOfficeId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["offices", "{{sampleOfficeId}}"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200 or 404 (if empty collection)', function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 404]);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create New Office",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Premium Furnished Office Sector 62\",\n  \"slug\": \"premium-furnished-office-sector-62-test\",\n  \"propertyType\": \"Office\",\n  \"purpose\": \"Rent\",\n  \"description\": \"Fully furnished prime workspace with dedicated meeting rooms.\",\n  \"location\": {\n    \"city\": \"Noida\",\n    \"sector\": \"Sector 62\",\n    \"locality\": \"Electronic City\",\n    \"address\": \"Plot No 4, Sector 62, Noida\"\n  },\n  \"buildingName\": \"Logix Cyber Park\",\n  \"floor\": \"4th Floor\",\n  \"areaSqFt\": 2500,\n  \"carpetAreaSqFt\": 2100,\n  \"furnishing\": \"Fully-Furnished\",\n  \"seats\": 35,\n  \"cabins\": 3,\n  \"meetingRooms\": 1,\n  \"parkingSlots\": 4,\n  \"pricing\": {\n    \"expectedPrice\": 150000,\n    \"isNegotiable\": true,\n    \"securityDeposit\": 300000\n  },\n  \"status\": \"Available\",\n  \"ownerContact\": {\n    \"name\": \"Test Owner\",\n    \"phone\": \"+919876543210\",\n    \"email\": \"owner@example.com\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/offices",
+              "host": ["{{baseUrl}}"],
+              "path": ["offices"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Office created successfully (201 or 400)', function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([201, 400]);",
+                  "    if (pm.response.code === 201) {",
+                  "        var res = pm.response.json();",
+                  "        if (res.data && res.data._id) {",
+                  "            pm.collectionVariables.set('sampleOfficeId', res.data._id);",
+                  "        }",
+                  "    }",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update Office",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"description\": \"Updated office description via Postman.\",\n  \"isFeatured\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/offices/{{sampleOfficeId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["offices", "{{sampleOfficeId}}"]
+            }
+          }
+        },
+        {
+          "name": "Duplicate Office",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/offices/{{sampleOfficeId}}/duplicate",
+              "host": ["{{baseUrl}}"],
+              "path": ["offices", "{{sampleOfficeId}}", "duplicate"]
+            }
+          }
+        },
+        {
+          "name": "Export Offices CSV",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/offices/export",
+              "host": ["{{baseUrl}}"],
+              "path": ["offices", "export"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "4. Clients",
+      "item": [
+        {
+          "name": "Get All Clients",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/clients?page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["clients"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "10" }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.data && jsonData.data.length > 0) {",
+                  "    pm.collectionVariables.set('sampleClientId', jsonData.data[0]._id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Client Stats",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/clients/stats",
+              "host": ["{{baseUrl}}"],
+              "path": ["clients", "stats"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create Client",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Amit Sharma\",\n  \"phone\": \"9876543210\",\n  \"email\": \"amit.sharma@example.com\",\n  \"company\": \"Apex Innovations\",\n  \"clientType\": \"Corporate\",\n  \"status\": \"In Discussion\",\n  \"budget\": 120000,\n  \"requirementSqFt\": 2000,\n  \"preferredSector\": \"Sector 62\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/clients",
+              "host": ["{{baseUrl}}"],
+              "path": ["clients"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Client created or duplicate handled', function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([201, 400]);",
+                  "    if (pm.response.code === 201) {",
+                  "        var res = pm.response.json();",
+                  "        if (res.data && res.data._id) {",
+                  "            pm.collectionVariables.set('sampleClientId', res.data._id);",
+                  "        }",
+                  "    }",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update Client",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"Site Visit Scheduled\",\n  \"budget\": 140000\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/clients/{{sampleClientId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["clients", "{{sampleClientId}}"]
+            }
+          }
+        },
+        {
+          "name": "Export Clients CSV",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/clients/export/csv",
+              "host": ["{{baseUrl}}"],
+              "path": ["clients", "export", "csv"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "5. Leads",
+      "item": [
+        {
+          "name": "Get All Leads",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/leads?page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["leads"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "10" }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.data && jsonData.data.length > 0) {",
+                  "    pm.collectionVariables.set('sampleLeadId', jsonData.data[0]._id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create Lead",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Vikram Malhotra\",\n  \"phone\": \"9811223344\",\n  \"email\": \"vikram@techcorp.in\",\n  \"company\": \"TechCorp Global\",\n  \"clientType\": \"Corporate\",\n  \"status\": \"Lead\",\n  \"budget\": 250000,\n  \"requirementSqFt\": 3500,\n  \"preferredSector\": \"Sector 135\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/leads",
+              "host": ["{{baseUrl}}"],
+              "path": ["leads"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Lead created or handled', function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([201, 400]);",
+                  "    if (pm.response.code === 201) {",
+                  "        var res = pm.response.json();",
+                  "        if (res.data && res.data._id) {",
+                  "            pm.collectionVariables.set('sampleLeadId', res.data._id);",
+                  "        }",
+                  "    }",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update Lead",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"In Discussion\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/leads/{{sampleLeadId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["leads", "{{sampleLeadId}}"]
+            }
+          }
+        },
+        {
+          "name": "Export Leads CSV",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/leads/export/csv",
+              "host": ["{{baseUrl}}"],
+              "path": ["leads", "export", "csv"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "6. Media Upload",
+      "item": [
+        {
+          "name": "Upload Media Base64",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"file\": \"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==\",\n  \"prefix\": \"test-postman\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/upload",
+              "host": ["{{baseUrl}}"],
+              "path": ["upload"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Upload status is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    var res = pm.response.json();",
+                  "    pm.expect(res.success).to.eql(true);",
+                  "    pm.expect(res.url).to.be.a('string');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

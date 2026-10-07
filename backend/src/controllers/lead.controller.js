@@ -9,6 +9,7 @@ export const getLeads = async (req, res, next) => {
       search,
       status,
       source,
+      portal,
       sortBy = 'createdAt',
       sortOrder = 'desc',
       page = 1,
@@ -23,6 +24,10 @@ export const getLeads = async (req, res, next) => {
 
     if (source && source !== 'all') {
       filter.source = source;
+    }
+
+    if (portal && portal !== 'all') {
+      filter.portal = portal;
     }
 
     if (search && search.trim()) {
@@ -72,21 +77,25 @@ export const getLeads = async (req, res, next) => {
  */
 export const getLeadStats = async (req, res, next) => {
   try {
+    const { portal } = req.query;
+    const baseFilter = portal && portal !== 'all' ? { portal } : {};
+
     const todayStr = new Date().toISOString().slice(0, 10);
     const startOfToday = new Date(todayStr);
     const endOfToday = new Date(todayStr);
     endOfToday.setHours(23, 59, 59, 999);
 
     const [total, inDiscussion, siteVisits, dealClosed, dueFollowUps, newToday] = await Promise.all([
-      Lead.countDocuments(),
-      Lead.countDocuments({ status: 'In Discussion' }),
-      Lead.countDocuments({ status: 'Site Visit Scheduled' }),
-      Lead.countDocuments({ status: 'Deal Closed' }),
+      Lead.countDocuments(baseFilter),
+      Lead.countDocuments({ ...baseFilter, status: 'In Discussion' }),
+      Lead.countDocuments({ ...baseFilter, status: 'Site Visit Scheduled' }),
+      Lead.countDocuments({ ...baseFilter, status: 'Deal Closed' }),
       Lead.countDocuments({
+        ...baseFilter,
         followUpDate: { $lte: endOfToday, $ne: null },
         status: { $nin: ['Deal Closed', 'Cold / Inactive'] }
       }),
-      Lead.countDocuments({ createdAt: { $gte: startOfToday } })
+      Lead.countDocuments({ ...baseFilter, createdAt: { $gte: startOfToday } })
     ]);
 
     res.status(200).json({
@@ -120,6 +129,7 @@ export const createLead = async (req, res, next) => {
       budget = 0,
       requirementSqFt = 0,
       preferredSector = 'Sector 62',
+      portal = 'officespaceinnoida',
       source = 'Direct Call',
       followUpDate,
       siteVisitDetails,
@@ -143,6 +153,7 @@ export const createLead = async (req, res, next) => {
       budget: Number(budget) || 0,
       requirementSqFt: Number(requirementSqFt) || 0,
       preferredSector: preferredSector ? preferredSector.trim() : 'Sector 62',
+      portal: portal || 'officespaceinnoida',
       source,
       followUpDate: followUpDate ? new Date(followUpDate) : undefined,
       siteVisitDetails: siteVisitDetails || undefined,
@@ -239,6 +250,7 @@ export const exportLeadsCSV = async (req, res, next) => {
 
     const headers = [
       'Lead ID',
+      'Portal / Website',
       'Name',
       'Phone',
       'Email',
@@ -260,8 +272,10 @@ export const exportLeadsCSV = async (req, res, next) => {
 
     for (const c of leads) {
       const escape = (val) => `"${String(val ?? '').replace(/"/g, '""')}"`;
+      const portalName = c.portal === 'trinetraestates' ? 'Trinetra Estates' : 'Office Space Noida';
       const row = [
         escape(c.leadId || c._id),
+        escape(portalName),
         escape(c.name || ''),
         escape(c.phone || ''),
         escape(c.email || ''),

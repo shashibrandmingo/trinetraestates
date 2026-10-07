@@ -94,11 +94,25 @@ export default function AdminDashboardPage() {
     handleTabChange('properties');
   };
 
-  if (isLoading || !dashboardData) {
+  if (isLoading && !dashboardData && activeTab === 'dashboard') {
     return <DashboardSkeletonLoader />;
   }
 
-  const { summary, recentLeads, expiringProperties, recentProperties, recentActivities } = dashboardData;
+  const summary = dashboardData?.summary || {
+    totalProperties: 0,
+    activeProperties: 0,
+    expiringSoon: 0,
+    expiredProperties: 0,
+    soldProperties: 0,
+    soldByMe: 0,
+    totalRevenue: 0,
+    activeLeads: 0,
+    convertedLeads: 0
+  };
+  const recentLeads = dashboardData?.recentLeads || [];
+  const expiringProperties = dashboardData?.expiringProperties || [];
+  const recentProperties = dashboardData?.recentProperties || [];
+  const recentActivities = dashboardData?.recentActivities || [];
 
   return (
     <div className="h-screen w-screen overflow-hidden bg-[#ebebeb] text-navy-900 flex flex-col">

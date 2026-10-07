@@ -139,3 +139,185 @@ export const processMediaPayload = async (data) => {
 
   return processed;
 };
+
+/**
+ * Safely delete a physical file from VPS disk storage
+ * - Guards against directory traversal
+ * - Never deletes templates or sample assets
+ * - Works for images, videos, and documents
+ * @param {string} fileUrl - Public URL path (e.g. '/uploads/prop-img-123.webp' or '/uploads/videos/prop-video-123.mp4')
+ * @returns {Promise<boolean>} True if file was unlinked, false otherwise
+ */
+export const deleteFileFromStorage = async (fileUrl) => {
+  if (!fileUrl || typeof fileUrl !== 'string') return false;
+
+  // Never delete external URLs, base64 data, or sample templates
+  if (
+    fileUrl.startsWith('http://') ||
+    fileUrl.startsWith('https://') ||
+    fileUrl.startsWith('data:') ||
+    fileUrl.includes('sample-office') ||
+    fileUrl.includes('/images/')
+  ) {
+    return false;
+  }
+
+  const cleanUrl = fileUrl.trim().split('?')[0].split('#')[0];
+  if (!cleanUrl.startsWith('/uploads/') && !cleanUrl.startsWith('uploads/')) {
+    return false;
+  }
+
+  try {
+    const relativeToUploads = cleanUrl.replace(/^\/?uploads\//, '');
+    const normalized = path.normalize(relativeToUploads);
+
+    // Prevent path traversal attacks
+    if (normalized.startsWith('..') || path.isAbsolute(normalized)) {
+      console.warn('[Storage Service] Blocked path traversal attempt in deleteFileFromStorage:', cleanUrl);
+      return false;
+    }
+
+    const physicalPath = path.join(UPLOAD_DIR, normalized);
+
+    if (fs.existsSync(physicalPath)) {
+      await fs.promises.unlink(physicalPath);
+      console.log(`[Storage Service] Safely unlinked file from VPS disk: ${physicalPath}`);
+      return true;
+    }
+  } catch (err) {
+    console.warn(`[Storage Service] Could not unlink file: ${fileUrl}`, err?.message);
+  }
+  return false;
+};
+
+/**
+ * Extract all local uploaded file URLs from a property object
+ * @param {object} doc - Property document or update payload
+ * @returns {Set<string>} Set of local upload URLs
+ */
+export const extractUploadUrls = (doc) => {
+  const urls = new Set();
+  if (!doc || typeof doc !== 'object') return urls;
+
+  const addIfLocalUpload = (url) => {
+    if (typeof url === 'string') {
+      const clean = url.trim().split('?')[0].split('#')[0];
+      if (
+        (clean.startsWith('/uploads/') || clean.startsWith('uploads/')) &&
+        !clean.includes('sample-office') &&
+        !clean.includes('/images/')
+      ) {
+        urls.add(clean.startsWith('/') ? clean : `/${clean}`);
+      }
+    }
+  };
+
+  // 1. images array
+  if (Array.isArray(doc.images)) {
+    for (const item of doc.images) {
+      if (typeof item === 'string') {
+        addIfLocalUpload(item);
+      } else if (item && typeof item === 'object' && item.url) {
+        addIfLocalUpload(item.url);
+      }
+    }
+  }
+
+  // 2. imageUrl & thumbnail
+  addIfLocalUpload(doc.imageUrl);
+  addIfLocalUpload(doc.thumbnail);
+
+  // 3. videoUrl
+  addIfLocalUpload(doc.videoUrl);
+
+  // 4. documents array
+  if (Array.isArray(doc.documents)) {
+    for (const item of doc.documents) {
+      if (typeof item === 'string') {
+        addIfLocalUpload(item);
+      } else if (item && typeof item === 'object' && item.url) {
+        addIfLocalUpload(item.url);
+      }
+    }
+  }
+
+  return urls;
+};
+
+/**
+ * Delete a file from disk ONLY IF no other property in MongoDB is referencing it
+ * (Protects duplicated properties or shared media from breaking)
+ * @param {string} fileUrl
+ * @param {import('mongoose').Model} OfficeModel
+ * @param {string|import('mongoose').Types.ObjectId} currentDocId
+ */
+export const deleteFileIfNotInUse = async (fileUrl, OfficeModel, currentDocId = null) => {
+  if (!fileUrl) return false;
+
+  try {
+    const filter = {
+      $or: [
+        { 'images.url': fileUrl },
+        { images: fileUrl },
+        { thumbnail: fileUrl },
+        { imageUrl: fileUrl },
+        { videoUrl: fileUrl },
+        { 'documents.url': fileUrl }
+      ]
+    };
+
+    if (currentDocId) {
+      filter._id = { $ne: currentDocId };
+    }
+
+    const inUse = await OfficeModel.exists(filter);
+    if (!inUse) {
+      return await deleteFileFromStorage(fileUrl);
+    } else {
+      console.log(`[Storage Service] Media file ${fileUrl} is still used by another property. Kept safely on disk.`);
+    }
+  } catch (err) {
+    console.warn(`[Storage Service] Failed to verify file reference for ${fileUrl}:`, err?.message);
+  }
+  return false;
+};
+
+/**
+ * Clean up all media files for a deleted property from VPS disk
+ * @param {object} propertyDoc
+ * @param {import('mongoose').Model} OfficeModel
+ */
+export const cleanupPropertyFilesOnDelete = async (propertyDoc, OfficeModel) => {
+  if (!propertyDoc) return;
+  const urls = extractUploadUrls(propertyDoc);
+  if (urls.size === 0) return;
+
+  console.log(`[Storage Service] Cleaning up ${urls.size} media file(s) for deleted property ${propertyDoc.propertyId || propertyDoc._id}`);
+  for (const url of urls) {
+    await deleteFileIfNotInUse(url, OfficeModel, propertyDoc._id);
+  }
+};
+
+/**
+ * Clean up orphaned media when a property is edited/updated
+ * (E.g. user removed 2 images or replaced the video)
+ * @param {object} oldPropertyDoc - Previous DB document before update
+ * @param {object} newPropertyDoc - Newly updated document or payload
+ * @param {import('mongoose').Model} OfficeModel
+ */
+export const cleanupOrphanedMediaOnUpdate = async (oldPropertyDoc, newPropertyDoc, OfficeModel) => {
+  if (!oldPropertyDoc) return;
+  const oldUrls = extractUploadUrls(oldPropertyDoc);
+  if (oldUrls.size === 0) return;
+
+  const newUrls = extractUploadUrls(newPropertyDoc);
+  const removedUrls = [...oldUrls].filter((url) => !newUrls.has(url));
+
+  if (removedUrls.length > 0) {
+    console.log(`[Storage Service] Found ${removedUrls.length} orphaned media file(s) removed during property update.`);
+    for (const url of removedUrls) {
+      await deleteFileIfNotInUse(url, OfficeModel, oldPropertyDoc._id);
+    }
+  }
+};
+

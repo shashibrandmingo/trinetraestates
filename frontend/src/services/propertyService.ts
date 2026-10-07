@@ -137,6 +137,10 @@ export const mapBackendToPropertyItem = (office: BackendOfficeDoc): PropertyItem
     carpetAreaSqFt: office.carpetAreaSqFt,
     builtUpAreaSqFt: office.builtUpAreaSqFt,
     superBuiltUpAreaSqFt: office.superBuiltUpAreaSqFt,
+    workstations: office.workstations,
+    cabins: office.cabins,
+    meetingRooms: office.meetingRooms,
+    badge: office.badge,
     unitNo: office.unitNo,
     address: office.location?.address || office.location?.locality,
     facing: office.facing,
@@ -151,7 +155,13 @@ export const mapBackendToPropertyItem = (office: BackendOfficeDoc): PropertyItem
     buildingName: office.buildingName,
     createdAt: office.createdAt || (office as any).listingDate || new Date().toISOString(),
     agentName: (office as any).agentName || 'Corporate Leasing Desk',
-    dealDetails: office.dealDetails
+    dealDetails: office.dealDetails,
+    locationDescription: (office as any).locationDescription || '',
+    mapEmbedUrl: (office as any).mapEmbedUrl || '',
+    connectivityHighlights: (office as any).connectivityHighlights || [],
+    nearbyPlaces: (office as any).nearbyPlaces || [],
+    overviewHeading: (office as any).overviewHeading || '',
+    overviewDescription: (office as any).overviewDescription || ''
   };
 };
 

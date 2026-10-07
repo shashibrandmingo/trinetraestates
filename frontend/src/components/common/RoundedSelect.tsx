@@ -25,14 +25,14 @@ export const RoundedSelect: React.FC<RoundedSelectProps> = ({
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Normalize options
+  // Normalize options to { value, label } shape
   const normalizedOptions: SelectOption[] = options.map((opt) =>
     typeof opt === 'string' ? { value: opt, label: opt } : opt
   );
 
   const selectedOption = normalizedOptions.find((opt) => opt.value === value);
 
-  // Close when clicking outside
+  // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
@@ -49,23 +49,26 @@ export const RoundedSelect: React.FC<RoundedSelectProps> = ({
 
   return (
     <div ref={containerRef} className={`relative select-none ${className}`}>
-      {/* Trigger Button with Rounded Border */}
+      {/* ── Trigger Button ── */}
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className={`w-full bg-white border rounded-xl px-3 py-2 text-xs font-medium text-navy-900 flex items-center justify-between cursor-pointer transition-all duration-200 outline-none ${
+        className="w-full bg-white border rounded-xl px-3.5 py-2.5 text-[13px] font-medium text-[#141414] flex items-center justify-between cursor-pointer transition-all duration-200 outline-none hover:border-gray-300"
+        style={
           isOpen
-            ? 'border-gold-500 ring-2 ring-gold-500/20 shadow-xs'
-            : 'border-slate-200 hover:border-slate-300'
-        }`}
+            ? { borderColor: '#c69960', boxShadow: '0 0 0 3px rgba(198,153,96,0.15)' }
+            : { borderColor: '#e5e7eb' }
+        }
       >
-        <span className={selectedOption ? 'text-navy-900' : 'text-slate-400'}>
+        <span style={{ color: selectedOption ? '#141414' : '#9ca3af' }}>
           {selectedOption ? selectedOption.label : placeholder}
         </span>
         <svg
-          className={`w-3.5 h-3.5 text-slate-400 transition-transform duration-200 ${
-            isOpen ? 'rotate-180 text-gold-500' : ''
-          }`}
+          className="w-3.5 h-3.5 transition-transform duration-200"
+          style={{
+            transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+            color: isOpen ? '#c69960' : '#9ca3af',
+          }}
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -75,9 +78,9 @@ export const RoundedSelect: React.FC<RoundedSelectProps> = ({
         </svg>
       </button>
 
-      {/* Floating Dropdown Menu with Rounded Borders */}
+      {/* ── Floating Dropdown ── */}
       {isOpen && (
-        <div className="absolute top-full left-0 mt-1.5 w-full bg-white border border-slate-200 rounded-xl shadow-xl p-1.5 z-50 max-h-60 overflow-y-auto animate-in fade-in zoom-in-95 duration-150">
+        <div className="absolute top-full left-0 mt-1.5 w-full bg-white border border-gray-200 rounded-xl shadow-xl p-1.5 z-50 max-h-60 overflow-y-auto animate-in fade-in zoom-in-95 duration-150">
           {normalizedOptions.map((opt) => {
             const isSelected = opt.value === value;
             return (
@@ -87,15 +90,28 @@ export const RoundedSelect: React.FC<RoundedSelectProps> = ({
                   onChange(opt.value);
                   setIsOpen(false);
                 }}
-                className={`px-3 py-2 rounded-lg text-xs font-semibold cursor-pointer transition-colors flex items-center justify-between my-0.5 ${
+                className="px-3.5 py-2.5 rounded-lg text-[13px] font-semibold cursor-pointer transition-colors flex items-center justify-between my-0.5"
+                style={
                   isSelected
-                    ? 'bg-gold-50 text-gold-900 font-bold'
-                    : 'text-slate-700 hover:bg-slate-50 hover:text-navy-950'
-                }`}
+                    ? { background: 'rgba(198,153,96,0.08)', color: '#141414' }
+                    : {}
+                }
+                onMouseEnter={(e) => {
+                  if (!isSelected) {
+                    (e.currentTarget as HTMLDivElement).style.background = '#f9fafb';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!isSelected) {
+                    (e.currentTarget as HTMLDivElement).style.background = '';
+                  }
+                }}
               >
-                <span>{opt.label}</span>
+                <span style={{ color: isSelected ? '#141414' : '#374151' }}>
+                  {opt.label}
+                </span>
                 {isSelected && (
-                  <span className="text-gold-600 font-bold text-xs">✓</span>
+                  <span className="font-bold text-xs" style={{ color: '#c69960' }}>✓</span>
                 )}
               </div>
             );

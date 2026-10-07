@@ -26,6 +26,17 @@ const officeSpaceSchema = new mongoose.Schema(
       default: 'Office',
       index: true
     },
+    category: {
+      type: String,
+      trim: true,
+      default: '',
+      index: true
+    },
+    categories: {
+      type: [String],
+      default: [],
+      index: true
+    },
     purpose: {
       type: String,
       enum: ['Rent', 'Sale', 'Lease'],
@@ -176,7 +187,58 @@ const officeSpaceSchema = new mongoose.Schema(
       type: Number,
       default: 60
     },
+    workstations: {
+      type: Number,
+      default: 0
+    },
+    cabins: {
+      type: Number,
+      default: 0
+    },
+    meetingRooms: {
+      type: Number,
+      default: 0
+    },
+    badge: {
+      type: String,
+      default: ''
+    },
     metroDistance: {
+      type: String,
+      default: 'Near Metro Station'
+    },
+    roadConnectivity: {
+      type: String,
+      default: 'Expressway / NH-24 Connect'
+    },
+    towerGrade: {
+      type: String,
+      default: 'Grade-A Commercial Tower'
+    },
+    locationDescription: {
+      type: String,
+      default: ''
+    },
+    mapEmbedUrl: {
+      type: String,
+      default: ''
+    },
+    connectivityHighlights: {
+      type: [String],
+      default: []
+    },
+    nearbyPlaces: [
+      {
+        label: { type: String, default: '' },
+        time: { type: String, default: '' },
+        icon: { type: String, default: 'fa-solid fa-location-dot' }
+      }
+    ],
+    overviewHeading: {
+      type: String,
+      default: ''
+    },
+    overviewDescription: {
       type: String,
       default: ''
     },

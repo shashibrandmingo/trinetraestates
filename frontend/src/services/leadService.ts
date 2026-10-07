@@ -13,6 +13,7 @@ export interface LeadItem {
   propertyTitle?: string;
   notes?: string;
   source?: string;
+  portal?: 'officespaceinnoida' | 'trinetraestates' | 'general' | 'other' | string;
   followUpDate?: string;
   siteVisitDetails?: {
     propertyId?: string;
@@ -28,6 +29,7 @@ export interface LeadFilterParams {
   search?: string;
   status?: string;
   source?: string;
+  portal?: string;
   page?: number;
   limit?: number;
 }
@@ -47,9 +49,10 @@ export const leadService = {
   /**
    * Fetch aggregated lead statistics for fast card rendering
    */
-  async getLeadStats(): Promise<LeadStats> {
+  async getLeadStats(portal?: string): Promise<LeadStats> {
     try {
-      const res = await fetch(`${API_BASE}/leads/stats`, {
+      const url = portal && portal !== 'all' ? `${API_BASE}/leads/stats?portal=${portal}` : `${API_BASE}/leads/stats`;
+      const res = await fetch(url, {
         cache: 'no-store'
       });
       if (!res.ok) throw new Error('Failed to fetch lead stats');
@@ -86,6 +89,9 @@ export const leadService = {
       }
       if (params?.source && params.source !== 'all') {
         searchParams.append('source', params.source);
+      }
+      if (params?.portal && params.portal !== 'all') {
+        searchParams.append('portal', params.portal);
       }
       if (params?.page) searchParams.append('page', String(params.page));
       searchParams.append('limit', String(params?.limit || 50));
