@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import React, { type ReactNode } from "react";
 import { Poppins } from "next/font/google";
 import "./globals.css";
 
@@ -54,6 +55,9 @@ export const metadata: Metadata = {
   },
   alternates: {
     canonical: "https://trinetraestates.com",
+  },
+  verification: {
+    google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || undefined,
   },
   openGraph: {
     title: "Office Space in Noida | Commercial Office Space for Rent | Trinetra Estates",
@@ -182,7 +186,7 @@ const organizationSchema = {
 export default function RootLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode;
+  children: ReactNode;
 }>) {
   return (
     <html lang="en" className={`${poppins.variable} h-full antialiased`}>
