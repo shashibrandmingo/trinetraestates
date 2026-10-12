@@ -1,13 +1,132 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import Container from "@/components/ui/Container";
+import RequirementModal from "@/components/modals/RequirementModal";
+import { RequirementFormData } from "@/components/forms/RequirementForm";
+import { getApiBaseUrl } from "@/config/apiConfig";
+
+const API_BASE = getApiBaseUrl();
 
 export default function Footer() {
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [subscribed, setSubscribed] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalInitialData, setModalInitialData] = useState<RequirementFormData>({});
+  const [activeBackendSectors, setActiveBackendSectors] = useState<string[]>([]);
+
+  // Fetch active sectors from backend to dynamically know which sectors have listings
+  useEffect(() => {
+    let isSubscribed = true;
+    const fetchSectors = async () => {
+      try {
+        const res = await fetch(`${API_BASE}/offices/sectors`, { cache: "no-store" });
+        if (res.ok) {
+          const json = await res.json();
+          if (json.success && json.data && Array.isArray(json.data.sectors) && isSubscribed) {
+            const sectorsWithProps = json.data.sectors
+              .filter((s: { sector: string; count: number }) => s.count > 0)
+              .map((s: { sector: string; count: number }) => s.sector);
+            setActiveBackendSectors(sectorsWithProps);
+          }
+        }
+      } catch (err) {
+        console.warn("Could not load backend sector summary for footer:", err);
+      }
+    };
+
+    fetchSectors();
+    return () => {
+      isSubscribed = false;
+    };
+  }, []);
+
+  const handleOpenOfficeSpaceModal = (spaceType: string) => {
+    setModalInitialData({
+      spaceType,
+      requirements: `Interested in ${spaceType} in Noida`,
+    });
+    setIsModalOpen(true);
+  };
+
+  const handleSectorClick = async (sectorName: string) => {
+    let currentSectors = activeBackendSectors;
+
+    // Fast fallback if user clicked before initial useEffect resolved
+    if (currentSectors.length === 0) {
+      try {
+        const res = await fetch(`${API_BASE}/offices/sectors`, { cache: "no-store" });
+        if (res.ok) {
+          const json = await res.json();
+          if (json.success && json.data && Array.isArray(json.data.sectors)) {
+            currentSectors = json.data.sectors
+              .filter((s: { sector: string; count: number }) => s.count > 0)
+              .map((s: { sector: string; count: number }) => s.sector);
+            setActiveBackendSectors(currentSectors);
+          }
+        }
+      } catch (e) {
+        // fallback
+      }
+    }
+
+    const cleanTarget = sectorName.trim().toLowerCase().replace(/[\s-_]+/g, "");
+    const matchingBackendSector = currentSectors.find(
+      (s) => s.trim().toLowerCase().replace(/[\s-_]+/g, "") === cleanTarget
+    );
+
+    if (matchingBackendSector) {
+      // Sector has active property listings in the database!
+      // Scroll smoothly to FEATURED SPACES and open this sector's tab!
+      if (typeof window !== "undefined") {
+        const isHomePage = window.location.pathname === "/" || window.location.pathname === "";
+        if (isHomePage) {
+          window.dispatchEvent(
+            new CustomEvent("select-featured-sector", {
+              detail: { sector: matchingBackendSector },
+            })
+          );
+          const featuredEl = document.getElementById("featured-spaces");
+          if (featuredEl) {
+            featuredEl.scrollIntoView({ behavior: "smooth" });
+          }
+        } else {
+          router.push(`/#featured-spaces?sector=${encodeURIComponent(matchingBackendSector)}`);
+        }
+      }
+      return;
+    }
+
+    // No property listed for this sector in DB: open global RequirementModal with pre-filled sector!
+    setModalInitialData({
+      area: sectorName,
+      requirements: `Interested in commercial office spaces in ${sectorName}, Noida`,
+    });
+    setIsModalOpen(true);
+  };
+
+  const handleViewAllSectors = () => {
+    if (typeof window !== "undefined") {
+      const isHomePage = window.location.pathname === "/" || window.location.pathname === "";
+      if (isHomePage) {
+        window.dispatchEvent(
+          new CustomEvent("select-featured-sector", {
+            detail: { sector: "all" },
+          })
+        );
+        const featuredEl = document.getElementById("featured-spaces");
+        if (featuredEl) {
+          featuredEl.scrollIntoView({ behavior: "smooth" });
+        }
+      } else {
+        router.push("/#featured-spaces");
+      }
+    }
+  };
 
   const handleSubscribe = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -54,27 +173,28 @@ export default function Footer() {
   ];
 
   const officeSpaces = [
-    { label: "IT & Corporate Offices", href: "/offices?type=it-park" },
-    { label: "Managed Offices", href: "/offices?type=managed" },
-    { label: "Coworking Spaces", href: "/offices?type=coworking" },
-    { label: "Plug & Play Offices", href: "/offices?furnishing=furnished" },
-    { label: "Commercial Spaces", href: "/offices?type=commercial" },
-    { label: "Built-to-Suit Offices", href: "/offices?type=built-to-suit" },
-    { label: "Virtual Offices", href: "/offices?type=virtual" },
+    { label: "IT & Corporate Offices" },
+    { label: "Managed Offices" },
+    { label: "Coworking Spaces" },
+    { label: "Plug & Play Offices" },
+    { label: "Commercial Spaces" },
+    { label: "Built-to-Suit Offices" },
+    { label: "Virtual Offices" },
   ];
 
   const popularSectors = [
-    { label: "Sector 62", href: "/offices?sector=sector-62" },
-    { label: "Sector 63", href: "/offices?sector=sector-63" },
-    { label: "Sector 125", href: "/offices?sector=sector-125" },
-    { label: "Sector 126", href: "/offices?sector=sector-126" },
-    { label: "Sector 132", href: "/offices?sector=sector-132" },
-    { label: "Sector 135", href: "/offices?sector=sector-135" },
-    { label: "Sector 142", href: "/offices?sector=sector-142" },
+    { label: "Sector 62" },
+    { label: "Sector 63" },
+    { label: "Sector 125" },
+    { label: "Sector 126" },
+    { label: "Sector 132" },
+    { label: "Sector 135" },
+    { label: "Sector 142" },
   ];
 
   return (
-    <footer className="relative w-full bg-[var(--footer-bg)] text-[var(--text-light)] overflow-hidden border-t border-[var(--footer-border)] font-sans">
+    <>
+      <footer className="relative w-full bg-[var(--footer-bg)] text-[var(--text-light)] overflow-hidden border-t border-[var(--footer-border)] font-sans">
       {/* Full-width Screen Edge Anchored Building Image */}
       <div className="absolute right-0 bottom-[54px] pointer-events-none z-0 select-none overflow-hidden hidden lg:flex items-end justify-end h-[300px] xl:h-[340px] 2xl:h-[370px] w-[380px] xl:w-[460px] 2xl:w-[520px]">
         <img
@@ -102,7 +222,8 @@ export default function Footer() {
               to enterprises, we create spaces for a brighter tomorrow.
             </p>
 
-            {/* Social Icons */}
+            {/* Social Icons (Temporarily commented out until official social handles are available) */}
+            {/*
             <div className="flex items-center gap-2.5 pt-1">
               {[
                 { icon: "fa-brands fa-linkedin-in", href: "https://linkedin.com", label: "LinkedIn" },
@@ -122,6 +243,7 @@ export default function Footer() {
                 </a>
               ))}
             </div>
+            */}
           </div>
 
           {/* Links Section */}
@@ -149,7 +271,7 @@ export default function Footer() {
               </ul>
             </div>
 
-            {/* Column 3: Office Spaces */}
+            {/* Column 3: Office Spaces (Opens Global Requirement Form with Pre-Filled Space Type) */}
             <div className="lg:w-[15.5%] lg:px-5 lg:border-r border-[var(--footer-border)]">
               <div className="mb-3">
                 <span className="text-[12px] font-bold uppercase tracking-[0.14em] text-[var(--text-white)] block whitespace-nowrap">
@@ -158,20 +280,21 @@ export default function Footer() {
                 <span className="inline-block w-6 h-[2px] bg-[var(--gold)] mt-1.5 rounded-full" />
               </div>
               <ul className="space-y-2 text-[13px]">
-                {officeSpaces.map((link) => (
-                  <li key={link.label}>
-                    <Link
-                      href={link.href}
-                      className="text-[var(--text-light-muted)] hover:text-[var(--text-white)] hover:translate-x-1.5 transition-all duration-200 inline-block"
+                {officeSpaces.map((item) => (
+                  <li key={item.label}>
+                    <button
+                      type="button"
+                      onClick={() => handleOpenOfficeSpaceModal(item.label)}
+                      className="text-[var(--text-light-muted)] hover:text-[var(--text-white)] hover:translate-x-1.5 transition-all duration-200 inline-block text-left cursor-pointer"
                     >
-                      {link.label}
-                    </Link>
+                      {item.label}
+                    </button>
                   </li>
                 ))}
               </ul>
             </div>
 
-            {/* Column 4: Popular Sectors */}
+            {/* Column 4: Popular Sectors (Opens Global Requirement Form with Pre-Filled Sector) */}
             <div className="col-span-2 sm:col-span-1 lg:w-[16.5%] lg:px-5 lg:border-r border-[var(--footer-border)]">
               <div className="mb-3">
                 <span className="text-[12px] font-bold uppercase tracking-[0.14em] text-[var(--text-white)] block whitespace-nowrap">
@@ -182,22 +305,24 @@ export default function Footer() {
               <ul className="grid grid-cols-2 sm:grid-cols-1 gap-x-4 gap-y-2 text-[13px]">
                 {popularSectors.map((sector) => (
                   <li key={sector.label}>
-                    <Link
-                      href={sector.href}
-                      className="text-[var(--text-light-muted)] hover:text-[var(--text-white)] hover:translate-x-1.5 transition-all duration-200 inline-block"
+                    <button
+                      type="button"
+                      onClick={() => handleSectorClick(sector.label)}
+                      className="text-[var(--text-light-muted)] hover:text-[var(--text-white)] hover:translate-x-1.5 transition-all duration-200 inline-block text-left cursor-pointer"
                     >
                       {sector.label}
-                    </Link>
+                    </button>
                   </li>
                 ))}
                 <li className="pt-1 col-span-2 sm:col-span-1">
-                  <Link
-                    href="/offices"
-                    className="text-[var(--gold)] hover:text-[var(--gold-hover)] font-semibold text-xs inline-flex items-center gap-1.5 transition-colors group"
+                  <button
+                    type="button"
+                    onClick={handleViewAllSectors}
+                    className="text-[var(--gold)] hover:text-[var(--gold-hover)] font-semibold text-xs inline-flex items-center gap-1.5 transition-colors group cursor-pointer"
                   >
                     <span>View All Sectors</span>
                     <i className="fa-solid fa-arrow-right text-[10px] transition-transform duration-200 group-hover:translate-x-1" aria-hidden="true" />
-                  </Link>
+                  </button>
                 </li>
               </ul>
             </div>
@@ -312,5 +437,13 @@ export default function Footer() {
         </div>
       </Container>
     </footer>
-  );
+
+    {/* Global Requirement Enquiry Modal for Footer Triggers */}
+    <RequirementModal
+      isOpen={isModalOpen}
+      onClose={() => setIsModalOpen(false)}
+      initialData={modalInitialData}
+    />
+  </>
+);
 }

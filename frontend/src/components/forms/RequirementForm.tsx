@@ -53,6 +53,13 @@ export interface RequirementFormProps {
   badge?: string;
   title?: string;
   subtitle?: string;
+  buttonText?: string;
+  propertyName?: string;
+  propertyContext?: {
+    sector?: string;
+    buildingName?: string;
+    areaSqFt?: number;
+  };
   onSuccess?: (data: RequirementFormData) => void;
   className?: string;
 }
@@ -78,6 +85,9 @@ export default function RequirementForm({
   badge = "GET STARTED",
   title = "Share Your Requirements",
   subtitle = "Our team will get in touch with the best options for you.",
+  buttonText = "Get Office Space Options",
+  propertyName,
+  propertyContext,
   onSuccess,
   className,
 }: RequirementFormProps) {
@@ -128,6 +138,21 @@ export default function RequirementForm({
       }));
     }
   }, [initialData]);
+
+  // Dynamic Area and Space Type options to support any sector/type passed via initialData
+  const areaOptions = React.useMemo(() => {
+    if (formData.area && !NOIDA_AREA_OPTIONS.some((o) => o.value.toLowerCase() === formData.area?.toLowerCase())) {
+      return [{ value: formData.area, label: formData.area }, ...NOIDA_AREA_OPTIONS];
+    }
+    return NOIDA_AREA_OPTIONS;
+  }, [formData.area]);
+
+  const spaceTypeOptions = React.useMemo(() => {
+    if (formData.spaceType && !SPACE_TYPE_OPTIONS.some((o) => o.value.toLowerCase() === formData.spaceType?.toLowerCase())) {
+      return [{ value: formData.spaceType, label: formData.spaceType }, ...SPACE_TYPE_OPTIONS];
+    }
+    return SPACE_TYPE_OPTIONS;
+  }, [formData.spaceType]);
 
   // Single field validation helper
   const validateField = (field: keyof FormErrors, value: string): string => {
@@ -282,7 +307,12 @@ export default function RequirementForm({
     setLoading(true);
 
     try {
+      const propertyNote = propertyName
+        ? `[Property: ${propertyName}${propertyContext?.sector ? ` | ${propertyContext.sector}` : ""}${propertyContext?.areaSqFt ? ` | ${propertyContext.areaSqFt} Sq.Ft.` : ""}]`
+        : "";
+
       const detailedNotes = [
+        propertyNote,
         formData.requirements?.trim(),
         isModal ? "(Via Website Modal)" : "(Via Website Form)",
       ].filter(Boolean).join(" ");
@@ -297,8 +327,8 @@ export default function RequirementForm({
           phone: formData.phone!.trim(),
           email: formData.email!.trim(),
           company: formData.company?.trim() || undefined,
-          preferredSector: formData.area || undefined,
-          propertyTitle: formData.spaceType || undefined,
+          preferredSector: formData.area || propertyContext?.sector || undefined,
+          propertyTitle: propertyName || formData.spaceType || undefined,
           notes: detailedNotes || undefined,
           source: "Website Enquiry",
           status: "Lead",
@@ -333,20 +363,28 @@ export default function RequirementForm({
   const formContent = (
     <>
       {/* Form Header */}
-      <div className="mb-2.5 sm:mb-3 text-left">
-        <div className="inline-flex items-center gap-2 mb-0.5">
-          <span className="w-4 h-[2px] bg-[var(--gold)] rounded-full inline-block" />
-          <span className="text-[9.5px] sm:text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--gold)]">
-            {badge}
-          </span>
+      {(badge || title || subtitle) && (
+        <div className="mb-2.5 sm:mb-3 text-left">
+          {badge ? (
+            <div className="inline-flex items-center gap-2 mb-0.5">
+              <span className="w-4 h-[2px] bg-[var(--gold)] rounded-full inline-block" />
+              <span className="text-[9.5px] sm:text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--gold)]">
+                {badge}
+              </span>
+            </div>
+          ) : null}
+          {title ? (
+            <h3 className="text-[15px] sm:text-base font-bold text-[#0a233c] !text-[#0a233c] tracking-tight leading-snug">
+              {title}
+            </h3>
+          ) : null}
+          {subtitle ? (
+            <p className="text-[11px] sm:text-[11.5px] text-[#475569] !text-[#475569] mt-0.5 font-normal leading-normal">
+              {subtitle}
+            </p>
+          ) : null}
         </div>
-        <h3 className="text-lg sm:text-xl md:text-[22px] font-bold text-[var(--text-heading)] mt-0.5 leading-snug tracking-tight">
-          {title}
-        </h3>
-        <p className="text-[11px] sm:text-[11.5px] text-[var(--text-body)] mt-0.5 font-normal leading-normal">
-          {subtitle}
-        </p>
-      </div>
+      )}
 
       {/* Form Fields */}
       <form onSubmit={handleSubmit} noValidate className="space-y-2 text-left">
@@ -506,7 +544,7 @@ export default function RequirementForm({
             onChange={handleAreaChange}
             placeholder="Preferred Area in Noida *"
             icon="fa-solid fa-map-location-dot"
-            options={NOIDA_AREA_OPTIONS}
+            options={areaOptions}
             error={errors.area}
           />
           {errors.area && (
@@ -525,7 +563,7 @@ export default function RequirementForm({
             onChange={handleSpaceTypeChange}
             placeholder="Type of Space *"
             icon="fa-regular fa-rectangle-list"
-            options={SPACE_TYPE_OPTIONS}
+            options={spaceTypeOptions}
             error={errors.spaceType}
           />
           {errors.spaceType && (
@@ -572,7 +610,7 @@ export default function RequirementForm({
             </span>
           ) : (
             <span className="inline-flex items-center gap-2">
-              <span>Get Office Space Options</span>
+              <span>{buttonText}</span>
               <i className="fa-solid fa-arrow-right text-[9.5px] group-hover:translate-x-0.5 transition-transform" aria-hidden="true" />
             </span>
           )}
@@ -649,7 +687,7 @@ export default function RequirementForm({
   }
 
   return (
-    <div className={cn("form-card w-full max-w-[380px] bg-[var(--bg-surface)] rounded-2xl p-4 sm:p-5 shadow-[0_12px_36px_-6px_rgba(10,35,60,0.18),0_4px_12px_-2px_rgba(10,35,60,0.06)] border border-[var(--border-card)]", className)}>
+    <div className={cn("form-card w-full mx-auto lg:mx-0 max-w-full sm:max-w-[420px] lg:max-w-full bg-[var(--bg-surface)] rounded-2xl p-4 sm:p-5 shadow-[0_12px_36px_-6px_rgba(10,35,60,0.18),0_4px_12px_-2px_rgba(10,35,60,0.06)] border border-[var(--border-card)]", className)}>
       {renderedContent}
     </div>
   );

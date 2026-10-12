@@ -1,26 +1,17 @@
+import { getApiBaseUrl, getSiteUrl } from './apiConfig';
+
 /**
- * Strict Environment Variable Validation
- * Enforces pure configuration from .env without hidden hardcoded localhost fallbacks.
+ * Environment Variable Accessor
+ * Proxies to centralized apiConfig to ensure reliable resolution on both client and server.
  */
-
-const getRequiredEnv = (key: string): string => {
-  const value = process.env[key];
-  if (!value) {
-    throw new Error(
-      `[CONFIG ERROR] Missing required environment variable: "${key}". Check your frontend .env file.`
-    );
-  }
-  return value;
-};
-
 export const env = {
   get API_URL(): string {
-    return getRequiredEnv('NEXT_PUBLIC_API_URL');
+    return getApiBaseUrl();
   },
   get SITE_URL(): string {
-    return getRequiredEnv('NEXT_PUBLIC_SITE_URL');
+    return getSiteUrl();
   },
   get ADS_CLIENT_ID(): string {
-    return getRequiredEnv('NEXT_PUBLIC_ADS_CLIENT_ID');
+    return process.env.NEXT_PUBLIC_ADS_CLIENT_ID || '';
   }
 };

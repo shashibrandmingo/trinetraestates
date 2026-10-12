@@ -1,12 +1,14 @@
 "use client";
 
-import React, { useState, useMemo, useRef, useEffect } from "react";
+import React, { useState, useMemo, useRef, useEffect, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import Container from "@/components/ui/Container";
-import { featuredPropertiesData as defaultProperties, FeaturedPropertyItem } from "@/data/featuredPropertiesData";
+import { FeaturedPropertyItem } from "@/data/featuredPropertiesData";
 import { useInView } from "@/hooks/useInView";
-import { BackendOfficeDoc } from "@/services/propertyService";
+import { BackendOfficeDoc, resolvePropertyImage } from "@/services/propertyService";
+import { getApiBaseUrl } from "@/config/apiConfig";
 
-const API_BASE = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api").replace(/\/+$/, "");
+const API_BASE = getApiBaseUrl();
 
 const BADGES = ["POPULAR", "READY TO MOVE", "PRIME LOCATION", "LATEST", "GRADE A", "PREMIUM"];
 const CURATED_IMAGES = [
@@ -35,47 +37,54 @@ function mapBackendOfficeToItem(office: BackendOfficeDoc, idx: number): Featured
     .replace(/\s*\(Copy\)+/gi, "")
     .trim();
 
-  // Sector & Location
+  // Sector & Location from real database document
   const rawSector = office.location?.sector || (office as any).sector || "Sector 62";
   const sector = rawSector.trim();
   const location = sector.toLowerCase().includes("noida") ? sector : `${sector}, Noida`;
 
-  // Area calculation
+  // Real Area calculation from DB
   const areaNum = Number(
     office.areaSqFt || office.builtUpAreaSqFt || office.carpetAreaSqFt || 1000
   );
   const areaFormatted = `${areaNum.toLocaleString("en-IN")} Sq. Ft.`;
 
-  // Realistic Workstations & Cabins based on area
-  const workstationsCount = Math.max(4, Math.round(areaNum / 65));
-  const cabinsCount = Math.max(1, Math.round(areaNum / 1200));
+  // Real Workstations from DB (with fallback to area ratio only if missing/zero)
+  const rawWorkstations = office.workstations;
+  const workstationsText =
+    typeof rawWorkstations === "number" && rawWorkstations > 0
+      ? `${rawWorkstations} Workstations`
+      : `${Math.max(4, Math.round(areaNum / 65))} Workstations`;
 
-  // Luxury Badge matching Screenshot 2 aesthetics
+  // Real Cabins from DB
+  const rawCabins = office.cabins;
+  const cabinsText =
+    typeof rawCabins === "number"
+      ? rawCabins === 0
+        ? "0 Cabins"
+        : `${rawCabins} ${rawCabins === 1 ? "Cabin" : "Cabins"}`
+      : `${Math.max(1, Math.round(areaNum / 1200))} Cabins`;
+
+  // Luxury Badge
   const badge =
-    office.dataAge && office.dataAge !== "Ready to Move"
+    office.badge ||
+    (office.dataAge && office.dataAge !== "Ready to Move"
       ? office.dataAge.toUpperCase()
-      : BADGES[idx % BADGES.length];
+      : BADGES[idx % BADGES.length]);
 
-  // Image resolution with luxury sector fallbacks
-  let rawImg = office.thumbnail || (office as any).imageUrl || office.images?.[0]?.url;
-  let finalImg = rawImg;
-  if (!finalImg || finalImg === "/images/sample-office.png") {
-    if (sector.includes("62")) {
-      finalImg = idx % 2 === 0 ? "/images/sectors/sector-62.jpg" : "/images/properties/interior-1.jpg";
-    } else if (sector.includes("142")) {
-      finalImg = "/images/sectors/sector-142.jpg";
-    } else if (sector.includes("125") || sector.includes("132")) {
-      finalImg = "/images/sectors/sector-125.jpg";
-    } else if (sector.includes("135")) {
-      finalImg = "/images/sectors/sector-136.jpg";
-    } else if (sector.includes("63")) {
-      finalImg = "/images/sectors/sector-63.jpg";
-    } else if (sector.includes("18")) {
-      finalImg = "/images/sectors/sector-18.jpg";
-    } else {
-      finalImg = CURATED_IMAGES[idx % CURATED_IMAGES.length];
-    }
+  // Real Price from DB
+  let priceFormatted = "Price on Request";
+  const rent = office.monthlyRentInLakh || office.price;
+  if (rent && Number(rent) > 0) {
+    priceFormatted = `₹${Number(rent).toLocaleString("en-IN", {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 2,
+    })} L / mo`;
   }
+
+  // Real Image resolution via dynamic backend host
+  const rawImg = office.thumbnail || (office as any).imageUrl || office.images?.[0]?.url;
+  const resolved = resolvePropertyImage(rawImg);
+  const finalImg = resolved || CURATED_IMAGES[idx % CURATED_IMAGES.length];
 
   return {
     id: office._id || office.propertyId || idx + 1,
@@ -84,8 +93,9 @@ function mapBackendOfficeToItem(office: BackendOfficeDoc, idx: number): Featured
     location,
     badge,
     area: areaFormatted,
-    workstations: `${workstationsCount} Workstations`,
-    cabins: `${cabinsCount} ${cabinsCount === 1 ? "Cabin" : "Cabins"}`,
+    workstations: workstationsText,
+    cabins: cabinsText,
+    price: priceFormatted,
     image: finalImg,
     slug: office.slug || (office.propertyId ? office.propertyId.toLowerCase() : `office-${idx + 1}`),
   };
@@ -96,8 +106,9 @@ export default function FeaturedPropertiesSection({
   onOpenForm,
 }: FeaturedPropertiesSectionProps) {
   const [sectionRef, isInView] = useInView<HTMLElement>({ threshold: 0.08, triggerOnce: true });
+  // Dynamic state: start with empty array to NEVER show dummy data
   const [currentProperties, setCurrentProperties] = useState<FeaturedPropertyItem[]>(
-    properties && properties.length > 0 ? properties : defaultProperties.slice(0, PAGE_SIZE)
+    properties && properties.length > 0 ? properties : []
   );
   const [activeSector, setActiveSector] = useState("all");
   const [sortBy, setSortBy] = useState("newest");
@@ -105,13 +116,60 @@ export default function FeaturedPropertiesSection({
   const [favorites, setFavorites] = useState<Record<string | number, boolean>>({});
   const [page, setPage] = useState<number>(1);
   const [hasMore, setHasMore] = useState<boolean>(false);
-  const [totalCount, setTotalCount] = useState<number>(defaultProperties.length);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [totalCount, setTotalCount] = useState<number>(properties ? properties.length : 0);
+  const [isLoading, setIsLoading] = useState<boolean>(!properties || properties.length === 0);
   const [isLoadingMore, setIsLoadingMore] = useState<boolean>(false);
   const [sectorTabs, setSectorTabs] = useState<{ id: string; label: string; hasIcon?: boolean }[]>([
-    { id: "all", label: `All Properties (${defaultProperties.length})`, hasIcon: true },
+    { id: "all", label: "All Properties", hasIcon: true },
   ]);
+
+  // Horizontal scroll refs & controls for infinite sector scalability
+  const tabsScrollRef = useRef<HTMLDivElement>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
   const sortRef = useRef<HTMLDivElement>(null);
+
+  // Check overflow to show/hide desktop scroll arrows
+  const updateScrollButtons = useCallback(() => {
+    const el = tabsScrollRef.current;
+    if (!el) return;
+    const { scrollLeft, scrollWidth, clientWidth } = el;
+    setCanScrollLeft(scrollLeft > 6);
+    setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 6);
+  }, []);
+
+  useEffect(() => {
+    const el = tabsScrollRef.current;
+    if (!el) return;
+    updateScrollButtons();
+    el.addEventListener("scroll", updateScrollButtons, { passive: true });
+    window.addEventListener("resize", updateScrollButtons);
+
+    let ro: ResizeObserver | null = null;
+    if (typeof ResizeObserver !== "undefined") {
+      ro = new ResizeObserver(() => updateScrollButtons());
+      ro.observe(el);
+    }
+
+    return () => {
+      el.removeEventListener("scroll", updateScrollButtons);
+      window.removeEventListener("resize", updateScrollButtons);
+      ro?.disconnect();
+    };
+  }, [updateScrollButtons, sectorTabs]);
+
+  const handleScrollLeft = () => {
+    tabsScrollRef.current?.scrollBy({ left: -260, behavior: "smooth" });
+  };
+
+  const handleScrollRight = () => {
+    tabsScrollRef.current?.scrollBy({ left: 260, behavior: "smooth" });
+  };
+
+  const handleTabClick = (tabId: string, e: React.MouseEvent<HTMLButtonElement>) => {
+    setActiveSector(tabId);
+    e.currentTarget.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+  };
 
   // 1. Fetch dynamic sector summary counts from backend
   useEffect(() => {
@@ -140,7 +198,7 @@ export default function FeaturedPropertiesSection({
           }
         }
       } catch (err) {
-        console.warn("Could not load sector summary, keeping default tabs:", err);
+        console.warn("Could not load sector summary:", err);
       }
     };
 
@@ -150,12 +208,75 @@ export default function FeaturedPropertiesSection({
     };
   }, []);
 
+  // Handle programmatic sector selection (from Footer, URL query, or other sections)
+  useEffect(() => {
+    const handleSelectFeaturedSector = (e: Event) => {
+      const customEvent = e as CustomEvent<{ sector: string }>;
+      const targetSector = customEvent.detail?.sector;
+      if (!targetSector) return;
+
+      if (
+        targetSector.toLowerCase() === "all" ||
+        targetSector.toLowerCase().includes("all properties")
+      ) {
+        setActiveSector("all");
+        const sectionEl = document.getElementById("featured-spaces");
+        if (sectionEl) {
+          sectionEl.scrollIntoView({ behavior: "smooth" });
+        }
+        return;
+      }
+
+      const cleanTarget = targetSector.trim().toLowerCase().replace(/[\s-_]+/g, "");
+      const matchingTab = sectorTabs.find(
+        (t) => t.id.trim().toLowerCase().replace(/[\s-_]+/g, "") === cleanTarget
+      );
+
+      const targetId = matchingTab ? matchingTab.id : targetSector;
+      setActiveSector(targetId);
+
+      const sectionEl = document.getElementById("featured-spaces");
+      if (sectionEl) {
+        sectionEl.scrollIntoView({ behavior: "smooth" });
+      }
+
+      setTimeout(() => {
+        const activeBtn = tabsScrollRef.current?.querySelector(
+          `[data-sector-id="${targetId}"]`
+        ) as HTMLElement | null;
+        if (activeBtn) {
+          activeBtn.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+        }
+      }, 300);
+    };
+
+    window.addEventListener("select-featured-sector", handleSelectFeaturedSector);
+
+    // Initial check from window.location (?sector=...) on mount
+    if (typeof window !== "undefined") {
+      const searchParams = new URLSearchParams(window.location.search);
+      const sectorParam = searchParams.get("sector");
+      if (sectorParam) {
+        setTimeout(() => {
+          handleSelectFeaturedSector(
+            new CustomEvent("select-featured-sector", { detail: { sector: sectorParam } })
+          );
+        }, 400);
+      }
+    }
+
+    return () => {
+      window.removeEventListener("select-featured-sector", handleSelectFeaturedSector);
+    };
+  }, [sectorTabs]);
+
   // 2. Fetch paginated properties on sector or sort change (limit = 12, page = 1)
   useEffect(() => {
     if (properties && properties.length > 0) {
       setCurrentProperties(properties.slice(0, PAGE_SIZE));
       setTotalCount(properties.length);
       setHasMore(properties.length > PAGE_SIZE);
+      setIsLoading(false);
       return;
     }
 
@@ -191,8 +312,14 @@ export default function FeaturedPropertiesSection({
             return;
           }
         }
+        if (isSubscribed) {
+          setCurrentProperties([]);
+        }
       } catch (err) {
-        console.warn("Could not load featured properties from backend, using defaults:", err);
+        console.warn("Could not load featured properties from backend:", err);
+        if (isSubscribed) {
+          setCurrentProperties([]);
+        }
       } finally {
         if (isSubscribed) {
           setIsLoading(false);
@@ -271,12 +398,13 @@ export default function FeaturedPropertiesSection({
     setFavorites((prev) => ({ ...prev, [id]: !prev[id] }));
   };
 
+  const router = useRouter();
+
   const handleCardClick = (e: React.MouseEvent, property: FeaturedPropertyItem) => {
     e.preventDefault();
     e.stopPropagation();
-    if (onOpenForm) {
-      onOpenForm(property);
-    }
+    const target = property.slug || String(property.id);
+    router.push(`/properties/${target}`);
   };
 
   return (
@@ -343,198 +471,314 @@ export default function FeaturedPropertiesSection({
           </div>
         </div>
 
-        {/* Filter Pills Bar & Sort Dropdown */}
+        {/* Filter Pills Bar & Sort Dropdown with Desktop Navigation Chevrons */}
         <div
-          className={`relative z-30 flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 pb-2 mb-6 sm:mb-8 transition-opacity duration-500 ${
+          className={`relative z-30 flex flex-col lg:flex-row lg:items-center justify-between gap-3 sm:gap-4 pb-2 mb-6 sm:mb-8 transition-opacity duration-500 ${
             isInView ? "animate-fade-up delay-200" : "opacity-0"
           }`}
         >
-          {/* Sector Pills */}
-          <div className="flex items-center gap-2 sm:gap-2.5 overflow-x-auto pb-1.5 -mx-4 px-4 sm:mx-0 sm:px-0 scrollbar-none flex-1">
-            {sectorTabs.map((tab) => {
-              const isActive = activeSector === tab.id;
-              return (
-                <button
-                  key={tab.id}
-                  type="button"
-                  onClick={() => setActiveSector(tab.id)}
-                  className={`px-3.5 sm:px-4.5 py-1.5 sm:py-2 rounded-full text-xs sm:text-[12.5px] font-semibold transition-all duration-300 whitespace-nowrap cursor-pointer flex items-center shrink-0 ${
-                    isActive
-                      ? "bg-[var(--gold)] text-white shadow-sm"
-                      : "bg-[var(--bg-surface)] text-[var(--text-body)] border border-[var(--border-card)] hover:border-[var(--gold)] hover:text-[var(--gold)]"
-                  }`}
-                >
-                  {tab.hasIcon && (
-                    <i
-                      className="fa-solid fa-table-cells-large text-[10px] sm:text-[11px] mr-1.5"
-                      aria-hidden="true"
-                    />
-                  )}
-                  <span>{tab.label}</span>
-                </button>
-              );
-            })}
-          </div>
+          {/* Sector Pills Carousel with Infinite Scalability & Gradient Masks */}
+          <div className="relative flex-1 min-w-0 flex items-center">
+            {/* Left Chevron Button (Desktop only when scrollable) */}
+            {canScrollLeft && (
+              <button
+                type="button"
+                onClick={handleScrollLeft}
+                aria-label="Scroll left sectors"
+                className="hidden md:flex absolute left-0 z-20 w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-[var(--bg-surface)]/95 hover:bg-[var(--gold)] text-[var(--gold)] hover:text-white border border-[var(--gold-border)] shadow-md items-center justify-center transition-all duration-200 cursor-pointer -translate-x-1"
+              >
+                <i className="fa-solid fa-chevron-left text-[10px]" aria-hidden="true" />
+              </button>
+            )}
 
-          {/* Sort By Dropdown */}
-          <div
-            ref={sortRef}
-            className="relative flex items-center justify-between sm:justify-end gap-2 shrink-0 select-none z-30 pt-1 sm:pt-0"
-          >
-            <span className="text-[11px] sm:text-xs text-[var(--text-muted)] font-normal">Sort By:</span>
+            {/* Left Gradient Fade Mask */}
+            <div
+              className={`hidden md:block pointer-events-none absolute left-0 top-0 bottom-0 w-8 sm:w-10 bg-gradient-to-r from-[var(--bg-main)] to-transparent z-10 transition-opacity duration-200 ${
+                canScrollLeft ? "opacity-100" : "opacity-0"
+              }`}
+            />
 
-            <button
-              type="button"
-              onClick={() => setIsSortOpen((prev) => !prev)}
-              className="inline-flex items-center gap-1.5 py-1 text-xs font-semibold text-[var(--text-heading)] hover:text-[var(--gold)] cursor-pointer transition-colors focus:outline-none"
-              aria-haspopup="listbox"
-              aria-expanded={isSortOpen}
+            {/* Scrollable Tabs Track */}
+            <div
+              ref={tabsScrollRef}
+              className="flex items-center gap-2 sm:gap-2.5 overflow-x-auto pb-1.5 -mx-4 px-4 sm:mx-0 sm:px-0 scroll-smooth [scrollbar-width:none] [&::-webkit-scrollbar]:hidden flex-1"
             >
-              <span>{sortOptions.find((o) => o.value === sortBy)?.label || "Latest"}</span>
-              <i
-                className={`fa-solid fa-chevron-down text-[9px] text-[var(--gold)] transition-transform duration-200 ${
-                  isSortOpen ? "rotate-180" : ""
-                }`}
-                aria-hidden="true"
-              />
-            </button>
+              {sectorTabs.map((tab) => {
+                const isActive = activeSector === tab.id;
+                return (
+                  <button
+                    key={tab.id}
+                    data-sector-id={tab.id}
+                    type="button"
+                    onClick={(e) => handleTabClick(tab.id, e)}
+                    className={`px-3.5 sm:px-4.5 py-1.5 sm:py-2 rounded-full text-xs sm:text-[12.5px] font-semibold transition-all duration-300 whitespace-nowrap cursor-pointer flex items-center shrink-0 ${
+                      isActive
+                        ? "bg-[var(--gold)] text-white shadow-sm"
+                        : "bg-[var(--bg-surface)] text-[var(--text-body)] border border-[var(--border-card)] hover:border-[var(--gold)] hover:text-[var(--gold)]"
+                    }`}
+                  >
+                    {tab.hasIcon && (
+                      <i
+                        className="fa-solid fa-table-cells-large text-[10px] sm:text-[11px] mr-1.5"
+                        aria-hidden="true"
+                      />
+                    )}
+                    <span>{tab.label}</span>
+                  </button>
+                );
+              })}
+            </div>
 
-            {isSortOpen && (
-              <div className="absolute right-0 top-full mt-1.5 w-44 bg-[var(--bg-surface)] rounded-xl border border-[var(--gold-border)] shadow-[0_12px_30px_-6px_rgba(10,35,60,0.14)] py-1.5 z-50 animate-fade-in overflow-hidden">
-                {sortOptions.map((opt) => {
-                  const isSelected = sortBy === opt.value;
-                  return (
-                    <button
-                      key={opt.value}
-                      type="button"
-                      onClick={() => {
-                        setSortBy(opt.value);
-                        setIsSortOpen(false);
-                      }}
-                      className={`w-full px-3.5 py-2 text-left text-xs flex items-center justify-between transition-colors cursor-pointer ${
-                        isSelected
-                          ? "bg-[var(--gold-light)] text-[var(--gold)] font-semibold"
-                          : "text-[var(--text-heading)] hover:bg-[var(--gold-light)]/60 hover:text-[var(--gold)]"
-                      }`}
-                    >
-                      <span>{opt.label}</span>
-                      {isSelected && (
-                        <i className="fa-solid fa-check text-[10px] text-[var(--gold)]" aria-hidden="true" />
-                      )}
-                    </button>
-                  );
-                })}
-              </div>
+            {/* Right Gradient Fade Mask */}
+            <div
+              className={`hidden md:block pointer-events-none absolute right-0 top-0 bottom-0 w-8 sm:w-10 bg-gradient-to-l from-[var(--bg-main)] to-transparent z-10 transition-opacity duration-200 ${
+                canScrollRight ? "opacity-100" : "opacity-0"
+              }`}
+            />
+
+            {/* Right Chevron Button (Desktop only when scrollable) */}
+            {canScrollRight && (
+              <button
+                type="button"
+                onClick={handleScrollRight}
+                aria-label="Scroll right sectors"
+                className="hidden md:flex absolute right-0 z-20 w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-[var(--bg-surface)]/95 hover:bg-[var(--gold)] text-[var(--gold)] hover:text-white border border-[var(--gold-border)] shadow-md items-center justify-center transition-all duration-200 cursor-pointer translate-x-1"
+              >
+                <i className="fa-solid fa-chevron-right text-[10px]" aria-hidden="true" />
+              </button>
             )}
           </div>
-        </div>
 
-        {/* 12 Property Cards Grid (with Backend Paginated Load More) */}
-        <div className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-4.5 lg:gap-5 transition-opacity duration-300 ${isLoading ? "opacity-40 pointer-events-none" : "opacity-100"}`}>
-          {currentProperties.map((property, idx) => (
+          {/* Right Area: Showing Count & Sort Dropdown */}
+          <div className="flex items-center justify-between lg:justify-end gap-3 sm:gap-4 shrink-0 pt-1 lg:pt-0 border-t lg:border-t-0 border-[var(--border-subtle)]">
+            <span className="text-[11.5px] sm:text-xs text-[var(--text-muted)] font-normal whitespace-nowrap">
+              Showing <strong className="text-[var(--text-heading)] font-semibold">{currentProperties.length}</strong>{" "}
+              {totalCount > currentProperties.length && (
+                <>of <strong className="text-[var(--text-heading)] font-semibold">{totalCount}</strong></>
+              )}{" "}
+              spaces
+            </span>
+
+            <span className="hidden sm:inline w-[1px] h-4 bg-[var(--border-subtle)]" />
+
+            {/* Sort By Dropdown */}
             <div
-              key={property.id}
-              onClick={(e) => handleCardClick(e, property)}
-              className={`group bg-[var(--bg-surface)] rounded-2xl overflow-hidden border border-[var(--border-card)] shadow-[0_2px_12px_rgba(10,35,60,0.04)] hover:-translate-y-1.5 hover:shadow-[0_16px_32px_-6px_rgba(10,35,60,0.12)] hover:border-[var(--gold)]/45 transition-all duration-300 ease-out cursor-pointer flex flex-col justify-between ${
-                isInView ? `animate-fade-up delay-${Math.min((idx + 1) * 60, 500)}` : "opacity-0"
-              }`}
+              ref={sortRef}
+              className="relative flex items-center gap-1.5 select-none z-30"
             >
-              {/* Card Image with Badge & Wishlist Heart */}
-              <div className="relative w-full h-[162px] sm:h-[170px] lg:h-[176px] overflow-hidden bg-[var(--primary)]">
-                <img
-                  src={property.image}
-                  alt={`Office Space in ${property.location}`}
-                  onError={(e) => {
-                    (e.currentTarget as HTMLImageElement).src = "/images/sectors/sector-62.jpg";
-                  }}
-                  className="w-full h-full object-cover object-center transition-transform duration-500 ease-out group-hover:scale-105"
+              <span className="text-[11px] sm:text-xs text-[var(--text-muted)] font-normal">Sort:</span>
+
+              <button
+                type="button"
+                onClick={() => setIsSortOpen((prev) => !prev)}
+                className="inline-flex items-center gap-1.5 py-1 px-2.5 rounded-lg bg-[var(--bg-surface)] border border-[var(--border-card)] text-xs font-semibold text-[var(--text-heading)] hover:text-[var(--gold)] hover:border-[var(--gold)] cursor-pointer transition-colors focus:outline-none"
+                aria-haspopup="listbox"
+                aria-expanded={isSortOpen}
+              >
+                <span>{sortOptions.find((o) => o.value === sortBy)?.label || "Latest"}</span>
+                <i
+                  className={`fa-solid fa-chevron-down text-[9px] text-[var(--gold)] transition-transform duration-200 ${
+                    isSortOpen ? "rotate-180" : ""
+                  }`}
+                  aria-hidden="true"
                 />
+              </button>
 
-                {/* Status Badge */}
-                <div className="absolute top-2.5 left-2.5 z-10">
-                  <span className="bg-[var(--gold-light)] text-[var(--gold-hover)] border border-[var(--gold-border)]/70 font-bold text-[9px] uppercase tracking-wider px-2.5 py-0.5 rounded-full shadow-xs">
-                    {property.badge}
-                  </span>
+              {isSortOpen && (
+                <div className="absolute right-0 top-full mt-1.5 w-44 bg-[var(--bg-surface)] rounded-xl border border-[var(--gold-border)] shadow-[0_12px_30px_-6px_rgba(10,35,60,0.14)] py-1.5 z-50 animate-fade-in overflow-hidden">
+                  {sortOptions.map((opt) => {
+                    const isSelected = sortBy === opt.value;
+                    return (
+                      <button
+                        key={opt.value}
+                        type="button"
+                        onClick={() => {
+                          setSortBy(opt.value);
+                          setIsSortOpen(false);
+                        }}
+                        className={`w-full px-3.5 py-2 text-left text-xs flex items-center justify-between transition-colors cursor-pointer ${
+                          isSelected
+                            ? "bg-[var(--gold-light)] text-[var(--gold)] font-semibold"
+                            : "text-[var(--text-heading)] hover:bg-[var(--gold-light)]/60 hover:text-[var(--gold)]"
+                        }`}
+                      >
+                        <span>{opt.label}</span>
+                        {isSelected && (
+                          <i className="fa-solid fa-check text-[10px] text-[var(--gold)]" aria-hidden="true" />
+                        )}
+                      </button>
+                    );
+                  })}
                 </div>
-
-                {/* Wishlist Heart Button */}
-                <button
-                  type="button"
-                  onClick={(e) => toggleFavorite(e, property.id)}
-                  aria-label="Add to favorites"
-                  className="absolute top-2.5 right-2.5 z-10 w-7.5 h-7.5 rounded-full bg-black/25 backdrop-blur-xs flex items-center justify-center text-white hover:text-red-400 hover:bg-black/45 transition-all cursor-pointer border border-white/20 shadow-xs"
-                >
-                  <i
-                    className={`${
-                      favorites[property.id]
-                        ? "fa-solid fa-heart text-red-500"
-                        : "fa-regular fa-heart"
-                    } text-[11.5px]`}
-                    aria-hidden="true"
-                  />
-                </button>
-              </div>
-
-              {/* Card Details Body */}
-              <div className="p-3 sm:p-3.5 flex-1 flex flex-col justify-between">
-                <div>
-                  {/* Highlighted Location (Backend Office Title Hidden) */}
-                  <div className="flex items-center gap-2">
-                    <span className="w-6 h-6 rounded-full bg-[var(--gold-light)] border border-[var(--gold-border)]/60 text-[var(--gold)] flex items-center justify-center shrink-0 shadow-xs">
-                      <i className="fa-solid fa-location-dot text-[11px]" aria-hidden="true" />
-                    </span>
-                    <h4
-                      className="property-card-title text-[var(--text-heading)] group-hover:text-[var(--gold)] transition-colors tracking-tight truncate font-bold text-[14.5px] sm:text-[15px]"
-                      style={{ lineHeight: "1.3" }}
-                      title={property.location}
-                    >
-                      {property.location}
-                    </h4>
-                  </div>
-
-                  {/* 3 Spec Badges */}
-                  <div className="flex items-center justify-between text-[10px] text-[var(--text-body)] font-medium pt-2.5 pb-0.5 border-t border-[var(--border-subtle)] mt-2.5">
-                    <div className="flex items-center gap-1 shrink-0">
-                      <i className="fa-regular fa-building text-[var(--gold)] text-[9.5px]" aria-hidden="true" />
-                      <span className="whitespace-nowrap">{property.area}</span>
-                    </div>
-
-                    <span className="text-[var(--border-subtle)] text-[10px] select-none font-light">|</span>
-
-                    <div className="flex items-center gap-1 shrink-0">
-                      <i className="fa-solid fa-chair text-[var(--gold)] text-[9.5px]" aria-hidden="true" />
-                      <span className="whitespace-nowrap">{property.workstations}</span>
-                    </div>
-
-                    <span className="text-[var(--border-subtle)] text-[10px] select-none font-light">|</span>
-
-                    <div className="flex items-center gap-1 shrink-0">
-                      <i className="fa-regular fa-id-badge text-[var(--gold)] text-[9.5px]" aria-hidden="true" />
-                      <span className="whitespace-nowrap">{property.cabins}</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Card Footer Bar */}
-                <div className="pt-2 border-t border-[var(--border-subtle)] mt-2 flex items-center justify-between">
-                  <span className="text-[11px] font-semibold text-[var(--gold)]">
-                    Price on Request
-                  </span>
-
-                  <div
-                    onClick={(e) => handleCardClick(e, property)}
-                    className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-[var(--text-heading)] group-hover:text-[var(--gold)] transition-colors cursor-pointer"
-                  >
-                    <span>View Details</span>
-                    <div className="w-5.5 h-5.5 rounded-full bg-[var(--gold)] text-white flex items-center justify-center text-[8px] group-hover:translate-x-0.5 group-hover:bg-[var(--gold-hover)] transition-all shadow-xs">
-                      <i className="fa-solid fa-arrow-right" aria-hidden="true" />
-                    </div>
-                  </div>
-                </div>
-              </div>
+              )}
             </div>
-          ))}
+          </div>
         </div>
+
+        {/* Loading Skeleton Cards */}
+        {isLoading && currentProperties.length === 0 && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 animate-pulse">
+            {[1, 2, 3].map((n) => (
+              <div
+                key={`prop-skeleton-${n}`}
+                className="bg-[var(--bg-surface)] rounded-2xl overflow-hidden border border-[var(--border-card)] shadow-xs flex flex-col justify-between"
+              >
+                <div className="w-full h-[176px] bg-slate-200/80 dark:bg-slate-700/40" />
+                <div className="p-3.5 space-y-3">
+                  <div className="flex items-center gap-2">
+                    <div className="w-6 h-6 rounded-full bg-slate-200/80" />
+                    <div className="h-4 bg-slate-200/80 rounded-md w-1/2" />
+                  </div>
+                  <div className="h-3.5 bg-slate-100 rounded-md w-full" />
+                  <div className="pt-2 border-t border-[var(--border-subtle)] flex items-center justify-between">
+                    <div className="h-3.5 bg-slate-200/80 rounded-md w-20" />
+                    <div className="h-5 w-20 bg-slate-200/80 rounded-full" />
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Empty State when zero properties found */}
+        {!isLoading && currentProperties.length === 0 && (
+          <div className="py-12 sm:py-16 text-center bg-[var(--bg-surface)] rounded-2xl border border-[var(--border-card)] p-6 sm:p-10 shadow-xs max-w-xl mx-auto animate-fade-in">
+            <div className="w-14 h-14 rounded-full bg-[var(--gold-light)] border border-[var(--gold-border)] text-[var(--gold)] flex items-center justify-center mx-auto mb-4 text-xl">
+              <i className="fa-solid fa-city" aria-hidden="true" />
+            </div>
+            <h3 className="text-lg sm:text-xl font-bold text-[var(--text-heading)] mb-1.5">
+              No Office Spaces Available in {activeSector === "all" ? "Noida" : activeSector}
+            </h3>
+            <p className="text-xs sm:text-[13px] text-[var(--text-muted)] max-w-md mx-auto mb-5 leading-relaxed">
+              We couldn&apos;t find active listings matching this sector right now. Our commercial property specialists can source verified off-market office spaces for your team.
+            </p>
+            <div className="flex flex-wrap items-center justify-center gap-3">
+              <button
+                type="button"
+                onClick={() => setActiveSector("all")}
+                className="px-4.5 py-2 rounded-full bg-[var(--gold)] text-white text-xs font-semibold hover:bg-[var(--gold-hover)] transition-all cursor-pointer shadow-xs"
+              >
+                View All Properties
+              </button>
+              <button
+                type="button"
+                onClick={() => onOpenForm && onOpenForm({ type: "customized", sector: activeSector })}
+                className="px-4.5 py-2 rounded-full bg-[var(--bg-surface)] border border-[var(--gold-border)] text-[var(--text-heading)] hover:text-[var(--gold)] text-xs font-semibold transition-all cursor-pointer"
+              >
+                Speak with an Expert
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* 3-Column Luxury Property Cards Grid (with Backend Paginated Load More) */}
+        {!isLoading && currentProperties.length > 0 && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-4.5 lg:gap-5">
+            {currentProperties.map((property, idx) => (
+              <div
+                key={property.id}
+                onClick={(e) => handleCardClick(e, property)}
+                className={`group bg-[var(--bg-surface)] rounded-2xl overflow-hidden border border-[var(--border-card)] shadow-[0_2px_12px_rgba(10,35,60,0.04)] hover:-translate-y-1.5 hover:shadow-[0_16px_32px_-6px_rgba(10,35,60,0.12)] hover:border-[var(--gold)]/45 transition-all duration-300 ease-out cursor-pointer flex flex-col justify-between ${
+                  isInView ? `animate-fade-up delay-${Math.min((idx + 1) * 60, 500)}` : "opacity-0"
+                }`}
+              >
+                {/* Card Image with Badge & Wishlist Heart */}
+                <div className="relative w-full h-[162px] sm:h-[170px] lg:h-[176px] overflow-hidden bg-[var(--primary)]">
+                  <img
+                    src={property.image}
+                    alt={`Office Space in ${property.location}`}
+                    onError={(e) => {
+                      (e.currentTarget as HTMLImageElement).src = "/images/sectors/sector-62.jpg";
+                    }}
+                    className="w-full h-full object-cover object-center transition-transform duration-500 ease-out group-hover:scale-105"
+                  />
+
+                  {/* Status Badge */}
+                  <div className="absolute top-2.5 left-2.5 z-10">
+                    <span className="bg-[var(--gold-light)] text-[var(--gold-hover)] border border-[var(--gold-border)]/70 font-bold text-[9px] uppercase tracking-wider px-2.5 py-0.5 rounded-full shadow-xs">
+                      {property.badge}
+                    </span>
+                  </div>
+
+                  {/* Wishlist Heart Button */}
+                  <button
+                    type="button"
+                    onClick={(e) => toggleFavorite(e, property.id)}
+                    aria-label="Add to favorites"
+                    className="absolute top-2.5 right-2.5 z-10 w-7.5 h-7.5 rounded-full bg-black/25 backdrop-blur-xs flex items-center justify-center text-white hover:text-red-400 hover:bg-black/45 transition-all cursor-pointer border border-white/20 shadow-xs"
+                  >
+                    <i
+                      className={`${
+                        favorites[property.id]
+                          ? "fa-solid fa-heart text-red-500"
+                          : "fa-regular fa-heart"
+                      } text-[11.5px]`}
+                      aria-hidden="true"
+                    />
+                  </button>
+                </div>
+
+                {/* Card Details Body */}
+                <div className="p-3 sm:p-3.5 flex-1 flex flex-col justify-between">
+                  <div>
+                    {/* Highlighted Location */}
+                    <div className="flex items-center gap-2">
+                      <span className="w-6 h-6 rounded-full bg-[var(--gold-light)] border border-[var(--gold-border)]/60 text-[var(--gold)] flex items-center justify-center shrink-0 shadow-xs">
+                        <i className="fa-solid fa-location-dot text-[11px]" aria-hidden="true" />
+                      </span>
+                      <h4
+                        className="property-card-title text-[var(--text-heading)] group-hover:text-[var(--gold)] transition-colors tracking-tight truncate font-bold text-[14.5px] sm:text-[15px]"
+                        style={{ lineHeight: "1.3" }}
+                        title={property.location}
+                      >
+                        {property.location}
+                      </h4>
+                    </div>
+
+                    {/* 3 Spec Badges from Real DB Data */}
+                    <div className="flex items-center justify-between text-[10px] text-[var(--text-body)] font-medium pt-2.5 pb-0.5 border-t border-[var(--border-subtle)] mt-2.5">
+                      <div className="flex items-center gap-1 shrink-0">
+                        <i className="fa-regular fa-building text-[var(--gold)] text-[9.5px]" aria-hidden="true" />
+                        <span className="whitespace-nowrap">{property.area}</span>
+                      </div>
+
+                      <span className="text-[var(--border-subtle)] text-[10px] select-none font-light">|</span>
+
+                      <div className="flex items-center gap-1 shrink-0">
+                        <i className="fa-solid fa-chair text-[var(--gold)] text-[9.5px]" aria-hidden="true" />
+                        <span className="whitespace-nowrap">{property.workstations}</span>
+                      </div>
+
+                      <span className="text-[var(--border-subtle)] text-[10px] select-none font-light">|</span>
+
+                      <div className="flex items-center gap-1 shrink-0">
+                        <i className="fa-regular fa-id-badge text-[var(--gold)] text-[9.5px]" aria-hidden="true" />
+                        <span className="whitespace-nowrap">{property.cabins}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Card Footer Bar with Real DB Price */}
+                  <div className="pt-2 border-t border-[var(--border-subtle)] mt-2 flex items-center justify-between">
+                    <span className="text-[11px] font-semibold text-[var(--gold)]">
+                      {property.price || "Price on Request"}
+                    </span>
+
+                    <div
+                      onClick={(e) => handleCardClick(e, property)}
+                      className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-[var(--text-heading)] group-hover:text-[var(--gold)] transition-colors cursor-pointer"
+                    >
+                      <span>View Details</span>
+                      <div className="w-5.5 h-5.5 rounded-full bg-[var(--gold)] text-white flex items-center justify-center text-[8px] group-hover:translate-x-0.5 group-hover:bg-[var(--gold-hover)] transition-all shadow-xs">
+                        <i className="fa-solid fa-arrow-right" aria-hidden="true" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
 
         {/* Luxury Load More Spaces Button */}
         {hasMore && (

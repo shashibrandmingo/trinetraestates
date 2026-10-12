@@ -399,16 +399,13 @@ export default function Hero() {
 
               {/* Main H1 Heading (2 Lines — Luxury & Crisp) */}
               <h1 className="font-heading text-[30px] sm:text-[42px] lg:text-[50px] font-medium leading-[1.16] text-white max-w-3xl">
-                Find the Perfect
-                <br />
-                <span className="text-gold font-normal">Office Space</span> in Noida
+                Office Space for Rent in{" "}
+                <span className="text-gold font-normal">Noida</span>
               </h1>
 
               {/* Description */}
               <p className="text-body-dark max-w-xl text-[14px] sm:text-[15.5px] leading-relaxed">
-                Modern workspaces for growing businesses.
-                <br className="hidden sm:block" />
-                From startups to enterprises — we help you find a space that fits.
+                Verified fully furnished, plug-and-play & bare-shell commercial office spaces across Sector 62, Sector 132, Sector 142 & Noida Expressway.
               </p>
 
               {/* ── LUXURY FLOATING SEARCH FILTER BAR ── */}

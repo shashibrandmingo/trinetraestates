@@ -28,6 +28,11 @@ export default function Navbar() {
     setActiveItem(item.label);
     setMobileMenuOpen(false);
 
+    if (typeof window !== "undefined" && window.location.pathname !== "/") {
+      window.location.href = `/${item.href}`;
+      return;
+    }
+
     if (item.href === "#home") {
       window.scrollTo({ top: 0, behavior: "smooth" });
       return;

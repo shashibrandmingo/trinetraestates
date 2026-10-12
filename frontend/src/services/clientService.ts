@@ -31,7 +31,9 @@ export interface ClientStats {
   totalVolume: number;
 }
 
-const API_BASE = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api').replace(/\/+$/, '');
+import { getApiBaseUrl } from '@/config/apiConfig';
+
+const API_BASE = getApiBaseUrl();
 
 export const clientService = {
   async getClients(params?: {

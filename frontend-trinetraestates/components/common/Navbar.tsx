@@ -133,7 +133,7 @@ export default function Navbar() {
                 height={80}
                 priority
                 unoptimized
-                className="h-[36px] sm:h-[40px] md:h-[42px] lg:h-[46px] xl:h-[48px] w-auto object-contain transition-transform duration-300 group-hover:scale-105 origin-left drop-shadow-[0_1px_2px_rgba(0,0,0,0.04)]"
+                className="h-[36px] sm:h-[40px] md:h-[42px] lg:h-[46px] xl:h-[48px] w-auto object-contain transition-transform duration-300 group-hover:scale-105 origin-left"
               />
             </a>
 

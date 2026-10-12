@@ -101,13 +101,12 @@ export default function AdminDashboardPage() {
   const summary = dashboardData?.summary || {
     totalProperties: 0,
     activeProperties: 0,
-    expiringSoon: 0,
+    expiringSoonProperties: 0,
     expiredProperties: 0,
-    soldProperties: 0,
-    soldByMe: 0,
-    totalRevenue: 0,
-    activeLeads: 0,
-    convertedLeads: 0
+    totalLeads: 0,
+    newLeadsToday: 0,
+    monthlyRevenue: 0,
+    monthlyRevenueFormatted: '₹0'
   };
   const recentLeads = dashboardData?.recentLeads || [];
   const expiringProperties = dashboardData?.expiringProperties || [];

@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import RequirementForm, { RequirementFormData } from "@/components/forms/RequirementForm";
 
 export interface RequirementModalProps {
@@ -17,6 +18,7 @@ export interface RequirementModalProps {
  * 1. EXPLORE BY LOCATION (PopularSectorsSection)
  * 2. FIND YOUR IDEAL SPACE (SpaceCategoriesSection)
  * 3. Premium Office Spaces in Noida (FeaturedPropertiesSection)
+ * 4. Footer Links (Office Spaces & Popular Sectors)
  */
 export default function RequirementModal({
   isOpen,
@@ -24,6 +26,12 @@ export default function RequirementModal({
   initialData = {},
   onSubmit,
 }: RequirementModalProps) {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   // Handle Escape key and body scroll lock
   useEffect(() => {
     if (!isOpen) return;
@@ -45,9 +53,9 @@ export default function RequirementModal({
     };
   }, [isOpen, onClose]);
 
-  if (!isOpen) return null;
+  if (!isOpen || !mounted) return null;
 
-  return (
+  const modalContent = (
     <div
       role="dialog"
       aria-modal="true"
@@ -87,4 +95,6 @@ export default function RequirementModal({
       </div>
     </div>
   );
+
+  return createPortal(modalContent, document.body);
 }

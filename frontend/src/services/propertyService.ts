@@ -1,5 +1,6 @@
 import { PropertyKPIStats, PropertyItem, PropertyFilterState } from '@/types/propertyFilter';
 import { initialPropertyList, defaultKPIStats } from '@/data/mockPropertiesList';
+import { getApiBaseUrl, getBackendHost } from '@/config/apiConfig';
 
 interface StatsCache {
   data: PropertyKPIStats;
@@ -28,7 +29,31 @@ export const clearPropertyDetailCache = (id?: string) => {
   }
 };
 
-const API_BASE = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api').replace(/\/+$/, '');
+const API_BASE = getApiBaseUrl();
+
+export function resolvePropertyImage(rawUrl?: string): string {
+  if (!rawUrl || rawUrl.trim() === '' || rawUrl === '/images/sample-office.png') {
+    return '';
+  }
+  const backendHost = getBackendHost();
+
+  // If the image URL contains /uploads/ (even if saved as http://localhost:5000/uploads/...),
+  // dynamically resolve against the active backend host from env!
+  if (rawUrl.includes('/uploads/')) {
+    const rel = rawUrl.substring(rawUrl.indexOf('/uploads/'));
+    return `${backendHost}${rel}`;
+  }
+  if (rawUrl.startsWith('uploads/')) {
+    return `${backendHost}/${rawUrl}`;
+  }
+  if (rawUrl.startsWith('http://') || rawUrl.startsWith('https://') || rawUrl.startsWith('data:')) {
+    return rawUrl;
+  }
+  if (rawUrl.startsWith('/')) {
+    return rawUrl;
+  }
+  return `${backendHost}/${rawUrl}`;
+}
 
 export interface BackendOfficeDoc {
   _id?: string;
@@ -55,6 +80,7 @@ export interface BackendOfficeDoc {
   description?: string;
   buildingName?: string;
   price?: number;
+  monthlyRentInLakh?: number | string;
   rentPerSqFt?: number;
   status?: 'Active' | 'Expiring' | 'Expired' | 'Sold' | 'Sold by Me' | 'Draft';
   daysRemaining?: number;
@@ -76,6 +102,19 @@ export interface BackendOfficeDoc {
   availabilityStatus?: string;
   listingDate?: string | Date;
   createdAt?: string;
+  workstations?: number;
+  cabins?: number;
+  meetingRooms?: number;
+  pantry?: string;
+  overviewHeading?: string;
+  overviewDescription?: string;
+  locationDescription?: string;
+  connectivityHighlights?: string[];
+  mapEmbedUrl?: string;
+  nearbyPlaces?: Array<{ icon?: string; label: string; time: string }>;
+  metroDistance?: string;
+  roadConnectivity?: string;
+  badge?: string;
   dealDetails?: {
     soldBy?: string;
     dealAmount?: number;
@@ -86,6 +125,7 @@ export interface BackendOfficeDoc {
     paymentMode?: string;
     notes?: string;
   };
+  updatedAt?: string;
 }
 
 export const mapBackendToPropertyItem = (office: BackendOfficeDoc): PropertyItem => {
@@ -203,11 +243,11 @@ export const propertyService = {
     }
 
     try {
-      if (API_BASE) {
-        const res = await fetch(`${API_BASE}/offices/stats`, {
-          headers: { 'Content-Type': 'application/json' },
-          cache: 'no-store'
-        });
+      const apiBase = getApiBaseUrl();
+      const res = await fetch(`${apiBase}/offices/stats`, {
+        headers: { 'Content-Type': 'application/json' },
+        cache: 'no-store'
+      });
         if (res.ok) {
           const json = await res.json();
           if (json.success && json.data) {
@@ -215,7 +255,6 @@ export const propertyService = {
             return json.data;
           }
         }
-      }
     } catch (err) {
       console.warn('Could not fetch KPI stats from backend:', err);
     }
@@ -361,7 +400,7 @@ export const propertyService = {
     const params = new URLSearchParams();
     if (status && status !== 'All') params.set('status', status);
     if (sector && sector !== 'All Sectors') params.set('sector', sector);
-    const base = API_BASE || 'http://localhost:5000/api';
+    const base = getApiBaseUrl();
     return `${base}/offices/export?${params.toString()}`;
   },
 
@@ -761,5 +800,79 @@ export const propertyService = {
 
       return true;
     });
-  }
+  },
+
+  /**
+   * Fetch a single property full details by slug, propertyId, or _id
+   * Handles resolving image URLs and cover image ordering.
+   */
+  getPropertyBySlugOrId: async (slugOrId: string): Promise<BackendOfficeDoc | null> => {
+    if (!slugOrId) return null;
+    try {
+      const clean = slugOrId.toLowerCase().trim();
+      const apiBase = getApiBaseUrl();
+      const res = await fetch(`${apiBase}/offices/${encodeURIComponent(clean)}`, {
+        headers: { 'Content-Type': 'application/json' },
+        cache: 'no-store',
+      });
+      if (!res.ok) return null;
+      const json = await res.json();
+      if (json.success && json.data) {
+        const doc = json.data as BackendOfficeDoc;
+        if (doc.thumbnail) doc.thumbnail = resolvePropertyImage(doc.thumbnail);
+        if (doc.imageUrl) doc.imageUrl = resolvePropertyImage(doc.imageUrl);
+        if (doc.images && Array.isArray(doc.images)) {
+          const sorted = [...doc.images].sort((a, b) => {
+            const aCover = typeof a === 'object' && a.isCover ? 1 : 0;
+            const bCover = typeof b === 'object' && b.isCover ? 1 : 0;
+            return bCover - aCover;
+          });
+          doc.images = sorted
+            .map((im) => {
+              const url = typeof im === 'string' ? im : im.url;
+              const isCover = typeof im === 'object' ? !!im.isCover : false;
+              return { url: resolvePropertyImage(url), isCover };
+            })
+            .filter((im) => Boolean(im.url));
+        }
+        return doc;
+      }
+      return null;
+    } catch (err) {
+      console.warn('Could not fetch property by slug/id:', err);
+      return null;
+    }
+  },
+
+  /**
+   * Fetch active properties from backend for Similar Properties section
+   */
+  getActiveProperties: async (limit = 12): Promise<BackendOfficeDoc[]> => {
+    try {
+      const apiBase = getApiBaseUrl();
+      const res = await fetch(`${apiBase}/offices?status=Active&limit=${limit}`, {
+        headers: { 'Content-Type': 'application/json' },
+        cache: 'no-store',
+      });
+      if (!res.ok) return [];
+      const json = await res.json();
+      if (json.success && Array.isArray(json.data)) {
+        return json.data.map((doc: BackendOfficeDoc) => {
+          if (doc.thumbnail) doc.thumbnail = resolvePropertyImage(doc.thumbnail);
+          if (doc.imageUrl) doc.imageUrl = resolvePropertyImage(doc.imageUrl);
+          if (doc.images && Array.isArray(doc.images)) {
+            doc.images = doc.images.map((im) => ({
+              url: resolvePropertyImage(typeof im === 'string' ? im : im.url),
+              isCover: typeof im === 'object' ? !!im.isCover : false,
+            })).filter((im) => Boolean(im.url));
+          }
+          return doc;
+        });
+      }
+      return [];
+    } catch (err) {
+      console.warn('Could not fetch active properties:', err);
+      return [];
+    }
+  },
 };

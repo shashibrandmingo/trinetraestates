@@ -9,6 +9,7 @@ export interface FeaturedPropertyItem {
   cabins: string;
   image: string;
   slug: string;
+  price?: string;
 }
 
 export const featuredPropertiesData: FeaturedPropertyItem[] = [

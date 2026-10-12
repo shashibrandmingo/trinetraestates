@@ -395,6 +395,23 @@ aside,
   color: var(--text-white) !important;
 }
 
+/* Ensure modal dialogs and form cards preserve high contrast dark readable text anywhere */
+.website-scope [role="dialog"] h1,
+.website-scope [role="dialog"] h2,
+.website-scope [role="dialog"] h3,
+.website-scope [role="dialog"] h4,
+.website-scope .form-card h1,
+.website-scope .form-card h2,
+.website-scope .form-card h3,
+.website-scope .form-card h4 {
+  color: #0a233c !important;
+}
+
+.website-scope [role="dialog"] p,
+.website-scope .form-card p {
+  color: #475569 !important;
+}
+
 .website-scope .text-light {
   color: var(--text-light) !important;
 }

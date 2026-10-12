@@ -43,7 +43,7 @@ export interface LeadStats {
   newLeadsToday: number;
 }
 
-const API_BASE = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api').replace(/\/+$/, '');
+import { getApiBaseUrl } from '@/config/apiConfig';
 
 export const leadService = {
   /**
@@ -51,7 +51,8 @@ export const leadService = {
    */
   async getLeadStats(portal?: string): Promise<LeadStats> {
     try {
-      const url = portal && portal !== 'all' ? `${API_BASE}/leads/stats?portal=${portal}` : `${API_BASE}/leads/stats`;
+      const apiBase = getApiBaseUrl();
+      const url = portal && portal !== 'all' ? `${apiBase}/leads/stats?portal=${portal}` : `${apiBase}/leads/stats`;
       const res = await fetch(url, {
         cache: 'no-store'
       });
@@ -96,7 +97,8 @@ export const leadService = {
       if (params?.page) searchParams.append('page', String(params.page));
       searchParams.append('limit', String(params?.limit || 50));
 
-      const res = await fetch(`${API_BASE}/leads?${searchParams.toString()}`, {
+      const apiBase = getApiBaseUrl();
+      const res = await fetch(`${apiBase}/leads?${searchParams.toString()}`, {
         cache: 'no-store'
       });
 
@@ -127,7 +129,8 @@ export const leadService = {
       ...leadData
     };
 
-    const res = await fetch(`${API_BASE}/leads`, {
+    const apiBase = getApiBaseUrl();
+    const res = await fetch(`${apiBase}/leads`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
@@ -146,7 +149,8 @@ export const leadService = {
    * Update lead status or details
    */
   async updateLead(id: string, updateData: Partial<LeadItem>): Promise<LeadItem> {
-    const res = await fetch(`${API_BASE}/leads/${id}`, {
+    const apiBase = getApiBaseUrl();
+    const res = await fetch(`${apiBase}/leads/${id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(updateData)
@@ -165,7 +169,8 @@ export const leadService = {
    * Delete lead
    */
   async deleteLead(id: string): Promise<boolean> {
-    const res = await fetch(`${API_BASE}/leads/${id}`, {
+    const apiBase = getApiBaseUrl();
+    const res = await fetch(`${apiBase}/leads/${id}`, {
       method: 'DELETE'
     });
     return res.ok;
@@ -175,6 +180,7 @@ export const leadService = {
    * Get direct CSV export download link
    */
   getExportCSVUrl(): string {
-    return `${API_BASE}/leads/export/csv`;
+    const apiBase = getApiBaseUrl();
+    return `${apiBase}/leads/export/csv`;
   }
 };
