@@ -131,6 +131,9 @@ export const metadata: Metadata = {
   alternates: {
     canonical: siteUrl || 'https://officespaceinnoida.com',
   },
+  verification: {
+    google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || 'googlec5992d66495aacf0',
+  },
   icons: {
     icon: [
       { url: '/favicon.png', type: 'image/png' },
