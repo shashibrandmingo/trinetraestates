@@ -392,6 +392,42 @@ export default function Footer() {
           </div>
         </div>
 
+        {/* SEO Popular Searches & Keyword Cloud (100% White-Hat, User-Visible, and Crawlable) */}
+        <div className="py-5 border-t border-[var(--footer-border)] text-xs">
+          <div className="flex items-center gap-2 mb-3">
+            <span className="text-[11px] font-bold uppercase tracking-[0.16em] text-[var(--gold)]">
+              Trending Office Searches in Noida
+            </span>
+            <span className="inline-block w-8 h-[1px] bg-[var(--gold)]/40" />
+          </div>
+          <div className="flex flex-wrap gap-2 text-[12px] text-[var(--text-light-muted)]">
+            {[
+              "Office Space for Rent in Noida",
+              "Commercial Office Space Sector 62",
+              "Fully Furnished Office in Sector 63",
+              "Plug and Play Offices Noida Expressway",
+              "IT Corporate Office Space Sector 132",
+              "Managed Coworking Spaces Sector 135",
+              "Office Space for Rent Sector 142",
+              "Corporate Office Space Sector 125 & 126",
+              "Small Office Space for Startups Noida",
+              "Ready to Move Commercial Space Noida",
+              "Bare Shell Office Space Lease Noida",
+              "Office Space near Noida Metro Station",
+              "Zero Brokerage Office Rentals Noida",
+            ].map((kw, i) => (
+              <button
+                key={i}
+                type="button"
+                onClick={() => handleOpenOfficeSpaceModal(kw)}
+                className="px-2.5 py-1 rounded-md bg-white/[0.04] hover:bg-[var(--gold)]/20 border border-white/10 hover:border-[var(--gold)]/50 hover:text-[var(--text-white)] transition-all cursor-pointer text-left"
+              >
+                {kw}
+              </button>
+            ))}
+          </div>
+        </div>
+
         {/* Bottom Bar: Copyright, Policies & Back to Top */}
         <div className="py-4.5 border-t border-[var(--footer-border)] text-xs text-[var(--text-light-muted)] flex flex-col md:flex-row items-center justify-between gap-4 text-center md:text-left">
           {/* Copyright */}
@@ -407,10 +443,6 @@ export default function Footer() {
             <span className="text-[var(--footer-border)]">|</span>
             <Link href="/terms" className="hover:text-[var(--text-white)] transition-colors">
               Terms & Conditions
-            </Link>
-            <span className="text-[var(--footer-border)]">|</span>
-            <Link href="/sitemap" className="hover:text-[var(--text-white)] transition-colors">
-              Sitemap
             </Link>
           </div>
 

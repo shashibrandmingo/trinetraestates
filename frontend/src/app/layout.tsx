@@ -258,6 +258,8 @@ export default function RootLayout({
           crossOrigin="anonymous"
           referrerPolicy="no-referrer"
         />
+        {/* Google Search Console verification */}
+        <meta name="google-site-verification" content={process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || 'googlec5992d66495aacf0'} />
         {isRealAdSense && (
           <>
             <link rel="preconnect" href="https://pagead2.googlesyndication.com" />
