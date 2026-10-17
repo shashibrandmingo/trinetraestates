@@ -2,6 +2,7 @@
 
 import React, { useState, useMemo, useRef, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import Container from "@/components/ui/Container";
 import { FeaturedPropertyItem } from "@/data/featuredPropertiesData";
 import { useInView } from "@/hooks/useInView";
@@ -31,7 +32,7 @@ export interface FeaturedPropertiesSectionProps {
 
 const PAGE_SIZE = 12;
 
-function mapBackendOfficeToItem(office: BackendOfficeDoc, idx: number): FeaturedPropertyItem {
+export function mapBackendOfficeToItem(office: BackendOfficeDoc, idx: number): FeaturedPropertyItem {
   // Clean excessive copy text from title
   const cleanTitle = (office.title || "Premium Office Space")
     .replace(/\s*\(Copy\)+/gi, "")
@@ -272,7 +273,7 @@ export default function FeaturedPropertiesSection({
 
   // 2. Fetch paginated properties on sector or sort change (limit = 12, page = 1)
   useEffect(() => {
-    if (properties && properties.length > 0) {
+    if (properties && properties.length > 0 && activeSector === "all" && sortBy === "newest") {
       setCurrentProperties(properties.slice(0, PAGE_SIZE));
       setTotalCount(properties.length);
       setHasMore(properties.length > PAGE_SIZE);
@@ -674,109 +675,118 @@ export default function FeaturedPropertiesSection({
         {/* 3-Column Luxury Property Cards Grid (with Backend Paginated Load More) */}
         {!isLoading && currentProperties.length > 0 && (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-4.5 lg:gap-5">
-            {currentProperties.map((property, idx) => (
-              <div
-                key={property.id}
-                onClick={(e) => handleCardClick(e, property)}
-                className={`group bg-[var(--bg-surface)] rounded-2xl overflow-hidden border border-[var(--border-card)] shadow-[0_2px_12px_rgba(10,35,60,0.04)] hover:-translate-y-1.5 hover:shadow-[0_16px_32px_-6px_rgba(10,35,60,0.12)] hover:border-[var(--gold)]/45 transition-all duration-300 ease-out cursor-pointer flex flex-col justify-between ${
-                  isInView ? `animate-fade-up delay-${Math.min((idx + 1) * 60, 500)}` : "opacity-0"
-                }`}
-              >
-                {/* Card Image with Badge & Wishlist Heart */}
-                <div className="relative w-full h-[162px] sm:h-[170px] lg:h-[176px] overflow-hidden bg-[var(--primary)]">
-                  <img
-                    src={property.image}
-                    alt={`Office Space in ${property.location}`}
-                    onError={(e) => {
-                      (e.currentTarget as HTMLImageElement).src = "/images/sectors/sector-62.jpg";
-                    }}
-                    className="w-full h-full object-cover object-center transition-transform duration-500 ease-out group-hover:scale-105"
-                  />
-
-                  {/* Status Badge */}
-                  <div className="absolute top-2.5 left-2.5 z-10">
-                    <span className="bg-[var(--gold-light)] text-[var(--gold-hover)] border border-[var(--gold-border)]/70 font-bold text-[9px] uppercase tracking-wider px-2.5 py-0.5 rounded-full shadow-xs">
-                      {property.badge}
-                    </span>
-                  </div>
-
-                  {/* Wishlist Heart Button */}
-                  <button
-                    type="button"
-                    onClick={(e) => toggleFavorite(e, property.id)}
-                    aria-label="Add to favorites"
-                    className="absolute top-2.5 right-2.5 z-10 w-7.5 h-7.5 rounded-full bg-black/25 backdrop-blur-xs flex items-center justify-center text-white hover:text-red-400 hover:bg-black/45 transition-all cursor-pointer border border-white/20 shadow-xs"
-                  >
-                    <i
-                      className={`${
-                        favorites[property.id]
-                          ? "fa-solid fa-heart text-red-500"
-                          : "fa-regular fa-heart"
-                      } text-[11.5px]`}
-                      aria-hidden="true"
-                    />
-                  </button>
-                </div>
-
-                {/* Card Details Body */}
-                <div className="p-3 sm:p-3.5 flex-1 flex flex-col justify-between">
-                  <div>
-                    {/* Highlighted Location */}
-                    <div className="flex items-center gap-2">
-                      <span className="w-6 h-6 rounded-full bg-[var(--gold-light)] border border-[var(--gold-border)]/60 text-[var(--gold)] flex items-center justify-center shrink-0 shadow-xs">
-                        <i className="fa-solid fa-location-dot text-[11px]" aria-hidden="true" />
-                      </span>
-                      <h4
-                        className="property-card-title text-[var(--text-heading)] group-hover:text-[var(--gold)] transition-colors tracking-tight truncate font-bold text-[14.5px] sm:text-[15px]"
-                        style={{ lineHeight: "1.3" }}
-                        title={property.location}
-                      >
-                        {property.location}
-                      </h4>
-                    </div>
-
-                    {/* 3 Spec Badges from Real DB Data */}
-                    <div className="flex items-center justify-between text-[10px] text-[var(--text-body)] font-medium pt-2.5 pb-0.5 border-t border-[var(--border-subtle)] mt-2.5">
-                      <div className="flex items-center gap-1 shrink-0">
-                        <i className="fa-regular fa-building text-[var(--gold)] text-[9.5px]" aria-hidden="true" />
-                        <span className="whitespace-nowrap">{property.area}</span>
-                      </div>
-
-                      <span className="text-[var(--border-subtle)] text-[10px] select-none font-light">|</span>
-
-                      <div className="flex items-center gap-1 shrink-0">
-                        <i className="fa-solid fa-chair text-[var(--gold)] text-[9.5px]" aria-hidden="true" />
-                        <span className="whitespace-nowrap">{property.workstations}</span>
-                      </div>
-
-                      <span className="text-[var(--border-subtle)] text-[10px] select-none font-light">|</span>
-
-                      <div className="flex items-center gap-1 shrink-0">
-                        <i className="fa-regular fa-id-badge text-[var(--gold)] text-[9.5px]" aria-hidden="true" />
-                        <span className="whitespace-nowrap">{property.cabins}</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Card Footer Bar with Real DB Price */}
-                  <div className="pt-2 border-t border-[var(--border-subtle)] mt-2 flex items-center justify-between">
-                    <span className="text-[11px] font-semibold text-[var(--gold)]">
-                      {property.price || "Price on Request"}
-                    </span>
-
-                    <div
-                      onClick={(e) => handleCardClick(e, property)}
-                      className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-[var(--text-heading)] group-hover:text-[var(--gold)] transition-colors cursor-pointer"
+            {currentProperties.map((property, idx) => {
+              const targetSlug = property.slug || String(property.id);
+              const propertyHref = `/properties/${targetSlug}`;
+              return (
+                <div
+                  key={property.id}
+                  className={`group bg-[var(--bg-surface)] rounded-2xl overflow-hidden border border-[var(--border-card)] shadow-[0_2px_12px_rgba(10,35,60,0.04)] hover:-translate-y-1.5 hover:shadow-[0_16px_32px_-6px_rgba(10,35,60,0.12)] hover:border-[var(--gold)]/45 transition-all duration-300 ease-out flex flex-col justify-between ${
+                    isInView ? `animate-fade-up delay-${Math.min((idx + 1) * 60, 500)}` : "opacity-0"
+                  }`}
+                >
+                  {/* Card Image with Badge & Wishlist Heart */}
+                  <div className="relative w-full h-[162px] sm:h-[170px] lg:h-[176px] overflow-hidden bg-[var(--primary)]">
+                    <Link
+                      href={propertyHref}
+                      className="block w-full h-full"
+                      aria-label={`View office in ${property.location}`}
                     >
-                      <span>View Details</span>
-                      <div className="w-5.5 h-5.5 rounded-full bg-[var(--gold)] text-white flex items-center justify-center text-[8px] group-hover:translate-x-0.5 group-hover:bg-[var(--gold-hover)] transition-all shadow-xs">
-                        <i className="fa-solid fa-arrow-right" aria-hidden="true" />
+                      <img
+                        src={property.image}
+                        alt={`Office Space in ${property.location}`}
+                        onError={(e) => {
+                          (e.currentTarget as HTMLImageElement).src = "/images/sectors/sector-62.jpg";
+                        }}
+                        className="w-full h-full object-cover object-center transition-transform duration-500 ease-out group-hover:scale-105"
+                      />
+                    </Link>
+
+                    {/* Status Badge */}
+                    <div className="absolute top-2.5 left-2.5 z-10 pointer-events-none">
+                      <span className="bg-[var(--gold-light)] text-[var(--gold-hover)] border border-[var(--gold-border)]/70 font-bold text-[9px] uppercase tracking-wider px-2.5 py-0.5 rounded-full shadow-xs">
+                        {property.badge}
+                      </span>
+                    </div>
+
+                    {/* Wishlist Heart Button */}
+                    <button
+                      type="button"
+                      onClick={(e) => toggleFavorite(e, property.id)}
+                      aria-label="Add to favorites"
+                      className="absolute top-2.5 right-2.5 z-10 w-7.5 h-7.5 rounded-full bg-black/25 backdrop-blur-xs flex items-center justify-center text-white hover:text-red-400 hover:bg-black/45 transition-all cursor-pointer border border-white/20 shadow-xs"
+                    >
+                      <i
+                        className={`${
+                          favorites[property.id]
+                            ? "fa-solid fa-heart text-red-500"
+                            : "fa-regular fa-heart"
+                        } text-[11.5px]`}
+                        aria-hidden="true"
+                      />
+                    </button>
+                  </div>
+
+                  {/* Card Details Body */}
+                  <div className="p-3 sm:p-3.5 flex-1 flex flex-col justify-between">
+                    <div>
+                      {/* Highlighted Location */}
+                      <Link href={propertyHref} className="flex items-center gap-2 group/title">
+                        <span className="w-6 h-6 rounded-full bg-[var(--gold-light)] border border-[var(--gold-border)]/60 text-[var(--gold)] flex items-center justify-center shrink-0 shadow-xs">
+                          <i className="fa-solid fa-location-dot text-[11px]" aria-hidden="true" />
+                        </span>
+                        <h4
+                          className="property-card-title text-[var(--text-heading)] group-hover/title:text-[var(--gold)] transition-colors tracking-tight truncate font-bold text-[14.5px] sm:text-[15px]"
+                          style={{ lineHeight: "1.3" }}
+                          title={property.location}
+                        >
+                          {property.location}
+                        </h4>
+                      </Link>
+
+                      {/* 3 Spec Badges from Real DB Data */}
+                      <div className="flex items-center justify-between text-[10px] text-[var(--text-body)] font-medium pt-2.5 pb-0.5 border-t border-[var(--border-subtle)] mt-2.5">
+                        <div className="flex items-center gap-1 shrink-0">
+                          <i className="fa-regular fa-building text-[var(--gold)] text-[9.5px]" aria-hidden="true" />
+                          <span className="whitespace-nowrap">{property.area}</span>
+                        </div>
+
+                        <span className="text-[var(--border-subtle)] text-[10px] select-none font-light">|</span>
+
+                        <div className="flex items-center gap-1 shrink-0">
+                          <i className="fa-solid fa-chair text-[var(--gold)] text-[9.5px]" aria-hidden="true" />
+                          <span className="whitespace-nowrap">{property.workstations}</span>
+                        </div>
+
+                        <span className="text-[var(--border-subtle)] text-[10px] select-none font-light">|</span>
+
+                        <div className="flex items-center gap-1 shrink-0">
+                          <i className="fa-regular fa-id-badge text-[var(--gold)] text-[9.5px]" aria-hidden="true" />
+                          <span className="whitespace-nowrap">{property.cabins}</span>
+                        </div>
                       </div>
+                    </div>
+
+                    {/* Card Footer Bar with Real DB Price */}
+                    <div className="pt-2 border-t border-[var(--border-subtle)] mt-2 flex items-center justify-between">
+                      <span className="text-[11px] font-semibold text-[var(--gold)]">
+                        {property.price || "Price on Request"}
+                      </span>
+
+                      <Link
+                        href={propertyHref}
+                        className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-[var(--text-heading)] group-hover:text-[var(--gold)] transition-colors cursor-pointer"
+                      >
+                        <span>View Details</span>
+                        <div className="w-5.5 h-5.5 rounded-full bg-[var(--gold)] text-white flex items-center justify-center text-[8px] group-hover:translate-x-0.5 group-hover:bg-[var(--gold-hover)] transition-all shadow-xs">
+                          <i className="fa-solid fa-arrow-right" aria-hidden="true" />
+                        </div>
+                      </Link>
                     </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
 

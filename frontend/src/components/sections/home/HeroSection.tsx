@@ -38,8 +38,8 @@ export default function HeroSection({ onFormSubmit }: HeroSectionProps) {
       {/* Background Hero Banner Image with Executive Deep Navy Overlay */}
       <div className="absolute inset-0 z-0 overflow-hidden">
         <img
-          src="/images/bgbanners/hero.png"
-          alt="Luxury Office Spaces in Noida"
+          src="/images/bgbanners/hero.webp"
+          alt="Commercial Office Space for Rent in Noida - Modern Corporate Workspaces"
           className="w-full h-full object-cover object-center"
         />
         {/* Balanced luxury blue gradient overlay: smooth vertical gradient on mobile, horizontal on desktop */}

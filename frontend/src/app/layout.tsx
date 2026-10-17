@@ -114,7 +114,7 @@ export const metadata: Metadata = {
       'Find verified office space for rent in Noida. Explore fully furnished, plug-and-play, IT corporate offices & bare-shell spaces in Sector 62, 63, 132, 135, 142 & Expressway.',
     images: [
       {
-        url: '/images/bgbanners/hero.png',
+        url: '/images/bgbanners/hero.webp',
         width: 1200,
         height: 630,
         alt: 'Office Space for Rent in Noida - Commercial Office Spaces',
@@ -126,7 +126,7 @@ export const metadata: Metadata = {
     title: 'Office Space for Rent in Noida | Commercial Office Space & Leasing',
     description:
       'Find verified office space for rent in Noida. Fully furnished, plug-and-play & bare shell corporate offices in Sector 62, 132, 135, 142 & Expressway.',
-    images: ['/images/bgbanners/hero.png'],
+    images: ['/images/bgbanners/hero.webp'],
   },
   alternates: {
     canonical: siteUrl || 'https://officespaceinnoida.com',
@@ -158,7 +158,7 @@ const realEstateAgentSchema = {
       alternateName: 'Noida Office Spaces Commercial Real Estate',
       url: 'https://officespaceinnoida.com',
       logo: 'https://officespaceinnoida.com/images/logo/logo-white.png',
-      image: 'https://officespaceinnoida.com/images/bgbanners/hero.png',
+      image: 'https://officespaceinnoida.com/images/bgbanners/hero.webp',
       description:
         'Premier commercial office space advisory offering verified fully furnished, bare-shell, and managed coworking office spaces for rent across Noida Sector 62, 63, 132, 135, 142, and Expressway corridors.',
       telephone: '+91 99999 01196',

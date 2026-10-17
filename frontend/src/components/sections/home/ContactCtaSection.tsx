@@ -46,7 +46,7 @@ export default function ContactCtaSection({ onFormSubmit }: ContactCtaSectionPro
             <div className="relative rounded-2xl sm:rounded-3xl overflow-hidden border border-[var(--border-subtle)] shadow-[0_8px_24px_-6px_rgba(10,35,60,0.06)] hover:shadow-[0_12px_32px_-6px_rgba(10,35,60,0.09)] transition-all duration-300 w-full h-full min-h-[340px] sm:min-h-[400px] lg:min-h-full bg-[var(--primary)] group">
               {/* User Background Image */}
               <Image
-                src="/images/ctaimage/ctaimage.png"
+                src="/images/ctaimage/ctaimage.webp"
                 alt="Find Your Perfect Office Space - Noida Commercial Workspaces"
                 fill
                 priority

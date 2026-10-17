@@ -131,7 +131,7 @@ export default function AboutSection() {
               }`}
             >
               <img
-                src="/images/homepagesimage/about.png"
+                src="/images/homepagesimage/about.webp"
                 alt="Noida Office Spaces Workspace & Reception"
                 className="w-full h-[300px] sm:h-[400px] lg:h-[470px] xl:h-[490px] object-cover object-center transition-transform duration-700 group-hover:scale-102"
               />

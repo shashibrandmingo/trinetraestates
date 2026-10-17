@@ -1,19 +1,13 @@
-"use client";
-
-import React, { useState } from "react";
-import HeroSection from "@/components/sections/home/HeroSection";
-import AboutSection from "@/components/sections/home/AboutSection";
-import PopularSectorsSection from "@/components/sections/home/PopularSectorsSection";
-import SpaceCategoriesSection, { CategoryItem } from "@/components/sections/home/SpaceCategoriesSection";
-import FeaturedPropertiesSection from "@/components/sections/home/FeaturedPropertiesSection";
-import WhyChooseUsSection from "@/components/sections/home/WhyChooseUsSection";
-import GetInTouchCtaSection from "@/components/sections/home/GetInTouchCtaSection";
-import ContactCtaSection from "@/components/sections/home/ContactCtaSection";
-import RequirementModal from "@/components/modals/RequirementModal";
-import { RequirementFormData } from "@/components/forms/RequirementForm";
+import React from "react";
+import HomePageClient from "@/components/home/HomePageClient";
+import { propertyService, BackendOfficeDoc } from "@/services/propertyService";
+import { mapBackendOfficeToItem } from "@/components/sections/home/FeaturedPropertiesSection";
 import { FeaturedPropertyItem } from "@/data/featuredPropertiesData";
 
-// Rich Snippet FAQ Schema for Google Top-10 SERP Features
+// Incremental Static Regeneration: revalidate data every 1 hour (3600 seconds)
+export const revalidate = 3600;
+
+// Rich Snippet FAQ Schema for Google Top-10 SERP Features in Noida
 const homeFaqSchema = {
   "@context": "https://schema.org",
   "@type": "FAQPage",
@@ -61,28 +55,17 @@ const homeFaqSchema = {
   ],
 };
 
-export default function HomePage() {
-  const [modalState, setModalState] = useState<{
-    isOpen: boolean;
-    initialData: RequirementFormData;
-  }>({
-    isOpen: false,
-    initialData: {},
-  });
+export default async function HomePage() {
+  let initialProperties: FeaturedPropertyItem[] = [];
 
-  const handleOpenModal = (data: RequirementFormData = {}) => {
-    setModalState({
-      isOpen: true,
-      initialData: data,
-    });
-  };
-
-  const handleCloseModal = () => {
-    setModalState({
-      isOpen: false,
-      initialData: {},
-    });
-  };
+  try {
+    const rawDocs: BackendOfficeDoc[] = await propertyService.getActiveProperties(24);
+    if (Array.isArray(rawDocs) && rawDocs.length > 0) {
+      initialProperties = rawDocs.map((doc, idx) => mapBackendOfficeToItem(doc, idx));
+    }
+  } catch (err) {
+    console.error("Error fetching homepage properties for SSR:", err);
+  }
 
   return (
     <main className="min-h-screen bg-[var(--bg-main)]">
@@ -94,59 +77,8 @@ export default function HomePage() {
         }}
       />
 
-      {/* 1. Hero Section with Luxury Requirements Form */}
-      <HeroSection />
-
-      {/* 2. About Us Section */}
-      <AboutSection />
-
-      {/* 3. Popular Sectors in Noida (EXPLORE BY LOCATION) */}
-      <PopularSectorsSection
-        onSelectSector={(sector) =>
-          handleOpenModal({
-            area: sector.name,
-            requirements: `Interested in office spaces in ${sector.name}`,
-          })
-        }
-      />
-
-      {/* 4. Find Your Ideal Space ("What are you looking for?") */}
-      <SpaceCategoriesSection
-        onOpenEnquiryModal={(data) => handleOpenModal(data)}
-      />
-
-      {/* 5. Premium Office Spaces in Noida (Featured Properties with Dynamic Filters) */}
-      <FeaturedPropertiesSection
-        onOpenForm={(property?: Partial<FeaturedPropertyItem> & { type?: string }) =>
-          handleOpenModal(
-            property
-              ? {
-                  area: property.sector || property.location,
-                  spaceType: property.badge || "",
-                  requirements: property.location || property.sector
-                    ? `Inquiring about office space in ${property.location || property.sector} (${property.area || ""})`
-                    : "",
-                }
-              : {}
-          )
-        }
-      />
-
-      {/* 6. Why Choose Us Section ("More Than Spaces, A Partner in Your Growth") */}
-      <WhyChooseUsSection />
-
-      {/* 7. Luxury Contact & Showcase Section (Form on Left + Image on Right) */}
-      <ContactCtaSection />
-
-      {/* 8. Get In Touch Banner ("The right workspace today, a bigger tomorrow") */}
-      <GetInTouchCtaSection onOpenForm={() => handleOpenModal()} />
-
-      {/* Luxury Popup Requirement Modal */}
-      <RequirementModal
-        isOpen={modalState.isOpen}
-        onClose={handleCloseModal}
-        initialData={modalState.initialData}
-      />
+      {/* Interactive Website Components with SSR-hydrated Properties */}
+      <HomePageClient initialProperties={initialProperties} />
     </main>
   );
 }

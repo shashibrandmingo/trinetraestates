@@ -1150,7 +1150,7 @@ export default function PropertyDetailClient({
           {/* Background Image with Balanced High-Contrast Luxury Overlay */}
           <div className="absolute inset-0 z-0">
             <Image
-              src="/images/ctaimage/ctaimage.png"
+              src="/images/ctaimage/ctaimage.webp"
               alt="Office Space Noida"
               fill
               className="object-cover object-center"

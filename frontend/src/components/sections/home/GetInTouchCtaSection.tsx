@@ -40,7 +40,7 @@ export default function GetInTouchCtaSection({ onOpenForm }: GetInTouchCtaSectio
           {/* Left Side: Cutout */}
           <div className="lg:absolute lg:left-0 lg:bottom-0 lg:top-0 lg:w-[48%] xl:w-[49%] w-full h-[190px] sm:h-[240px] lg:h-full pointer-events-none z-10 overflow-hidden flex items-end justify-center lg:justify-start pt-2 sm:pt-4 lg:pt-0">
             <img
-              src="/images/cta/GET IN TOUCH.png"
+              src="/images/cta/get-in-touch.webp"
               alt="Premium Noida Commercial Workspace Building"
               className="h-full w-auto max-w-none object-contain lg:object-left-bottom drop-shadow-[0_10px_25px_rgba(10,35,60,0.08)]"
             />
