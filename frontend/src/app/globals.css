@@ -321,12 +321,12 @@ aside,
   position: absolute;
   inset: 0;
   pointer-events: none;
-  background: linear-gradient(180deg, rgba(7, 25, 43, 0.88) 0%, rgba(10, 35, 60, 0.74) 48%, rgba(7, 25, 43, 0.78) 100%);
+  background: linear-gradient(180deg, rgba(7, 25, 43, 0.90) 0%, rgba(10, 35, 60, 0.78) 48%, rgba(7, 25, 43, 0.82) 100%);
 }
 
 @media (min-width: 1024px) {
   .hero-banner-overlay {
-    background: linear-gradient(90deg, rgba(10, 35, 60, 0.55) 0%, rgba(10, 35, 60, 0.18) 50%, transparent 100%);
+    background: linear-gradient(90deg, rgba(7, 25, 43, 0.76) 0%, rgba(10, 35, 60, 0.60) 45%, rgba(10, 35, 60, 0.28) 75%, rgba(10, 35, 60, 0.12) 100%);
   }
 }
 

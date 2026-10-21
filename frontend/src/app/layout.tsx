@@ -46,17 +46,18 @@ const isRealAdSense =
 export const metadata: Metadata = {
   metadataBase: siteUrl ? new URL(siteUrl) : new URL('https://officespaceinnoida.com'),
   title: {
-    default: 'Office Space for Rent in Noida | Commercial Office Space & Leasing',
+    default: 'Office Spaces in Noida | Noida Office Space for Rent & Lease',
     template: '%s | Noida Office Spaces',
   },
   description:
-    'Find verified office space for rent in Noida. Explore fully furnished, plug-and-play, IT corporate offices & bare-shell spaces in Sector 62, 63, 132, 135, 142 & Noida Expressway. Zero brokerage options.',
+    'Find verified office spaces in Noida. Explore fully furnished, plug-and-play IT corporate offices & bare-shell spaces in Sector 62, 132, 135, 142 & Expressway.',
   keywords: [
+    'office spaces in noida',
+    'noida office space',
+    'office space in noida',
     'office space for rent in Noida',
-    'office space in Noida',
-    'office space for lease in Noida',
     'commercial office space in Noida',
-    'office for rent in Noida',
+    'office space for lease in Noida',
     'fully furnished office space in Noida',
     'office space available in Noida',
     'commercial property for rent in Noida',
@@ -65,8 +66,6 @@ export const metadata: Metadata = {
     'small office space for rent in Noida',
     'office space near Noida Metro',
     'office space for IT companies in Noida',
-    'office space for rent in Noida at affordable price',
-    'office space rental consultant in Noida',
     'office space for rent in Sector 62 Noida',
     'office space in Sector 62 Noida',
     'furnished office space in Sector 62 Noida',
@@ -75,8 +74,6 @@ export const metadata: Metadata = {
     'office space for rent in Sector 135 Noida',
     'office space for rent in Sector 142 Noida',
     'office space for rent in Sector 132 Noida',
-    'office space for rent in Sector 125 Noida',
-    'office space for rent in Sector 126 Noida',
     'office space on Noida Expressway',
     'plug and play office space in Noida',
     'ready to move office space in Noida',
@@ -109,23 +106,23 @@ export const metadata: Metadata = {
     locale: 'en_IN',
     url: siteUrl || 'https://officespaceinnoida.com',
     siteName: 'Noida Office Spaces',
-    title: 'Office Space for Rent in Noida | Commercial Office Space & Leasing',
+    title: 'Office Spaces in Noida | Noida Office Space for Rent & Lease',
     description:
-      'Find verified office space for rent in Noida. Explore fully furnished, plug-and-play, IT corporate offices & bare-shell spaces in Sector 62, 63, 132, 135, 142 & Expressway.',
+      'Find verified office spaces in Noida. Explore fully furnished, plug-and-play IT corporate offices & bare-shell spaces in Sector 62, 132, 135, 142 & Expressway.',
     images: [
       {
         url: '/images/bgbanners/hero.webp',
         width: 1200,
         height: 630,
-        alt: 'Office Space for Rent in Noida - Commercial Office Spaces',
+        alt: 'Office Spaces in Noida - Commercial Workspaces for Rent & Lease',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Office Space for Rent in Noida | Commercial Office Space & Leasing',
+    title: 'Office Spaces in Noida | Noida Office Space for Rent & Lease',
     description:
-      'Find verified office space for rent in Noida. Fully furnished, plug-and-play & bare shell corporate offices in Sector 62, 132, 135, 142 & Expressway.',
+      'Find verified office spaces in Noida. Fully furnished, plug-and-play & bare-shell corporate offices in Sector 62, 132, 135, 142 & Expressway.',
     images: ['/images/bgbanners/hero.webp'],
   },
   alternates: {
@@ -134,14 +131,18 @@ export const metadata: Metadata = {
   verification: {
     google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || 'googlec5992d66495aacf0',
   },
+  manifest: '/site.webmanifest',
   icons: {
     icon: [
       { url: '/favicon.ico', sizes: 'any' },
+      { url: '/favicon-96x96.png', type: 'image/png', sizes: '96x96' },
+      { url: '/favicon.svg', type: 'image/svg+xml' },
       { url: '/icon.png', type: 'image/png', sizes: '512x512' },
-      { url: '/favicon.png', type: 'image/png', sizes: '48x48' },
+      { url: '/favicon.png', type: 'image/png', sizes: '96x96' },
     ],
     shortcut: '/favicon.ico',
     apple: [
+      { url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' },
       { url: '/apple-icon.png', sizes: '180x180', type: 'image/png' },
     ],
   },

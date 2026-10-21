@@ -59,13 +59,12 @@ export default function HeroSection({ onFormSubmit }: HeroSectionProps) {
 
             {/* Main Title (H1) — High-Intent Primary SEO Target Keyword */}
             <h1 className="hero-title drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)] lg:drop-shadow-sm animate-fade-up delay-100">
-              Office Space for Rent <br className="hidden sm:inline" />
-              in <span className="text-[var(--gold)]">Noida</span>
+              Office Spaces in <span className="text-[var(--gold-bright)] drop-shadow-[0_2px_8px_rgba(0,0,0,0.7)]">Noida</span>
             </h1>
 
             {/* Subtitle Description — Natural Secondary Keyword Variants */}
             <p className="hero-subtitle text-xs sm:text-sm md:text-[14px] !text-[var(--text-light)] leading-relaxed max-w-lg font-normal drop-shadow-[0_1px_3px_rgba(0,0,0,0.6)] lg:drop-shadow-sm animate-fade-up delay-200">
-              Explore verified fully furnished, plug &amp; play, and commercial bare-shell workspaces. From startups to corporate enterprises across Sector 62, 132, 135, 142 &amp; Expressway.
+              Find verified Noida office space for rent &amp; lease. Explore fully furnished, plug &amp; play, and commercial bare-shell workspaces across Sector 62, 132, 135, 142 &amp; Expressway.
             </p>
 
             {/* 4 Feature Badges */}
