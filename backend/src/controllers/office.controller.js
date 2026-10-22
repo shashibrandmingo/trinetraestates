@@ -759,6 +759,7 @@ export const searchOffices = async (req, res, next) => {
     const searchProjection = {
       propertyId: 1,
       title: 1,
+      frontendTitle: 1,
       slug: 1,
       propertyType: 1,
       purpose: 1,
@@ -816,6 +817,7 @@ export const searchOffices = async (req, res, next) => {
         _id: doc._id,
         propertyId: doc.propertyId,
         title: doc.title,
+        frontendTitle: doc.frontendTitle || 'Ithum Tower',
         slug: doc.slug,
         propertyType: doc.propertyType || 'Office',
         purpose: doc.purpose || 'Rent',
@@ -920,6 +922,7 @@ export const bulkImportOffices = async (req, res, next) => {
       return {
         propertyId: p.propertyId || `PROP-${new Date().getFullYear()}-${Math.floor(10000 + Math.random() * 90000)}`,
         title,
+        frontendTitle: String(p.frontendTitle || p['Frontend Title'] || 'Ithum Tower').trim(),
         slug,
         propertyType: p.propertyType || p['Property Type'] || 'Office',
         purpose: p.purpose || p['Purpose'] || 'Rent',
@@ -997,6 +1000,7 @@ export const exportOfficesCSV = async (req, res, next) => {
     const headers = [
       'Property ID',
       'Property Name',
+      'Frontend Title',
       'Property Type',
       'Purpose',
       'Sector',
@@ -1024,6 +1028,7 @@ export const exportOfficesCSV = async (req, res, next) => {
       const row = [
         escape(doc.propertyId || ''),
         escape(doc.title || ''),
+        escape(doc.frontendTitle || 'Ithum Tower'),
         escape(doc.propertyType || 'Office'),
         escape(doc.purpose || 'Rent'),
         escape(doc.location?.sector || ''),
