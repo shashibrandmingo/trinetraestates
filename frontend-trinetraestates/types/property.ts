@@ -14,6 +14,7 @@ export interface BackendOfficeDoc {
   propertyId?: string;
   slug?: string;
   title: string;
+  frontendTitle?: string;
   propertyType?: string;
   category?: string;
   categories?: string[];
@@ -65,6 +66,7 @@ export interface BackendOfficeDoc {
 export interface PropertyCardItem {
   id: string | number;
   title: string;
+  frontendTitle?: string;
   sector: string;
   location: string;
   buildingName?: string;

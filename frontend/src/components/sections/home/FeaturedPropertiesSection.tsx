@@ -33,8 +33,8 @@ export interface FeaturedPropertiesSectionProps {
 const PAGE_SIZE = 12;
 
 export function mapBackendOfficeToItem(office: BackendOfficeDoc, idx: number): FeaturedPropertyItem {
-  // Clean excessive copy text from title
-  const cleanTitle = (office.title || "Premium Office Space")
+  // Use frontend display title if provided, otherwise default to Ithum Tower
+  const cleanTitle = (office.frontendTitle?.trim() || "Ithum Tower")
     .replace(/\s*\(Copy\)+/gi, "")
     .trim();
 

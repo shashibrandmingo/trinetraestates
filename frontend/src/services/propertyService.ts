@@ -61,6 +61,7 @@ export interface BackendOfficeDoc {
   propertyId?: string;
   slug?: string;
   title: string;
+  frontendTitle?: string;
   propertyType?: string;
   purpose?: 'Rent' | 'Sale' | 'Lease';
   location?: {
@@ -153,6 +154,7 @@ export const mapBackendToPropertyItem = (office: BackendOfficeDoc): PropertyItem
     propertyId: office.propertyId,
     slug: office.slug,
     title: office.title || 'Untitled Property',
+    frontendTitle: office.frontendTitle || 'Ithum Tower',
     propertyType: (office.propertyType as any) || 'Office',
     purpose: office.purpose || 'Rent',
     city: office.location?.city || 'Noida',

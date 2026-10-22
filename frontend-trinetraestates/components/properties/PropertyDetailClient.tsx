@@ -300,7 +300,7 @@ export default function PropertyDetailClient({
   }, [slug]);
 
   // Derived display fields strictly from backend data
-  const title = propertyData?.title || "";
+  const title = (propertyData?.frontendTitle && propertyData.frontendTitle.trim()) || "Ithum Tower";
   const rawSector =
     propertyData?.location?.sector ||
     propertyData?.location?.locality ||

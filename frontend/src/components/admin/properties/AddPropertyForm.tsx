@@ -110,6 +110,7 @@ export const AddPropertyForm: React.FC<AddPropertyFormProps> = ({ onBack, onSucc
 
     return {
       title: data?.title || '',
+      frontendTitle: (data as any)?.frontendTitle || 'Ithum Tower',
       propertyType: data?.propertyType || 'Office',
       category: initialCategories[0] || '',
       categories: initialCategories,
@@ -503,6 +504,7 @@ export const AddPropertyForm: React.FC<AddPropertyFormProps> = ({ onBack, onSucc
 
     const payload = {
       title: formData.title.trim(),
+      frontendTitle: (formData.frontendTitle || 'Ithum Tower').trim(),
       propertyType: formData.propertyType,
       category: selectedCats[0] || '',
       categories: selectedCats,
@@ -667,8 +669,26 @@ export const AddPropertyForm: React.FC<AddPropertyFormProps> = ({ onBack, onSucc
                   placeholder="e.g. Express Trade Tower, Ground Floor, Sector 132, Noida"
                   className={inputCls(hasOverviewErr && !formData.title.trim())}
                 />
-                <p className="text-[11px] text-gray-400 mt-1">This appears as the main H1 heading on the property details page</p>
+                <p className="text-[11px] text-gray-400 mt-1">Internal Title / Unit Name (Admin panel me show hoga)</p>
               </div>
+            </div>
+
+            {/* Frontend Display Title */}
+            <div className="p-3.5 sm:p-4 bg-[#fbfdfa] border border-[#e3ede3] rounded-xl">
+              <div className="flex items-center justify-between gap-2 mb-1">
+                <FieldLabel>Frontend Title (Website Cards &amp; Pages Par Show Hoga)</FieldLabel>
+                <span className="text-[9.5px] font-bold px-2 py-0.5 rounded bg-[#e8f5e9] text-[#2e7d32]">Website Display</span>
+              </div>
+              <input
+                type="text"
+                value={formData.frontendTitle}
+                onChange={(e) => handleFieldChange('frontendTitle', e.target.value, 'overview')}
+                placeholder="Ithum Tower"
+                className={inputCls(false)}
+              />
+              <p className="text-[11px] text-gray-500 mt-1">
+                Website frontend par office number hide rakhne ke liye ye title show hoga (By default: <strong className="text-gray-700">Ithum Tower</strong>)
+              </p>
             </div>
 
             {/* Row 2: Property Type + Purpose + Availability Badge */}

@@ -13,6 +13,12 @@ const officeSpaceSchema = new mongoose.Schema(
       trim: true,
       maxlength: [150, 'Title cannot exceed 150 characters']
     },
+    frontendTitle: {
+      type: String,
+      trim: true,
+      default: 'Ithum Tower',
+      maxlength: [150, 'Frontend Title cannot exceed 150 characters']
+    },
     slug: {
       type: String,
       required: [true, 'Slug is required'],

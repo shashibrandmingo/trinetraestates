@@ -26,6 +26,7 @@ export const officeQuerySchema = z.object({
 
 export const createOfficeSchema = z.object({
   title: z.string().trim().min(2, 'Property Name is required (minimum 2 characters)').max(150),
+  frontendTitle: z.string().trim().max(150).optional().default('Ithum Tower'),
   propertyType: z.string().trim().min(1, 'Property Type is required'),
   category: z.string().trim().optional().default(''),
   categories: z.array(z.string().trim()).optional().default([]),

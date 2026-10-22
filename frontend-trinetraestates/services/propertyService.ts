@@ -106,8 +106,11 @@ export const propertyService = {
               ? office.availabilityStatus.toUpperCase()
               : BADGES[idx % BADGES.length]);
 
-          // Clean title
-          const title = (office.title || "Office Space").replace(/\s*\(Copy\)+/gi, "").trim();
+          // Clean title & Frontend display title (hides office number/unit on website)
+          const frontendTitle = (office.frontendTitle && office.frontendTitle.trim())
+            ? office.frontendTitle.trim()
+            : "Ithum Tower";
+          const title = frontendTitle;
 
           // 1. Pick designated cover image from images array if marked isCover, else thumbnail/imageUrl/first image
           let rawImg = "";

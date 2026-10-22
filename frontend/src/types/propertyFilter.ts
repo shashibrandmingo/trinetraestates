@@ -8,6 +8,7 @@ export interface PropertyItem {
   propertyId?: string;
   slug?: string;
   title: string;
+  frontendTitle?: string;
   buildingName?: string;
   propertyType: PropertyType;
   purpose: PropertyPurpose;

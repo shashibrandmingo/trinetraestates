@@ -294,7 +294,7 @@ export default function PropertyDetailClient({
   }, [handleNextImage, handlePrevImage]);
 
   // Property fields extraction strictly from backend doc
-  const title = propertyData?.title || "Premium Commercial Office Space";
+  const title = propertyData?.frontendTitle?.trim() || "Ithum Tower";
   const buildingName =
     propertyData?.buildingName ||
     (title.includes(",") ? title.split(",")[0].trim() : "Commercial Landmark");

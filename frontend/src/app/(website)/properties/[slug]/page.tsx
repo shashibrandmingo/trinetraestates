@@ -24,7 +24,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     };
   }
 
-  const title = doc.title || "Commercial Office Space";
+  const title = doc.frontendTitle?.trim() || "Ithum Tower";
   const sector =
     doc.location?.sector || doc.location?.locality || "Sector 62, Noida";
   const area = doc.areaSqFt ? `${doc.areaSqFt.toLocaleString("en-IN")} Sq.Ft.` : "Commercial";
