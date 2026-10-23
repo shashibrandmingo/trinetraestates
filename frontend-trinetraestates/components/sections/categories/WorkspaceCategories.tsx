@@ -54,7 +54,7 @@ const DEFAULT_CATEGORIES: WorkspaceCategory[] = [
     title: "Startup Office",
     seatRange: "1 - 10 Seats",
     description: "Compact, private & furnished workspaces tailored for fast-moving startups.",
-    image: "/images/findyouridealspace/1.jpg",
+    image: "/images/findyouridealspace/1.webp",
     spacesCount: "45+ Spaces",
     properties: [
       {
@@ -110,7 +110,7 @@ const DEFAULT_CATEGORIES: WorkspaceCategory[] = [
     title: "10 – 25 Seats",
     seatRange: "10 - 25 Seats",
     description: "Fully plug & play offices with executive cabins, meeting rooms & reception.",
-    image: "/images/findyouridealspace/2.jpg",
+    image: "/images/findyouridealspace/2.webp",
     spacesCount: "60+ Spaces",
     properties: [
       {
@@ -166,7 +166,7 @@ const DEFAULT_CATEGORIES: WorkspaceCategory[] = [
     title: "25 – 50 Seats",
     seatRange: "25 - 50 Seats",
     description: "Spacious corporate wings with manager cabins, pantry, conference room & server room.",
-    image: "/images/findyouridealspace/3.jpg",
+    image: "/images/findyouridealspace/3.webp",
     spacesCount: "40+ Spaces",
     properties: [
       {
@@ -222,7 +222,7 @@ const DEFAULT_CATEGORIES: WorkspaceCategory[] = [
     title: "50 – 100 Seats",
     seatRange: "50 - 100 Seats",
     description: "Independent corporate floors for mid-size companies, tech firms & regional head offices.",
-    image: "/images/findyouridealspace/4.jpg",
+    image: "/images/findyouridealspace/4.webp",
     spacesCount: "30+ Spaces",
     properties: [
       {
@@ -263,7 +263,7 @@ const DEFAULT_CATEGORIES: WorkspaceCategory[] = [
     title: "100+ Seats",
     seatRange: "100+ Seats",
     description: "Enterprise scale multi-floor managed offices and dedicated building blocks.",
-    image: "/images/findyouridealspace/5.jpg",
+    image: "/images/findyouridealspace/5.webp",
     spacesCount: "25+ Spaces",
     properties: [
       {
@@ -304,7 +304,7 @@ const DEFAULT_CATEGORIES: WorkspaceCategory[] = [
     title: "Corporate Office",
     seatRange: "Custom / 150+ Seats",
     description: "Grade A corporate headquarters with custom fit-outs, boardrooms & private terraces.",
-    image: "/images/findyouridealspace/6.jpg",
+    image: "/images/findyouridealspace/6.webp",
     spacesCount: "20+ Spaces",
     properties: [
       {
@@ -643,7 +643,7 @@ export default function WorkspaceCategories({
                     <div className="w-full h-full rounded-full overflow-hidden relative bg-[#f5f2eb]">
                       <Image
                         src={cat.image}
-                        alt={cat.title}
+                        alt={`${cat.title} - Office Space in Noida`}
                         fill
                         sizes="(max-width: 640px) 33vw, (max-width: 1024px) 25vw, 16vw"
                         className="object-cover object-center group-hover:scale-110 transition-transform duration-700 ease-out"
@@ -767,7 +767,7 @@ export default function WorkspaceCategories({
                     <div className="relative w-full h-32 sm:h-34 bg-[#1a1816] overflow-hidden">
                       <Image
                         src={prop.image}
-                        alt={prop.title}
+                        alt={`${prop.title} - Office Space in Noida`}
                         fill
                         sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                         className="object-cover transition-transform duration-500 group-hover:scale-105"

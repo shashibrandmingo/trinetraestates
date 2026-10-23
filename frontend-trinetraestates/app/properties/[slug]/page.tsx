@@ -47,7 +47,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     doc.imageUrl || doc.thumbnail || doc.images?.[0]?.url || "";
   const imageUrl =
     resolvePropertyImage(rawImage) ||
-    "https://trinetraestates.com/images/bgbanners/herobanner.png";
+    "https://trinetraestates.com/images/bgbanners/herobanner.webp";
 
   return {
     title: seoTitle,
@@ -107,7 +107,7 @@ export default async function PropertyDetailPage({ params }: PageProps) {
         url: `https://trinetraestates.com/properties/${slug}`,
         image:
           resolvePropertyImage(rawImage) ||
-          "https://trinetraestates.com/images/bgbanners/herobanner.png",
+          "https://trinetraestates.com/images/bgbanners/herobanner.webp",
         offers: {
           "@type": "Offer",
           price: doc.price || "On Request",

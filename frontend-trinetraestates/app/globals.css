@@ -408,7 +408,7 @@ h6, .heading-h6 {
  * ============================================================================
  */
 .footer-banner-bg {
-  background-image: url('/images/bgbanners/footermobilebanner.png');
+  background-image: url('/images/bgbanners/footermobilebanner.webp');
   background-repeat: no-repeat;
   background-position: center bottom;
   background-size: cover;
@@ -416,7 +416,7 @@ h6, .heading-h6 {
 
 @media (min-width: 768px) {
   .footer-banner-bg {
-    background-image: url('/images/bgbanners/footer%20bg.png');
+    background-image: url('/images/bgbanners/footer%20bg.webp');
     background-position: center center;
     background-size: 100% 100%;
   }

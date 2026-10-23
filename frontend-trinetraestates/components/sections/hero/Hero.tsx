@@ -371,7 +371,7 @@ export default function Hero() {
       <section
         className="relative z-30 min-h-screen flex items-center bg-no-repeat bg-cover bg-center"
         style={{
-          backgroundImage: "url('/images/bgbanners/herobanner.png')",
+          backgroundImage: "url('/images/bgbanners/herobanner.webp')",
           backgroundColor: "var(--color-bg-dark)",
         }}
       >
@@ -399,7 +399,7 @@ export default function Hero() {
 
               {/* Main H1 Heading (2 Lines — Luxury & Crisp) */}
               <h1 className="font-heading text-[30px] sm:text-[42px] lg:text-[50px] font-medium leading-[1.16] text-white max-w-3xl">
-                Office Space for Rent in{" "}
+                Office Space in{" "}
                 <span className="text-gold font-normal">Noida</span>
               </h1>
 
@@ -902,7 +902,7 @@ export default function Hero() {
                               {prop.image ? (
                                 <Image
                                   src={prop.image}
-                                  alt={prop.title}
+                                  alt={`${prop.title} - Office Space in Noida`}
                                   fill
                                   sizes="50px"
                                   className="object-cover group-hover:scale-105 transition-transform duration-300"

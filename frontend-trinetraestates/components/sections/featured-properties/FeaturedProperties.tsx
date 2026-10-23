@@ -526,7 +526,7 @@ export default function FeaturedProperties({
                         {prop.image ? (
                           <Image
                             src={prop.image}
-                            alt={prop.title}
+                            alt={`${prop.title} - Office Space in Noida`}
                             fill
                             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
                             className="object-cover transition-transform duration-500 group-hover:scale-105"

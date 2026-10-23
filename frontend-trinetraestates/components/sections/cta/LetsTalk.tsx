@@ -81,8 +81,8 @@ export default function LetsTalk({
                 {/* Building Asset */}
                 <div className="relative w-full h-full flex items-center justify-center">
                   <Image
-                    src="/images/letstalk/LET'S TALK.png"
-                    alt="Modern Corporate Commercial Building in Noida"
+                    src="/images/letstalk/LET'S TALK.webp"
+                    alt="Office Space in Noida - Trinetra Estates Grade-A Commercial Tower"
                     fill
                     sizes="(max-width: 640px) 95vw, (max-width: 1024px) 50vw, 35vw"
                     className="object-contain object-bottom sm:object-center drop-shadow-md scale-95 sm:scale-100"
@@ -122,8 +122,8 @@ export default function LetsTalk({
                 <div className="flex -space-x-2.5 overflow-hidden">
                   <div className="inline-block h-8 w-8 sm:h-8.5 sm:w-8.5 rounded-full ring-2 ring-white overflow-hidden relative bg-neutral-200 shadow-sm">
                     <Image
-                      src="/images/sectors/sector-62.jpg"
-                      alt="Commercial Property 1"
+                      src="/images/sectors/sector-62.webp"
+                      alt="Office Space in Noida Sector 62 Commercial Hub"
                       fill
                       sizes="36px"
                       className="object-cover"
@@ -131,8 +131,8 @@ export default function LetsTalk({
                   </div>
                   <div className="inline-block h-8 w-8 sm:h-8.5 sm:w-8.5 rounded-full ring-2 ring-white overflow-hidden relative bg-neutral-200 shadow-sm">
                     <Image
-                      src="/images/sectors/sector-142.jpg"
-                      alt="Commercial Property 2"
+                      src="/images/sectors/sector-142.webp"
+                      alt="Office Space in Noida Sector 142 Expressway"
                       fill
                       sizes="36px"
                       className="object-cover"
@@ -140,8 +140,8 @@ export default function LetsTalk({
                   </div>
                   <div className="inline-block h-8 w-8 sm:h-8.5 sm:w-8.5 rounded-full ring-2 ring-white overflow-hidden relative bg-neutral-200 shadow-sm">
                     <Image
-                      src="/images/sectors/sector-18.jpg"
-                      alt="Commercial Property 3"
+                      src="/images/sectors/sector-18.webp"
+                      alt="Office Space in Noida Sector 18 Central Business District"
                       fill
                       sizes="36px"
                       className="object-cover"

@@ -70,8 +70,8 @@ export default function Footer() {
                 aria-label="Trinetra Estates Home"
               >
                 <Image
-                  src="/images/logo/Trinetra Estates logo.png"
-                  alt="Trinetra Estates"
+                  src="/images/logo/Trinetra Estates logo.webp"
+                  alt="Trinetra Estates - Office Space for Rent in Noida Commercial Real Estate"
                   width={220}
                   height={60}
                   unoptimized
@@ -80,9 +80,7 @@ export default function Footer() {
               </a>
 
               <p className="font-heading italic text-white/90 text-[13.5px] sm:text-[15px] leading-snug sm:leading-relaxed max-w-xs">
-                Spaces for People.
-                <br />
-                Possibilities for a{" "}
+                Premium commercial <strong>Office Space for Rent in Noida</strong>. Spaces for People, Possibilities for a{" "}
                 <span className="text-gold font-normal">Bigger Tomorrow.</span>
               </p>
 
@@ -313,6 +311,48 @@ export default function Footer() {
               )}
             </div>
 
+          </div>
+        </div>
+      </div>
+
+      {/* ═══════════════════════════════════════════════════════════════
+          SEO TRENDING SEARCHES & KEYWORD CLOUD (NOIDA & TRINETRA ESTATES)
+          ═══════════════════════════════════════════════════════════════ */}
+      <div className="relative z-10 py-5 border-t border-white/10 text-xs">
+        <div className="site-container">
+          <div className="flex items-center gap-2 mb-3">
+            <span className="text-[11px] font-bold uppercase tracking-[0.16em] text-[var(--color-gold)] font-sans">
+              Trending Office Searches in Noida
+            </span>
+            <span className="inline-block w-8 h-[1px] bg-[var(--color-gold)]/40" />
+          </div>
+          <div className="flex flex-wrap gap-2 text-[12px] text-white/70">
+            {[
+              "Office Space for Rent in Noida",
+              "Office Space in Noida",
+              "Trinetra Estates Noida",
+              "Commercial Office Space in Noida",
+              "Office Space for Rent in Sector 62 Noida",
+              "Office Space for Rent in Sector 63 Noida",
+              "Office Space in Sector 132 Noida",
+              "Office Space in Sector 135 Noida",
+              "Office Space in Sector 142 Noida Expressway",
+              "Corporate Office Space in Sector 125 Noida",
+              "Fully Furnished Office Space in Noida",
+              "Plug and Play Office Space in Noida",
+              "Small Office Space for Startups in Noida",
+              "Ready to Move Commercial Space in Noida",
+              "Bare Shell Office Space Lease in Noida",
+              "Office Space near Noida Metro Station",
+              "Zero Brokerage Office Space in Noida",
+            ].map((kw, i) => (
+              <span
+                key={i}
+                className="px-2.5 py-1 rounded-md bg-white/[0.04] hover:bg-[var(--color-gold)]/20 border border-white/10 hover:border-[var(--color-gold)]/50 hover:text-white transition-all text-left cursor-default"
+              >
+                {kw}
+              </span>
+            ))}
           </div>
         </div>
       </div>

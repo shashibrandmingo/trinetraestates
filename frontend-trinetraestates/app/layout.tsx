@@ -14,14 +14,14 @@ const poppins = Poppins({
 export const metadata: Metadata = {
   metadataBase: new URL("https://trinetraestates.com"),
   title: {
-    default: "Office Space for Rent in Noida | Commercial Office Space & Leasing | Trinetra Estates",
+    default: "Office Space in Noida | Commercial Office Space & Leasing | Trinetra Estates",
     template: "%s | Trinetra Estates Noida",
   },
   description:
-    "Find verified office space for rent in Noida with Trinetra Estates. Explore fully furnished, plug-and-play, IT corporate offices & bare-shell spaces in Sector 62, 63, 132, 135, 142 & Noida Expressway. 0% brokerage options.",
+    "Find verified office space in Noida with Trinetra Estates. Explore fully furnished, plug-and-play, IT corporate offices & bare-shell spaces in Sector 62, 63, 132, 135, 142 & Noida Expressway. 0% brokerage options.",
   keywords: [
-    "office space for rent in Noida",
     "office space in Noida",
+    "office space for rent in Noida",
     "office space for lease in Noida",
     "commercial office space in Noida",
     "commercial property for rent in Noida",
@@ -69,28 +69,28 @@ export const metadata: Metadata = {
     google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || undefined,
   },
   openGraph: {
-    title: "Office Space for Rent in Noida | Commercial Office Space & Leasing | Trinetra Estates",
+    title: "Office Space in Noida | Commercial Office Space & Leasing | Trinetra Estates",
     description:
-      "Find 500+ premium, verified commercial office spaces for rent across Noida Sector 62, 132, 142 & Expressway. Fully furnished & plug-and-play offices with 0% brokerage.",
+      "Find 500+ premium, verified commercial office spaces across Noida Sector 62, 132, 142 & Expressway. Fully furnished & plug-and-play offices with 0% brokerage.",
     url: "https://trinetraestates.com",
     siteName: "Trinetra Estates",
     locale: "en_IN",
     type: "website",
     images: [
       {
-        url: "/images/bgbanners/herobanner.png",
+        url: "/images/bgbanners/herobanner.webp",
         width: 1200,
         height: 630,
-        alt: "Office Space for Rent in Noida - Trinetra Estates",
+        alt: "Office Space in Noida - Trinetra Estates",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Office Space for Rent in Noida | Commercial Office Space & Leasing | Trinetra Estates",
+    title: "Office Space in Noida | Commercial Office Space & Leasing | Trinetra Estates",
     description:
       "Find 500+ premium, verified commercial office spaces for rent across Noida Sector 62, 132, 142 & Expressway.",
-    images: ["/images/bgbanners/herobanner.png"],
+    images: ["/images/bgbanners/herobanner.webp"],
     creator: "@trinetraestate",
   },
   robots: {
@@ -129,8 +129,8 @@ const organizationSchema = {
       name: "Trinetra Estates",
       alternateName: "Trinetra Estates Commercial Real Estate Noida",
       url: "https://trinetraestates.com",
-      logo: "https://trinetraestates.com/images/logo/logo.png",
-      image: "https://trinetraestates.com/images/bgbanners/herobanner.png",
+      logo: "https://trinetraestates.com/images/logo/logo.webp",
+      image: "https://trinetraestates.com/images/bgbanners/herobanner.webp",
       description:
         "Premier commercial real estate agency offering verified fully furnished, bare-shell, and coworking office spaces for rent across Noida Sector 62, 132, 142, and Expressway corridors.",
       telephone: "+91 99999 01196",

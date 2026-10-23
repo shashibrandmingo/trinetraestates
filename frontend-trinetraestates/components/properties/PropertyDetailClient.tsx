@@ -521,7 +521,7 @@ export default function PropertyDetailClient({
                     <Image
                       key={activeGalleryIndex}
                       src={galleryImages[activeGalleryIndex % totalImages]}
-                      alt={`${title} - Photo ${activeGalleryIndex + 1}`}
+                      alt={`${title} - Office Space in Noida Photo ${activeGalleryIndex + 1}`}
                       fill
                       priority
                       sizes="(max-width: 1024px) 100vw, 66vw"
@@ -594,7 +594,7 @@ export default function PropertyDetailClient({
                         >
                           <Image
                             src={thumbUrl}
-                            alt={`${title} Preview ${targetIdx + 1}`}
+                            alt={`${title} - Office Space in Noida Preview ${targetIdx + 1}`}
                             fill
                             className="object-cover group-hover:scale-105 transition-transform duration-500"
                           />
@@ -743,7 +743,7 @@ export default function PropertyDetailClient({
                         <>
                           <Image
                             src={galleryImages[activeGalleryIndex % totalImages] || galleryImages[0]}
-                            alt={title}
+                            alt={`${title} - Commercial Office Space in Noida`}
                             fill
                             className="object-cover"
                           />
@@ -1171,8 +1171,8 @@ export default function PropertyDetailClient({
               {/* Background Image with Balanced Overlay */}
               <div className="absolute inset-0 z-0">
                 <Image
-                  src="/images/card-cta/card-cta.png"
-                  alt="Find Office Space"
+                  src="/images/card-cta/card-cta.webp"
+                  alt="Office Space in Noida - Trinetra Estates Commercial Property Advisory"
                   fill
                   className="object-cover object-center"
                   sizes="(max-width: 1200px) 100vw, 1200px"
@@ -1237,7 +1237,7 @@ export default function PropertyDetailClient({
                         {simProp.image ? (
                           <Image
                             src={simProp.image}
-                            alt={simProp.title}
+                            alt={`${simProp.title} - Office Space in Noida`}
                             fill
                             className="object-cover group-hover:scale-105 transition-transform duration-500"
                           />
@@ -1343,7 +1343,7 @@ export default function PropertyDetailClient({
             <Image
               key={activeGalleryIndex}
               src={galleryImages[activeGalleryIndex % totalImages]}
-              alt={`${title} Fullscreen`}
+              alt={`${title} - Office Space in Noida Fullscreen`}
               fill
               className="object-contain animate-in zoom-in-95 duration-200"
             />

@@ -19,56 +19,56 @@ const ALL_LOCATIONS: LocationItem[] = [
     name: "Sector 62",
     sectorNumber: "62",
     badge: "MOST DEMANDED",
-    image: "/images/sectors/sector-62.jpg",
+    image: "/images/sectors/sector-62.webp",
     spacesCount: "120+ Spaces",
   },
   {
     id: "sec-63",
     name: "Sector 63",
     sectorNumber: "63",
-    image: "/images/sectors/sector-63.jpg",
+    image: "/images/sectors/sector-63.webp",
     spacesCount: "85+ Spaces",
   },
   {
     id: "sec-136",
     name: "Sector 136",
     sectorNumber: "136",
-    image: "/images/sectors/sector-136.jpg",
+    image: "/images/sectors/sector-136.webp",
     spacesCount: "65+ Spaces",
   },
   {
     id: "sec-132",
     name: "Sector 132",
     sectorNumber: "132",
-    image: "/images/sectors/sector-132.jpg",
+    image: "/images/sectors/sector-132.webp",
     spacesCount: "70+ Spaces",
   },
   {
     id: "sec-142",
     name: "Sector 142",
     sectorNumber: "142",
-    image: "/images/sectors/sector-142.jpg",
+    image: "/images/sectors/sector-142.webp",
     spacesCount: "55+ Spaces",
   },
   {
     id: "sec-125",
     name: "Sector 125",
     sectorNumber: "125",
-    image: "/images/sectors/sector-125.jpg",
+    image: "/images/sectors/sector-125.webp",
     spacesCount: "50+ Spaces",
   },
   {
     id: "sec-18",
     name: "Sector 18",
     sectorNumber: "18",
-    image: "/images/sectors/sector-18.jpg",
+    image: "/images/sectors/sector-18.webp",
     spacesCount: "90+ Spaces",
   },
   {
     id: "sec-144",
     name: "Sector 144",
     sectorNumber: "144",
-    image: "/images/sectors/sector-144.jpg",
+    image: "/images/sectors/sector-144.webp",
     spacesCount: "45+ Spaces",
   },
 ];
@@ -199,7 +199,7 @@ export default function PopularLocalities() {
               <div className="relative w-full flex-1 overflow-hidden">
                 <Image
                   src={loc.image}
-                  alt={loc.name}
+                  alt={`Office Space in Noida ${loc.name} - Commercial IT Workspaces & Towers`}
                   fill
                   sizes="20vw"
                   className="object-cover object-center group-hover:scale-108 transition-transform duration-700 ease-out"
@@ -259,7 +259,7 @@ export default function PopularLocalities() {
                 <div className="relative w-full flex-1 overflow-hidden">
                   <Image
                     src={loc.image}
-                    alt={loc.name}
+                    alt={`Office Space in Noida ${loc.name} - Commercial IT Workspaces & Towers`}
                     fill
                     sizes="(max-width: 640px) 50vw, 33vw"
                     className="object-cover object-center"

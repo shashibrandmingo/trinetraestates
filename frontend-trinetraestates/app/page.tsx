@@ -7,6 +7,7 @@ import FeaturedProperties from "@/components/sections/featured-properties/Featur
 import WhyChooseUs from "@/components/sections/why-choose-us/WhyChooseUs";
 import GetInTouch from "@/components/sections/cta/GetInTouch";
 import LetsTalk from "@/components/sections/cta/LetsTalk";
+import FaqSection from "@/components/sections/faq/FaqSection";
 import Footer from "@/components/common/Footer";
 
 // FAQ Structured Data Schema for Rich Snippets on Google Search
@@ -93,6 +94,9 @@ export default function Home() {
 
       {/* ── LET'S TALK / FIND A SPACE BANNER SECTION ── */}
       <LetsTalk />
+
+      {/* ── FAQ SECTION (SEO & Voice Search Rich Results) ── */}
+      <FaqSection />
 
       {/* ── Creative Luxury Footer ── */}
       <Footer />

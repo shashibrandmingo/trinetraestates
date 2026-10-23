@@ -127,8 +127,8 @@ export default function Navbar() {
               aria-label="Trinetra Estates Home"
             >
               <Image
-                src="/images/logo/Trinetra Estates logo.png"
-                alt="Trinetra Estates"
+                src="/images/logo/Trinetra Estates logo.webp"
+                alt="Trinetra Estates - Office Space for Rent in Noida Commercial Real Estate"
                 width={240}
                 height={80}
                 priority
@@ -236,8 +236,8 @@ export default function Navbar() {
             {/* Drawer header with logo & close */}
             <div className="flex items-center justify-between px-5 pt-5 pb-4 border-b border-[rgba(10,1,0,0.06)] bg-white">
               <Image
-                src="/images/logo/Trinetra Estates logo.png"
-                alt="Trinetra Estates"
+                src="/images/logo/Trinetra Estates logo.webp"
+                alt="Trinetra Estates - Office Space for Rent in Noida Commercial Real Estate"
                 width={210}
                 height={70}
                 unoptimized

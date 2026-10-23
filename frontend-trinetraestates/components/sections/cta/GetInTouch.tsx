@@ -39,8 +39,8 @@ export default function GetInTouch() {
             {/* Main Image Container — dynamically stretches to match right form height */}
             <div className="relative w-full flex-1 min-h-[480px] sm:min-h-[540px] lg:min-h-[610px] rounded-tl-[48px] sm:rounded-tl-[60px] rounded-br-[48px] sm:rounded-br-[60px] rounded-tr-[16px] rounded-bl-[16px] overflow-hidden shadow-[0_12px_36px_rgba(0,0,0,0.1)] border border-black/[0.05]">
               <Image
-                src="/images/gateintuch/gateintuch.png"
-                alt="Modern commercial office space in Noida"
+                src="/images/gateintuch/gateintuch.webp"
+                alt="Office Space in Noida - Trinetra Estates Commercial Workspace Consultation"
                 fill
                 priority
                 sizes="(max-width: 1024px) 100vw, 50vw"

@@ -141,8 +141,8 @@ export default function AboutUs() {
               {/* Image Container with Luxury Arched Top-Left Corner */}
               <div className="relative rounded-2xl lg:rounded-3xl overflow-hidden shadow-[0_16px_40px_rgba(0,0,0,0.12)] border border-black/5 bg-[#f8f8f8]">
                 <Image
-                  src="/images/about/about.png"
-                  alt="Trinetra Estates Reception Office"
+                  src="/images/about/about.webp"
+                  alt="Office Space in Noida - Trinetra Estates Modern Commercial Reception & Workspaces"
                   width={800}
                   height={550}
                   unoptimized
