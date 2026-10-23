@@ -46,17 +46,18 @@ const isRealAdSense =
 export const metadata: Metadata = {
   metadataBase: siteUrl ? new URL(siteUrl) : new URL('https://officespaceinnoida.com'),
   title: {
-    default: 'Office Spaces in Noida | Noida Office Space for Rent & Lease',
+    default: 'Office Space in Noida | Commercial Office Space for Rent & Lease',
     template: '%s | Noida Office Spaces',
   },
   description:
-    'Find verified office spaces in Noida. Explore fully furnished, plug-and-play IT corporate offices & bare-shell spaces in Sector 62, 132, 135, 142 & Expressway.',
+    'Find verified office space in Noida for rent & lease. Explore fully furnished, plug & play IT corporate offices & bare-shell spaces in Sector 62, 132, 135 & Expressway.',
   keywords: [
+    'office space in noida',
+    'office space in noida for rent',
+    'commercial office space in noida',
     'office spaces in noida',
     'noida office space',
-    'office space in noida',
     'office space for rent in Noida',
-    'commercial office space in Noida',
     'office space for lease in Noida',
     'fully furnished office space in Noida',
     'office space available in Noida',
@@ -106,23 +107,23 @@ export const metadata: Metadata = {
     locale: 'en_IN',
     url: siteUrl || 'https://officespaceinnoida.com',
     siteName: 'Noida Office Spaces',
-    title: 'Office Spaces in Noida | Noida Office Space for Rent & Lease',
+    title: 'Office Space in Noida | Commercial Office Space for Rent & Lease',
     description:
-      'Find verified office spaces in Noida. Explore fully furnished, plug-and-play IT corporate offices & bare-shell spaces in Sector 62, 132, 135, 142 & Expressway.',
+      'Find verified office space in Noida for rent & lease. Explore fully furnished, plug & play IT corporate offices & bare-shell spaces in Sector 62, 132, 135 & Expressway.',
     images: [
       {
         url: '/images/bgbanners/hero.webp',
         width: 1200,
         height: 630,
-        alt: 'Office Spaces in Noida - Commercial Workspaces for Rent & Lease',
+        alt: 'Office Space in Noida - Commercial Workspaces for Rent & Lease',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Office Spaces in Noida | Noida Office Space for Rent & Lease',
+    title: 'Office Space in Noida | Commercial Office Space for Rent & Lease',
     description:
-      'Find verified office spaces in Noida. Fully furnished, plug-and-play & bare-shell corporate offices in Sector 62, 132, 135, 142 & Expressway.',
+      'Find verified office space in Noida for rent & lease. Fully furnished, plug & play corporate offices in Sector 62, 132, 135 & Expressway.',
     images: ['/images/bgbanners/hero.webp'],
   },
   alternates: {
@@ -155,7 +156,7 @@ const realEstateAgentSchema = {
     {
       '@type': 'RealEstateAgent',
       '@id': 'https://officespaceinnoida.com/#organization',
-      name: 'Noida Office Spaces',
+      name: 'Office Space in Noida',
       alternateName: 'Noida Office Spaces Commercial Real Estate',
       url: 'https://officespaceinnoida.com',
       logo: 'https://officespaceinnoida.com/images/logo/logo-white.png',
@@ -202,7 +203,7 @@ const realEstateAgentSchema = {
       '@type': 'WebSite',
       '@id': 'https://officespaceinnoida.com/#website',
       url: 'https://officespaceinnoida.com',
-      name: 'Noida Office Spaces',
+      name: 'Office Space in Noida',
       publisher: {
         '@id': 'https://officespaceinnoida.com/#organization',
       },

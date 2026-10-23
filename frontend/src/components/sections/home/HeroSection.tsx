@@ -39,7 +39,7 @@ export default function HeroSection({ onFormSubmit }: HeroSectionProps) {
       <div className="absolute inset-0 z-0 overflow-hidden">
         <img
           src="/images/bgbanners/hero.webp"
-          alt="Commercial Office Space for Rent in Noida - Modern Corporate Workspaces"
+          alt="Office Space in Noida - Verified Commercial Workspaces for Rent and Lease"
           className="w-full h-full object-cover object-center"
         />
         {/* Balanced luxury blue gradient overlay: smooth vertical gradient on mobile, horizontal on desktop */}
@@ -59,12 +59,12 @@ export default function HeroSection({ onFormSubmit }: HeroSectionProps) {
 
             {/* Main Title (H1) — High-Intent Primary SEO Target Keyword */}
             <h1 className="hero-title drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)] lg:drop-shadow-sm animate-fade-up delay-100">
-              Office Spaces in <span className="text-[var(--gold-bright)] drop-shadow-[0_2px_8px_rgba(0,0,0,0.7)]">Noida</span>
+              Office Space in <span className="text-[var(--gold-bright)] drop-shadow-[0_2px_8px_rgba(0,0,0,0.7)]">Noida</span>
             </h1>
 
             {/* Subtitle Description — Natural Secondary Keyword Variants */}
             <p className="hero-subtitle text-xs sm:text-sm md:text-[14px] !text-[var(--text-light)] leading-relaxed max-w-lg font-normal drop-shadow-[0_1px_3px_rgba(0,0,0,0.6)] lg:drop-shadow-sm animate-fade-up delay-200">
-              Find verified Noida office space for rent &amp; lease. Explore fully furnished, plug &amp; play, and commercial bare-shell workspaces across Sector 62, 132, 135, 142 &amp; Expressway.
+              Find verified office space in Noida for rent &amp; lease. Explore fully furnished, plug &amp; play, and commercial bare-shell workspaces across Sector 62, 132, 135, 142 &amp; Expressway.
             </p>
 
             {/* 4 Feature Badges */}
@@ -94,7 +94,7 @@ export default function HeroSection({ onFormSubmit }: HeroSectionProps) {
                 href="#office-spaces"
                 className="btn btn-gold px-6 sm:px-7 py-2.5 sm:py-3 text-xs sm:text-[13.5px] tracking-wide"
               >
-                <span>Explore Office Spaces</span>
+                <span>Explore Office Space in Noida</span>
                 <i
                   className="fa-solid fa-arrow-right text-[11.5px]"
                   aria-hidden="true"

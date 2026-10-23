@@ -168,7 +168,7 @@ export default function Footer() {
     { label: "Office Spaces", href: "#space-categories" },
     { label: "By Sector", href: "#office-spaces" },
     { label: "Why Choose Us", href: "#why-choose-us" },
-    { label: "Our Process", href: "#featured-spaces" },
+    { label: "FAQs", href: "#faq" },
     { label: "Contact Us", href: "#contact" },
   ];
 
@@ -199,7 +199,7 @@ export default function Footer() {
       <div className="absolute right-0 bottom-[54px] pointer-events-none z-0 select-none overflow-hidden hidden lg:flex items-end justify-end h-[300px] xl:h-[340px] 2xl:h-[370px] w-[380px] xl:w-[460px] 2xl:w-[520px]">
         <img
           src="/images/bgbanners/footer.png"
-          alt="Noida Skyline"
+          alt="Office Space in Noida - Skyline and Commercial Infrastructure"
           className="h-full w-auto object-contain object-right-bottom opacity-85"
         />
       </div>
@@ -212,14 +212,14 @@ export default function Footer() {
             <Link href="/" className="inline-block transition-transform hover:scale-[1.02] duration-200">
               <img
                 src="/images/logo/logo-white.png"
-                alt="Noida Office Spaces"
+                alt="Office Space in Noida - Commercial Workspaces for Rent & Lease Logo"
                 className="h-20 sm:h-24 md:h-[96px] w-auto object-contain"
               />
             </Link>
 
             <p className="text-[13.5px] text-[var(--text-light)] leading-relaxed max-w-sm sm:max-w-md lg:max-w-[240px]">
-              Helping businesses find the right workspaces in Noida. From startups
-              to enterprises, we create spaces for a brighter tomorrow.
+              Helping businesses find verified, premium <strong>Office Space in Noida</strong>. From startups
+              to enterprises, we create workspaces for a brighter tomorrow.
             </p>
 
             {/* Social Icons (Temporarily commented out until official social handles are available) */}
@@ -271,11 +271,11 @@ export default function Footer() {
               </ul>
             </div>
 
-            {/* Column 3: Office Spaces (Opens Global Requirement Form with Pre-Filled Space Type) */}
+            {/* Column 3: Office Spaces in Noida (Opens Global Requirement Form with Pre-Filled Space Type) */}
             <div className="lg:w-[15.5%] lg:px-5 lg:border-r border-[var(--footer-border)]">
               <div className="mb-3">
                 <span className="text-[12px] font-bold uppercase tracking-[0.14em] text-[var(--text-white)] block whitespace-nowrap">
-                  OFFICE SPACES
+                  OFFICE SPACES IN NOIDA
                 </span>
                 <span className="inline-block w-6 h-[2px] bg-[var(--gold)] mt-1.5 rounded-full" />
               </div>
@@ -338,7 +338,7 @@ export default function Footer() {
             </div>
 
             <p className="text-[13.5px] text-[var(--text-light)] leading-relaxed max-w-md lg:max-w-[310px]">
-              Get the latest office spaces, market insights and exclusive listings directly in your inbox.
+              Get the latest verified <strong>office space in Noida</strong>, commercial market insights, and exclusive listings directly in your inbox.
             </p>
 
             {/* Subscribe Form */}
@@ -402,19 +402,20 @@ export default function Footer() {
           </div>
           <div className="flex flex-wrap gap-2 text-[12px] text-[var(--text-light-muted)]">
             {[
+              "Office Space in Noida",
               "Office Space for Rent in Noida",
-              "Commercial Office Space Sector 62",
-              "Fully Furnished Office in Sector 63",
-              "Plug and Play Offices Noida Expressway",
-              "IT Corporate Office Space Sector 132",
-              "Managed Coworking Spaces Sector 135",
-              "Office Space for Rent Sector 142",
-              "Corporate Office Space Sector 125 & 126",
-              "Small Office Space for Startups Noida",
-              "Ready to Move Commercial Space Noida",
-              "Bare Shell Office Space Lease Noida",
+              "Commercial Office Space in Noida Sector 62",
+              "Fully Furnished Office Space in Noida Sector 63",
+              "Plug and Play Office Space in Noida Expressway",
+              "IT Corporate Office Space in Noida Sector 132",
+              "Managed Coworking Spaces in Noida Sector 135",
+              "Office Space for Rent in Noida Sector 142",
+              "Corporate Office Space in Noida Sector 125 & 126",
+              "Small Office Space for Startups in Noida",
+              "Ready to Move Commercial Office Space in Noida",
+              "Bare Shell Office Space Lease in Noida",
               "Office Space near Noida Metro Station",
-              "Zero Brokerage Office Rentals Noida",
+              "Zero Brokerage Office Space in Noida",
             ].map((kw, i) => (
               <button
                 key={i}
@@ -432,7 +433,7 @@ export default function Footer() {
         <div className="py-4.5 border-t border-[var(--footer-border)] text-xs text-[var(--text-light-muted)] flex flex-col md:flex-row items-center justify-between gap-4 text-center md:text-left">
           {/* Copyright */}
           <div className="order-2 md:order-1">
-            © {new Date().getFullYear()} Noida Office Spaces. All rights reserved.
+            © {new Date().getFullYear()} Office Space in Noida. All rights reserved.
           </div>
 
           {/* Policy Links */}

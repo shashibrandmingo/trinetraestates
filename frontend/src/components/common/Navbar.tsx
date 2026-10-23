@@ -44,7 +44,7 @@ export default function Navbar() {
             <div className="relative h-16 w-20 sm:h-20 sm:w-28 transition-transform duration-300 group-hover:scale-105">
               <Image
                 src="/brand-logo.png"
-                alt="Noida Office Spaces"
+                alt="Office Space in Noida - Commercial Workspaces for Rent & Lease"
                 fill
                 sizes="(max-width: 640px) 80px, 112px"
                 className="object-contain object-left scale-125 sm:scale-130 origin-left"

@@ -82,7 +82,7 @@ export default function WhyChooseUsSection() {
               isInView ? "animate-fade-up delay-200" : "opacity-0"
             }`}
           >
-            We go beyond just finding office spaces. We provide the right spaces, guidance and support to help your business thrive in Noida.
+            We provide verified commercial office space in Noida with expert leasing guidance, tailored workspace solutions, and 100% transparency to help your business thrive.
           </p>
         </div>
 

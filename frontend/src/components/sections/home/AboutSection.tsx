@@ -59,8 +59,8 @@ export default function AboutSection() {
                 isInView ? "animate-fade-up delay-100" : "opacity-0"
               }`}
             >
-              Redefining Workspaces <br />
-              <span className="text-[var(--gold)]">in Noida</span>
+              Premium Commercial <br />
+              <span className="text-[var(--gold)]">Office Space in Noida</span>
             </h2>
 
             {/* Descriptive Body Text */}
@@ -69,9 +69,7 @@ export default function AboutSection() {
                 isInView ? "animate-fade-up delay-200" : "opacity-0"
               }`}
             >
-              We specialize in providing premium office spaces across Noida for
-              businesses of every size. From startups to established enterprises,
-              we help you find the right space to work, grow and succeed.
+              We specialize in providing verified, ready-to-move office space in Noida for businesses of every size. From fully furnished plug-and-play corporate centers to bare-shell leasing across Sector 62, 132, 135 &amp; Expressway, we help you find the best office space in Noida to scale your enterprise.
             </p>
 
             {/* 4 Feature Points with Clean Responsive Dividers */}
@@ -132,7 +130,7 @@ export default function AboutSection() {
             >
               <img
                 src="/images/homepagesimage/about.webp"
-                alt="Noida Office Spaces Workspace & Reception"
+                alt="Office Space in Noida - Modern Corporate Reception & Premium Furnished Workspaces"
                 className="w-full h-[300px] sm:h-[400px] lg:h-[470px] xl:h-[490px] object-cover object-center transition-transform duration-700 group-hover:scale-102"
               />
 

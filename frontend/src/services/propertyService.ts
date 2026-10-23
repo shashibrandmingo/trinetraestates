@@ -1,6 +1,7 @@
 import { PropertyKPIStats, PropertyItem, PropertyFilterState } from '@/types/propertyFilter';
 import { initialPropertyList, defaultKPIStats } from '@/data/mockPropertiesList';
 import { getApiBaseUrl, getBackendHost } from '@/config/apiConfig';
+import { FeaturedPropertyItem } from '@/data/featuredPropertiesData';
 
 interface StatsCache {
   data: PropertyKPIStats;
@@ -127,6 +128,82 @@ export interface BackendOfficeDoc {
     notes?: string;
   };
   updatedAt?: string;
+}
+
+const BADGES = ["POPULAR", "READY TO MOVE", "PRIME LOCATION", "LATEST", "GRADE A", "PREMIUM"];
+const CURATED_IMAGES = [
+  "/images/sectors/sector-62.jpg",
+  "/images/properties/interior-1.jpg",
+  "/images/sectors/sector-142.jpg",
+  "/images/properties/interior-2.jpg",
+  "/images/sectors/sector-125.jpg",
+  "/images/sectors/sector-63.jpg",
+  "/images/sectors/sector-18.jpg",
+  "/images/sectors/sector-136.jpg",
+  "/images/sectors/sector-144.jpg",
+  "/images/sectors/sector-126.jpg",
+];
+
+export function mapBackendOfficeToItem(office: BackendOfficeDoc, idx: number): FeaturedPropertyItem {
+  const cleanTitle = (office.frontendTitle?.trim() || "Ithum Tower")
+    .replace(/\s*\(Copy\)+/gi, "")
+    .trim();
+
+  const rawSector = office.location?.sector || (office as any).sector || "Sector 62";
+  const sector = rawSector.trim();
+  const location = sector.toLowerCase().includes("noida") ? sector : `${sector}, Noida`;
+
+  const areaNum = Number(
+    office.areaSqFt || office.builtUpAreaSqFt || office.carpetAreaSqFt || 1000
+  );
+  const areaFormatted = `${areaNum.toLocaleString("en-IN")} Sq. Ft.`;
+
+  const rawWorkstations = office.workstations;
+  const workstationsText =
+    typeof rawWorkstations === "number" && rawWorkstations > 0
+      ? `${rawWorkstations} Workstations`
+      : `${Math.max(4, Math.round(areaNum / 65))} Workstations`;
+
+  const rawCabins = office.cabins;
+  const cabinsText =
+    typeof rawCabins === "number"
+      ? rawCabins === 0
+        ? "0 Cabins"
+        : `${rawCabins} ${rawCabins === 1 ? "Cabin" : "Cabins"}`
+      : `${Math.max(1, Math.round(areaNum / 1200))} Cabins`;
+
+  const badge =
+    office.badge ||
+    (office.dataAge && office.dataAge !== "Ready to Move"
+      ? office.dataAge.toUpperCase()
+      : BADGES[idx % BADGES.length]);
+
+  let priceFormatted = "Price on Request";
+  const rent = office.monthlyRentInLakh || office.price;
+  if (rent && Number(rent) > 0) {
+    priceFormatted = `₹${Number(rent).toLocaleString("en-IN", {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 2,
+    })} L / mo`;
+  }
+
+  const rawImg = office.thumbnail || (office as any).imageUrl || office.images?.[0]?.url;
+  const resolved = resolvePropertyImage(rawImg);
+  const finalImg = resolved || CURATED_IMAGES[idx % CURATED_IMAGES.length];
+
+  return {
+    id: office._id || office.propertyId || idx + 1,
+    title: cleanTitle,
+    sector,
+    location,
+    badge,
+    area: areaFormatted,
+    workstations: workstationsText,
+    cabins: cabinsText,
+    price: priceFormatted,
+    image: finalImg,
+    slug: office.slug || (office.propertyId ? office.propertyId.toLowerCase() : `office-${idx + 1}`),
+  };
 }
 
 export const mapBackendToPropertyItem = (office: BackendOfficeDoc): PropertyItem => {

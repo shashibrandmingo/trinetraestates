@@ -340,6 +340,9 @@ export default function SpaceCategoriesSection({
           <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-[2.6rem] font-bold text-[var(--text-heading)] leading-tight tracking-tight mt-2.5">
             What are you <span className="text-[var(--gold)]">looking for?</span>
           </h2>
+          <p className="text-[13px] sm:text-[14.5px] text-[var(--text-body)] font-normal mt-2 leading-relaxed">
+            Find your ideal office space in Noida by category — from furnished corporate suites to bare-shell spaces.
+          </p>
         </div>
 
         {/* 6 Category Cards Grid Matching Screenshot Exact Layout */}
@@ -560,7 +563,7 @@ export default function SpaceCategoriesSection({
                       <div className="relative w-full h-28 sm:h-30 lg:h-32 bg-[var(--primary)] overflow-hidden">
                         <img
                           src={prop.image}
-                          alt={`${prop.title} - ${prop.location}`}
+                          alt={`Office Space in ${prop.location.includes("Noida") ? prop.location : `${prop.location}, Noida`} - ${prop.title}`}
                           onError={(e) => {
                             (e.currentTarget as HTMLImageElement).src = "/images/sectors/sector-62.jpg";
                           }}

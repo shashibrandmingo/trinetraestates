@@ -6,8 +6,10 @@ import Link from "next/link";
 import Container from "@/components/ui/Container";
 import { FeaturedPropertyItem } from "@/data/featuredPropertiesData";
 import { useInView } from "@/hooks/useInView";
-import { BackendOfficeDoc, resolvePropertyImage } from "@/services/propertyService";
+import { BackendOfficeDoc, resolvePropertyImage, mapBackendOfficeToItem } from "@/services/propertyService";
 import { getApiBaseUrl } from "@/config/apiConfig";
+
+export { mapBackendOfficeToItem };
 
 const API_BASE = getApiBaseUrl();
 
@@ -31,76 +33,6 @@ export interface FeaturedPropertiesSectionProps {
 }
 
 const PAGE_SIZE = 12;
-
-export function mapBackendOfficeToItem(office: BackendOfficeDoc, idx: number): FeaturedPropertyItem {
-  // Use frontend display title if provided, otherwise default to Ithum Tower
-  const cleanTitle = (office.frontendTitle?.trim() || "Ithum Tower")
-    .replace(/\s*\(Copy\)+/gi, "")
-    .trim();
-
-  // Sector & Location from real database document
-  const rawSector = office.location?.sector || (office as any).sector || "Sector 62";
-  const sector = rawSector.trim();
-  const location = sector.toLowerCase().includes("noida") ? sector : `${sector}, Noida`;
-
-  // Real Area calculation from DB
-  const areaNum = Number(
-    office.areaSqFt || office.builtUpAreaSqFt || office.carpetAreaSqFt || 1000
-  );
-  const areaFormatted = `${areaNum.toLocaleString("en-IN")} Sq. Ft.`;
-
-  // Real Workstations from DB (with fallback to area ratio only if missing/zero)
-  const rawWorkstations = office.workstations;
-  const workstationsText =
-    typeof rawWorkstations === "number" && rawWorkstations > 0
-      ? `${rawWorkstations} Workstations`
-      : `${Math.max(4, Math.round(areaNum / 65))} Workstations`;
-
-  // Real Cabins from DB
-  const rawCabins = office.cabins;
-  const cabinsText =
-    typeof rawCabins === "number"
-      ? rawCabins === 0
-        ? "0 Cabins"
-        : `${rawCabins} ${rawCabins === 1 ? "Cabin" : "Cabins"}`
-      : `${Math.max(1, Math.round(areaNum / 1200))} Cabins`;
-
-  // Luxury Badge
-  const badge =
-    office.badge ||
-    (office.dataAge && office.dataAge !== "Ready to Move"
-      ? office.dataAge.toUpperCase()
-      : BADGES[idx % BADGES.length]);
-
-  // Real Price from DB
-  let priceFormatted = "Price on Request";
-  const rent = office.monthlyRentInLakh || office.price;
-  if (rent && Number(rent) > 0) {
-    priceFormatted = `₹${Number(rent).toLocaleString("en-IN", {
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 2,
-    })} L / mo`;
-  }
-
-  // Real Image resolution via dynamic backend host
-  const rawImg = office.thumbnail || (office as any).imageUrl || office.images?.[0]?.url;
-  const resolved = resolvePropertyImage(rawImg);
-  const finalImg = resolved || CURATED_IMAGES[idx % CURATED_IMAGES.length];
-
-  return {
-    id: office._id || office.propertyId || idx + 1,
-    title: cleanTitle,
-    sector,
-    location,
-    badge,
-    area: areaFormatted,
-    workstations: workstationsText,
-    cabins: cabinsText,
-    price: priceFormatted,
-    image: finalImg,
-    slug: office.slug || (office.propertyId ? office.propertyId.toLowerCase() : `office-${idx + 1}`),
-  };
-}
 
 export default function FeaturedPropertiesSection({
   properties,
@@ -444,11 +376,11 @@ export default function FeaturedPropertiesSection({
             </div>
 
             <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-[2.65rem] font-bold text-[var(--text-heading)] leading-tight tracking-tight mt-1">
-              Premium Office Spaces <span className="text-[var(--gold)]">in Noida</span>
+              Premium Office Space <span className="text-[var(--gold)]">in Noida</span>
             </h2>
 
             <p className="text-[13px] sm:text-[14.5px] text-[var(--text-body)] font-normal mt-2 max-w-xl leading-relaxed">
-              Explore handpicked office spaces in prime locations, designed to help your business grow.
+              Explore verified commercial office space in Noida across prime IT sectors, designed to help your enterprise thrive.
             </p>
           </div>
 
@@ -694,7 +626,7 @@ export default function FeaturedPropertiesSection({
                     >
                       <img
                         src={property.image}
-                        alt={`Office Space in ${property.location}`}
+                        alt={`Office Space in ${property.location.includes("Noida") ? property.location : `${property.location}, Noida`} - ${property.title}`}
                         onError={(e) => {
                           (e.currentTarget as HTMLImageElement).src = "/images/sectors/sector-62.jpg";
                         }}
@@ -856,7 +788,7 @@ export default function FeaturedPropertiesSection({
           <div className="relative h-[78px] sm:h-[84px] lg:h-[88px] w-full max-w-[170px] lg:max-w-[210px] shrink-0 overflow-hidden rounded-l-[50px] sm:rounded-l-[60px] border-l-2 border-t border-b border-[var(--gold-border)]/70 hidden md:block">
             <img
               src="/images/properties/customized-space-banner.jpg"
-              alt="Customized Office Space Lounge"
+              alt="Customized Office Space in Noida - Luxury Furnished Lounge & Workspaces"
               className="w-full h-full object-cover object-center"
               style={{
                 maskImage: "linear-gradient(to right, black 65%, transparent 100%)",

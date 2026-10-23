@@ -7,6 +7,7 @@ import PopularSectorsSection from "@/components/sections/home/PopularSectorsSect
 import SpaceCategoriesSection from "@/components/sections/home/SpaceCategoriesSection";
 import FeaturedPropertiesSection from "@/components/sections/home/FeaturedPropertiesSection";
 import WhyChooseUsSection from "@/components/sections/home/WhyChooseUsSection";
+import FaqSection from "@/components/sections/home/FaqSection";
 import GetInTouchCtaSection from "@/components/sections/home/GetInTouchCtaSection";
 import ContactCtaSection from "@/components/sections/home/ContactCtaSection";
 import RequirementModal from "@/components/modals/RequirementModal";
@@ -84,7 +85,10 @@ export default function HomePageClient({ initialProperties = [] }: HomePageClien
       {/* 6. Why Choose Us Section ("More Than Spaces, A Partner in Your Growth") */}
       <WhyChooseUsSection />
 
-      {/* 7. Luxury Contact & Showcase Section (Form on Left + Image on Right) */}
+      {/* 7. Frequently Asked Questions (SEO Google Rich Snippet Accordion) */}
+      <FaqSection />
+
+      {/* 8. Luxury Contact & Showcase Section (Form on Left + Image on Right) */}
       <ContactCtaSection />
 
       {/* 8. Get In Touch Banner ("The right workspace today, a bigger tomorrow") */}

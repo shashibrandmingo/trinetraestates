@@ -85,7 +85,7 @@ export default function Navbar() {
           >
             <Image
               src="/images/logo/logo.png"
-              alt="Noida Office Spaces"
+              alt="Office Space in Noida - Commercial Workspaces for Rent & Lease"
               width={300}
               height={140}
               priority

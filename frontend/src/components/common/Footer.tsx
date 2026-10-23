@@ -13,7 +13,7 @@ export default function Footer() {
               <div className="relative w-10 h-10 overflow-hidden flex-shrink-0 bg-white/10 rounded-lg p-1">
                 <Image
                   src="/brand-logo.png"
-                  alt="Noida Office Spaces"
+                  alt="Office Space in Noida - Commercial Workspaces for Rent & Lease"
                   fill
                   sizes="40px"
                   className="object-contain"
@@ -29,7 +29,7 @@ export default function Footer() {
               </div>
             </div>
             <p className="text-sm text-slate-400 max-w-sm leading-relaxed">
-              Noida&apos;s premier commercial leasing consultancy providing verified corporate office spaces, IT parks, and tech hubs across Sector 62 and Noida Expressway.
+              Noida&apos;s premier commercial leasing consultancy providing verified corporate <strong>Office Space in Noida</strong>, IT parks, and tech hubs across Sector 62 and Noida Expressway.
             </p>
           </div>
 

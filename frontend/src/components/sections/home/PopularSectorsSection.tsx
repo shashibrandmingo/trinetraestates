@@ -14,7 +14,7 @@ export interface PopularSectorsSectionProps {
 
 export default function PopularSectorsSection({
   sectors = defaultSectors,
-  title = "Popular Sectors in Noida",
+  title = "Office Space in Noida by Sector",
   subtitle = null,
   onSelectSector,
 }: PopularSectorsSectionProps) {
@@ -49,8 +49,7 @@ export default function PopularSectorsSection({
             <p className="text-[13px] sm:text-[14.5px] md:text-[15px] text-[var(--text-body)] leading-relaxed font-normal mt-2">
               {subtitle || (
                 <>
-                  Discover prime business locations with world-class infrastructure <br className="hidden sm:inline" />
-                  and unmatched connectivity.
+                  Discover prime office space in Noida across top commercial hubs with world-class infrastructure and metro connectivity.
                 </>
               )}
             </p>
@@ -81,7 +80,7 @@ export default function PopularSectorsSection({
                   onSelectSector && onSelectSector(sector);
                 }
               }}
-              aria-label={`Explore office spaces in ${sector.name}`}
+              aria-label={`Explore office space in Noida ${sector.name}`}
               className={`group relative rounded-xl sm:rounded-2xl overflow-hidden shadow-[0_4px_16px_-4px_rgba(10,35,60,0.12)] border border-[var(--border-card)] hover:border-[var(--gold)]/50 block cursor-pointer transition-all duration-400 ease-out hover:-translate-y-1.5 hover:shadow-[0_18px_36px_-8px_rgba(10,35,60,0.28)] ${
                 isInView ? `animate-fade-up delay-${Math.min((idx + 1) * 75, 500)}` : "opacity-0"
               }`}
@@ -90,7 +89,7 @@ export default function PopularSectorsSection({
               <div className="relative w-full h-[175px] sm:h-[185px] lg:h-[195px] xl:h-[200px] overflow-hidden bg-[var(--primary)]">
                 <img
                   src={sector.image}
-                  alt={`${sector.name} - ${sector.tagline}`}
+                  alt={`Office Space in Noida ${sector.name} - ${sector.tagline}`}
                   className="w-full h-full object-cover object-center transition-transform duration-700 ease-out group-hover:scale-106"
                 />
 

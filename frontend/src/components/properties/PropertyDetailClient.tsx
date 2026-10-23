@@ -449,7 +449,7 @@ export default function PropertyDetailClient({
               <Image
                 key={activeGalleryIndex}
                 src={galleryImages[activeGalleryIndex % totalImages]}
-                alt={`${title} - Photo ${activeGalleryIndex + 1}`}
+                alt={`Office Space in ${sector.includes("Noida") ? sector : `${sector}, Noida`} - ${title} Photo ${activeGalleryIndex + 1}`}
                 fill
                 priority
                 sizes="(max-width: 1024px) 100vw, 66vw"
@@ -526,7 +526,7 @@ export default function PropertyDetailClient({
                   >
                     <Image
                       src={thumbUrl}
-                      alt={`${title} Preview ${targetIdx + 1}`}
+                      alt={`Office Space in ${sector.includes("Noida") ? sector : `${sector}, Noida`} - ${title} Preview ${targetIdx + 1}`}
                       fill
                       className="object-cover group-hover:scale-105 transition-transform duration-500"
                     />
@@ -687,7 +687,7 @@ export default function PropertyDetailClient({
                     <>
                       <Image
                         src={galleryImages[activeGalleryIndex % totalImages] || galleryImages[0]}
-                        alt={title}
+                        alt={`Office Space in ${sector.includes("Noida") ? sector : `${sector}, Noida`} - ${title}`}
                         fill
                         className="object-cover"
                       />
@@ -1151,7 +1151,7 @@ export default function PropertyDetailClient({
           <div className="absolute inset-0 z-0">
             <Image
               src="/images/ctaimage/ctaimage.webp"
-              alt="Office Space Noida"
+              alt="Office Space in Noida - Verified Corporate Leasing Advisory"
               fill
               className="object-cover object-center"
               sizes="(max-width: 1200px) 100vw, 1200px"
@@ -1236,7 +1236,7 @@ export default function PropertyDetailClient({
                     <div className="relative aspect-[16/10] w-full bg-[#0a233c] overflow-hidden flex items-center justify-center">
                       <Image
                         src={simImg}
-                        alt={simTitle}
+                        alt={`Office Space in ${simSector.includes("Noida") ? simSector : `${simSector}, Noida`} - ${simTitle}`}
                         fill
                         className="object-cover group-hover:scale-105 transition-transform duration-500"
                       />
@@ -1328,7 +1328,7 @@ export default function PropertyDetailClient({
             <Image
               key={activeGalleryIndex}
               src={galleryImages[activeGalleryIndex % totalImages]}
-              alt={`${title} Fullscreen`}
+              alt={`Office Space in ${sector.includes("Noida") ? sector : `${sector}, Noida`} - ${title} Fullscreen`}
               fill
               className="object-contain"
             />
