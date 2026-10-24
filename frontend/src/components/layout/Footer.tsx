@@ -151,6 +151,10 @@ export default function Footer() {
   const handleQuickLinkClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     if (href.startsWith("#")) {
       e.preventDefault();
+      if (typeof window !== "undefined" && window.location.pathname !== "/") {
+        router.push(`/${href}`);
+        return;
+      }
       if (href === "#home") {
         window.scrollTo({ top: 0, behavior: "smooth" });
         return;
@@ -167,6 +171,7 @@ export default function Footer() {
     { label: "About Us", href: "#about" },
     { label: "Office Spaces", href: "#space-categories" },
     { label: "By Sector", href: "#office-spaces" },
+    { label: "Blogs", href: "/blogs" },
     { label: "Why Choose Us", href: "#why-choose-us" },
     { label: "FAQs", href: "#faq" },
     { label: "Contact Us", href: "#contact" },
@@ -259,13 +264,22 @@ export default function Footer() {
               <ul className="space-y-2 text-[13px]">
                 {quickLinks.map((link) => (
                   <li key={link.label}>
-                    <a
-                      href={link.href}
-                      onClick={(e) => handleQuickLinkClick(e, link.href)}
-                      className="text-[var(--text-light-muted)] hover:text-[var(--text-white)] hover:translate-x-1.5 transition-all duration-200 inline-block cursor-pointer"
-                    >
-                      {link.label}
-                    </a>
+                    {link.href.startsWith("#") ? (
+                      <a
+                        href={link.href}
+                        onClick={(e) => handleQuickLinkClick(e, link.href)}
+                        className="text-[var(--text-light-muted)] hover:text-[var(--text-white)] hover:translate-x-1.5 transition-all duration-200 inline-block cursor-pointer"
+                      >
+                        {link.label}
+                      </a>
+                    ) : (
+                      <Link
+                        href={link.href}
+                        className="text-[var(--text-light-muted)] hover:text-[var(--text-white)] hover:translate-x-1.5 transition-all duration-200 inline-block cursor-pointer"
+                      >
+                        {link.label}
+                      </Link>
+                    )}
                   </li>
                 ))}
               </ul>

@@ -1,6 +1,7 @@
 import { MetadataRoute } from 'next';
 import { propertyService } from '@/services/propertyService';
 import { getSiteUrl, getApiBaseUrl } from '@/config/apiConfig';
+import { blogsData } from '@/data/blogsData';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const siteUrl = getSiteUrl();
@@ -11,6 +12,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: new Date(),
       changeFrequency: 'daily',
       priority: 1.0,
+    },
+    {
+      url: `${siteUrl}/blogs`,
+      lastModified: new Date(),
+      changeFrequency: 'daily',
+      priority: 0.9,
     },
     {
       url: `${siteUrl}/privacy`,
@@ -46,7 +53,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         priority: 0.85,
       }));
 
-    return [...staticRoutes, ...dynamicRoutes];
+    const blogRoutes: MetadataRoute.Sitemap = blogsData.map((b) => ({
+      url: `${siteUrl}/blogs/${b.slug}`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly',
+      priority: 0.85,
+    }));
+
+    return [...staticRoutes, ...dynamicRoutes, ...blogRoutes];
   } catch (err) {
     console.error('Sitemap generation error:', err);
     return staticRoutes;
